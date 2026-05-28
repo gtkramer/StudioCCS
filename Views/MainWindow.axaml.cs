@@ -5,35 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using StudioCCS.Controls;
 using StudioCCS.libCCS;
-// 'Grid' is ambiguous: StudioCCS.Grid (the GL grid renderer) shadows
-// Avalonia.Controls.Grid within this nested namespace, so alias the control.
-using AvGrid = Avalonia.Controls.Grid;
 
 namespace StudioCCS.Views
 {
     public partial class MainWindow : Window
     {
-        private TreeView _ccsTree;
-        private TreeView _sceneTree;
         private TreeViewItem _sceneAnimationNode;
-        private TextBox _logView;
-        private TextBlock _lblRenderMode;
-        private TextBlock _lblCamera;
-        private Panel _leftPanel;
-        private AvGrid _scenePanel;
-        private AvGrid _splitGrid;
-        private Control _treeSplitter;
-        private ToggleButton _tbtnPreview, _tbtnScene, _tbtnAll;
-        private GlViewport _glViewport;
-
         private bool _suppressModeEvents;
         private readonly DispatcherTimer _statusTimer;
 
@@ -45,35 +27,21 @@ namespace StudioCCS.Views
         {
             InitializeComponent();
 
-            _glViewport = this.FindControl<GlViewport>("glViewport");
-            _ccsTree = this.FindControl<TreeView>("ccsTree");
-            _sceneTree = this.FindControl<TreeView>("sceneTree");
-            _logView = this.FindControl<TextBox>("logView");
-            _lblRenderMode = this.FindControl<TextBlock>("lblRenderMode");
-            _lblCamera = this.FindControl<TextBlock>("lblCamera");
-            _leftPanel = this.FindControl<Panel>("leftPanel");
-            _scenePanel = this.FindControl<AvGrid>("scenePanel");
-            _splitGrid = this.FindControl<AvGrid>("splitGrid");
-            _treeSplitter = this.FindControl<Control>("treeSplitter");
-            _tbtnPreview = this.FindControl<ToggleButton>("tbtnPreview");
-            _tbtnScene = this.FindControl<ToggleButton>("tbtnScene");
-            _tbtnAll = this.FindControl<ToggleButton>("tbtnAll");
-
             // Scene animations root node.
             _sceneAnimationNode = new TreeViewItem { Header = "Animations" };
-            ((IList)_sceneTree.Items).Add(_sceneAnimationNode);
+            ((IList)sceneTree.Items).Add(_sceneAnimationNode);
 
             // Route Logger output to the log panel (marshalled onto the UI thread).
             Logger.SetOutput(AppendLog);
 
             // Initial render-option menu states (matches the original defaults).
-            SetCheck("miTextured", true);
-            SetCheck("miGrid", true);
-            SetCheck("miCollision", true);
-            SetCheck("miDummies", true);
-            SetCheck("miLights", true);
-            SetCheck("miAxisViewport", true);
-            SetCheck("miWorldCenter", true);
+            miTextured.IsChecked = true;
+            miGrid.IsChecked = true;
+            miCollision.IsChecked = true;
+            miDummies.IsChecked = true;
+            miLights.IsChecked = true;
+            miAxisViewport.IsChecked = true;
+            miWorldCenter.IsChecked = true;
             ApplyViewMenu();
 
             // Drag & drop CCS files onto the window.
@@ -83,7 +51,7 @@ namespace StudioCCS.Views
 
             // SMD export was a debug-only feature in the original (gated behind #if DEBUG).
 #if DEBUG
-            this.FindControl<MenuItem>("miDumpSmd").IsVisible = true;
+            miDumpSmd.IsVisible = true;
 #endif
 
             SetMode(Scene.SceneMode.Preview);
@@ -99,11 +67,6 @@ namespace StudioCCS.Views
             }
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-
         #region Logging
 
         private void AppendLog(string text, System.Drawing.Color color)
@@ -117,8 +80,8 @@ namespace StudioCCS.Views
             }
 
             Console.Write(text);
-            _logView.Text += text;
-            _logView.CaretIndex = _logView.Text.Length;
+            logView.Text += text;
+            logView.CaretIndex = logView.Text.Length;
         }
 
         #endregion
@@ -166,12 +129,12 @@ namespace StudioCCS.Views
                     }
                     if (file == null) continue;
 
-                    _glViewport.EnqueueGlJob(() =>
+                    glViewport.EnqueueGlJob(() =>
                     {
                         CcsTreeNode node = Scene.InitCCSFile(file);
                         if (node != null)
                         {
-                            Dispatcher.UIThread.Post(() => ((IList)_ccsTree.Items).Add(BuildTreeItem(node)));
+                            Dispatcher.UIThread.Post(() => ((IList)ccsTree.Items).Add(BuildTreeItem(node)));
                         }
                     });
                 }
@@ -229,8 +192,8 @@ namespace StudioCCS.Views
                 items.Add(MakeMenuItem("Unload", () =>
                 {
                     // DeInit() deletes GL resources, so run it on the render thread.
-                    _glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
-                    ((IList)_ccsTree.Items).Remove(item);
+                    glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
+                    ((IList)ccsTree.Items).Remove(item);
                 }));
                 items.Add(MakeMenuItem("View Info Report", () =>
                 {
@@ -321,7 +284,7 @@ namespace StudioCCS.Views
 
         private void OnCcsTreeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var item = _ccsTree.SelectedItem as TreeViewItem;
+            var item = ccsTree.SelectedItem as TreeViewItem;
             var tag = item?.Tag as TreeNodeTag;
             Scene.SelectedPreviewItemTag = tag;
             if (tag != null && tag.ObjectType == CCSFile.SECTION_ANIME)
@@ -339,18 +302,6 @@ namespace StudioCCS.Views
 
         #region View / render option menus
 
-        private void SetCheck(string name, bool value)
-        {
-            var mi = this.FindControl<MenuItem>(name);
-            if (mi != null) mi.IsChecked = value;
-        }
-
-        private bool IsChecked(string name)
-        {
-            var mi = this.FindControl<MenuItem>(name);
-            return mi != null && mi.IsChecked;
-        }
-
         private void OnRenderToggle(object sender, RoutedEventArgs e)
         {
             ApplyViewMenu();
@@ -358,22 +309,22 @@ namespace StudioCCS.Views
 
         private void ApplyViewMenu()
         {
-            Scene.DrawWireframe = IsChecked("miWireframe");
-            Scene.DrawVertexColors = IsChecked("miVertexColors");
-            Scene.DrawVertexNormals = IsChecked("miVertexNormals");
-            Scene.DrawTextures = IsChecked("miTextured");
-            Scene.BackfaceCull = IsChecked("miBackface");
-            Scene.DrawViewGrid = IsChecked("miGrid");
-            Scene.DrawCollisionMeshes = IsChecked("miCollision");
-            Scene.DrawDummyHelpers = IsChecked("miDummies");
-            Scene.DrawLightHelpers = IsChecked("miLights");
-            Scene.DrawViewAxis = IsChecked("miAxisViewport");
-            Scene.DrawWorldCenter = IsChecked("miWorldCenter");
+            Scene.DrawWireframe = miWireframe.IsChecked;
+            Scene.DrawVertexColors = miVertexColors.IsChecked;
+            Scene.DrawVertexNormals = miVertexNormals.IsChecked;
+            Scene.DrawTextures = miTextured.IsChecked;
+            Scene.BackfaceCull = miBackface.IsChecked;
+            Scene.DrawViewGrid = miGrid.IsChecked;
+            Scene.DrawCollisionMeshes = miCollision.IsChecked;
+            Scene.DrawDummyHelpers = miDummies.IsChecked;
+            Scene.DrawLightHelpers = miLights.IsChecked;
+            Scene.DrawViewAxis = miAxisViewport.IsChecked;
+            Scene.DrawWorldCenter = miWorldCenter.IsChecked;
         }
 
         private void OnAxisMovementToggle(object sender, RoutedEventArgs e)
         {
-            Scene.DefaultToAxisMovement = IsChecked("miAxisMovement");
+            Scene.DefaultToAxisMovement = miAxisMovement.IsChecked;
         }
 
         #endregion
@@ -383,28 +334,28 @@ namespace StudioCCS.Views
         private void OnModeClick(object sender, RoutedEventArgs e)
         {
             if (_suppressModeEvents) return;
-            if (sender == _tbtnPreview) SetMode(Scene.SceneMode.Preview);
-            else if (sender == _tbtnScene) SetMode(Scene.SceneMode.Scene);
-            else if (sender == _tbtnAll) SetMode(Scene.SceneMode.All);
+            if (sender == tbtnPreview) SetMode(Scene.SceneMode.Preview);
+            else if (sender == tbtnScene) SetMode(Scene.SceneMode.Scene);
+            else if (sender == tbtnAll) SetMode(Scene.SceneMode.All);
         }
 
         private void SetMode(Scene.SceneMode mode)
         {
             _suppressModeEvents = true;
-            _tbtnPreview.IsChecked = mode == Scene.SceneMode.Preview;
-            _tbtnScene.IsChecked = mode == Scene.SceneMode.Scene;
-            _tbtnAll.IsChecked = mode == Scene.SceneMode.All;
+            tbtnPreview.IsChecked = mode == Scene.SceneMode.Preview;
+            tbtnScene.IsChecked = mode == Scene.SceneMode.Scene;
+            tbtnAll.IsChecked = mode == Scene.SceneMode.All;
             _suppressModeEvents = false;
 
             Scene.SceneDisplay = mode;
 
             bool leftVisible = mode != Scene.SceneMode.All;
-            _leftPanel.IsVisible = leftVisible;
-            _treeSplitter.IsVisible = leftVisible;
-            _splitGrid.ColumnDefinitions[0].Width = leftVisible ? new GridLength(240) : new GridLength(0);
+            leftPanel.IsVisible = leftVisible;
+            treeSplitter.IsVisible = leftVisible;
+            splitGrid.ColumnDefinitions[0].Width = leftVisible ? new GridLength(240) : new GridLength(0);
 
-            _ccsTree.IsVisible = mode == Scene.SceneMode.Preview;
-            _scenePanel.IsVisible = mode == Scene.SceneMode.Scene;
+            ccsTree.IsVisible = mode == Scene.SceneMode.Preview;
+            scenePanel.IsVisible = mode == Scene.SceneMode.Scene;
         }
 
         #endregion
@@ -437,12 +388,12 @@ namespace StudioCCS.Views
         private void UpdateStatus()
         {
             ArcBallCamera cam = Scene.CurrentCamera();
-            _lblCamera.Text = string.Format(
+            lblCamera.Text = string.Format(
                 "Camera: Rotation: {0}, {1}, {2}, Target: {3}, {4}, {5}, Distance: {6}",
                 cam.Rotation.X, cam.Rotation.Y, cam.Rotation.Z,
                 cam.Target.X, cam.Target.Y, cam.Target.Z, cam.Distance);
 
-            _lblRenderMode.Text = RenderModeText();
+            lblRenderMode.Text = RenderModeText();
         }
 
         private string RenderModeText()

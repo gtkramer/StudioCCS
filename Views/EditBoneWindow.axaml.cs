@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using OpenTK.Mathematics;
@@ -23,40 +22,18 @@ namespace StudioCCS.Views
         public CCSClump OperatingClump = null;
         public CCSObject OperatingObject = null;
 
-        private TreeView _treeBones;
-        private TextBlock _lblBoneName;
-        private List<TextBox> _textBoxes;
-        private TextBox _txtPosX, _txtPosY, _txtPosZ;
-        private TextBox _txtRotX, _txtRotY, _txtRotZ;
-        private TextBox _txtScaleX, _txtScaleY, _txtScaleZ;
+        private readonly List<TextBox> _textBoxes;
 
         public EditBoneWindow()
         {
             InitializeComponent();
 
-            _treeBones = this.FindControl<TreeView>("treeBones");
-            _lblBoneName = this.FindControl<TextBlock>("lblBoneName");
-            _txtPosX = this.FindControl<TextBox>("txtPosX");
-            _txtPosY = this.FindControl<TextBox>("txtPosY");
-            _txtPosZ = this.FindControl<TextBox>("txtPosZ");
-            _txtRotX = this.FindControl<TextBox>("txtRotX");
-            _txtRotY = this.FindControl<TextBox>("txtRotY");
-            _txtRotZ = this.FindControl<TextBox>("txtRotZ");
-            _txtScaleX = this.FindControl<TextBox>("txtScaleX");
-            _txtScaleY = this.FindControl<TextBox>("txtScaleY");
-            _txtScaleZ = this.FindControl<TextBox>("txtScaleZ");
-
             _textBoxes = new List<TextBox>
             {
-                _txtPosX, _txtPosY, _txtPosZ,
-                _txtRotX, _txtRotY, _txtRotZ,
-                _txtScaleX, _txtScaleY, _txtScaleZ,
+                txtPosX, txtPosY, txtPosZ,
+                txtRotX, txtRotY, txtRotZ,
+                txtScaleX, txtScaleY, txtScaleZ,
             };
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
         }
 
         public void SetClump(CCSClump clump)
@@ -101,7 +78,7 @@ namespace StudioCCS.Views
             Debug.WriteLine(string.Format("BoneTree has {0} Nodes...", mainNodes.Count));
             foreach (var tmpNode in mainNodes)
             {
-                ((IList)_treeBones.Items).Add(tmpNode);
+                ((IList)treeBones.Items).Add(tmpNode);
             }
 
             Title = string.Format("Edit Bones for {0}...", clumpName);
@@ -152,7 +129,7 @@ namespace StudioCCS.Views
 
         private void OnBoneSelected(object sender, SelectionChangedEventArgs e)
         {
-            var tmpNode = _treeBones.SelectedItem as TreeViewItem;
+            var tmpNode = treeBones.SelectedItem as TreeViewItem;
             if (tmpNode == null) return;
             var tmpTag = tmpNode.Tag as BoneNodeTag;
             if (tmpTag != null)
@@ -170,20 +147,20 @@ namespace StudioCCS.Views
                     tmpScale = OperatingClump.PoseScales[OperatingObject.NodeID];
                 }
 
-                _txtPosX.Text = tmpPos.X.ToString();
-                _txtPosY.Text = tmpPos.Y.ToString();
-                _txtPosZ.Text = tmpPos.Z.ToString();
+                txtPosX.Text = tmpPos.X.ToString();
+                txtPosY.Text = tmpPos.Y.ToString();
+                txtPosZ.Text = tmpPos.Z.ToString();
 
                 float pi = 3.14159265f;
-                _txtRotX.Text = (tmpRot.X * 180.0f / pi).ToString();
-                _txtRotY.Text = (tmpRot.Y * 180.0f / pi).ToString();
-                _txtRotZ.Text = (tmpRot.Z * 180.0f / pi).ToString();
+                txtRotX.Text = (tmpRot.X * 180.0f / pi).ToString();
+                txtRotY.Text = (tmpRot.Y * 180.0f / pi).ToString();
+                txtRotZ.Text = (tmpRot.Z * 180.0f / pi).ToString();
 
-                _txtScaleX.Text = tmpScale.X.ToString();
-                _txtScaleY.Text = tmpScale.Y.ToString();
-                _txtScaleZ.Text = tmpScale.Z.ToString();
+                txtScaleX.Text = tmpScale.X.ToString();
+                txtScaleY.Text = tmpScale.Y.ToString();
+                txtScaleZ.Text = tmpScale.Z.ToString();
 
-                _lblBoneName.Text = OperatingFile.GetSubObjectName(OperatingObject.ObjectID);
+                lblBoneName.Text = OperatingFile.GetSubObjectName(OperatingObject.ObjectID);
             }
         }
 

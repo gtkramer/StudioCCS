@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
 namespace StudioCCS.Views
 {
@@ -10,14 +9,9 @@ namespace StudioCCS.Views
             InitializeComponent();
         }
 
-        private void InitializeComponent()
+        public void SetReportText(string text)
         {
-            AvaloniaXamlLoader.Load(this);
-        }
-
-        public void SetReportText(string reportText)
-        {
-            this.FindControl<TextBox>("reportText").Text = reportText;
+            reportText.Text = text;
         }
     }
 }
