@@ -17,7 +17,6 @@ namespace StudioCCS.Views
     public partial class MainWindow : Window
     {
         private readonly MainViewModel _vm = new MainViewModel();
-        private bool _suppressModeEvents;
         private readonly DispatcherTimer _statusTimer;
 
         public MainWindow() : this(null)
@@ -42,7 +41,14 @@ namespace StudioCCS.Views
             miDumpSmd.IsVisible = true;
 #endif
 
-            SetMode(Scene.SceneMode.Preview);
+            // The toolbar RadioButtons set _vm.Mode; mirror mode changes into the
+            // panel layout (and apply the initial layout, since the VM's default
+            // Mode is set before this handler is attached).
+            _vm.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.Mode)) ApplyModeLayout(_vm.Mode);
+            };
+            ApplyModeLayout(_vm.Mode);
 
             _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _statusTimer.Tick += (_, _) => _vm.RefreshCameraStatus();
@@ -292,24 +298,11 @@ namespace StudioCCS.Views
 
         #region Mode toolbar
 
-        private void OnModeClick(object sender, RoutedEventArgs e)
+        // The grouped RadioButtons drive _vm.Mode (which writes Scene.SceneDisplay);
+        // this only updates the panel layout, which can't bind cleanly because of the
+        // GridLength column collapse.
+        private void ApplyModeLayout(Scene.SceneMode mode)
         {
-            if (_suppressModeEvents) return;
-            if (sender == tbtnPreview) SetMode(Scene.SceneMode.Preview);
-            else if (sender == tbtnScene) SetMode(Scene.SceneMode.Scene);
-            else if (sender == tbtnAll) SetMode(Scene.SceneMode.All);
-        }
-
-        private void SetMode(Scene.SceneMode mode)
-        {
-            _suppressModeEvents = true;
-            tbtnPreview.IsChecked = mode == Scene.SceneMode.Preview;
-            tbtnScene.IsChecked = mode == Scene.SceneMode.Scene;
-            tbtnAll.IsChecked = mode == Scene.SceneMode.All;
-            _suppressModeEvents = false;
-
-            Scene.SceneDisplay = mode;
-
             bool leftVisible = mode != Scene.SceneMode.All;
             leftPanel.IsVisible = leftVisible;
             treeSplitter.IsVisible = leftVisible;

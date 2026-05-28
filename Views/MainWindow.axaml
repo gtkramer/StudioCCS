@@ -39,11 +39,11 @@
             </MenuItem>
         </Menu>
 
-        <!-- Mode toolbar -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4" Spacing="4">
-            <ToggleButton Name="tbtnPreview" Content="Preview" Click="OnModeClick" />
-            <ToggleButton Name="tbtnScene" Content="Scene" Click="OnModeClick" />
-            <ToggleButton Name="tbtnAll" Content="All" Click="OnModeClick" />
+        <!-- Mode toolbar: grouped radio buttons are mutually exclusive by design. -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4" Spacing="8">
+            <RadioButton GroupName="ViewMode" Content="Preview" IsChecked="{Binding IsPreviewMode, Mode=TwoWay}" />
+            <RadioButton GroupName="ViewMode" Content="Scene" IsChecked="{Binding IsSceneMode, Mode=TwoWay}" />
+            <RadioButton GroupName="ViewMode" Content="All" IsChecked="{Binding IsAllMode, Mode=TwoWay}" />
         </StackPanel>
 
         <!-- Status bar -->

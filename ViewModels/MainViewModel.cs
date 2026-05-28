@@ -32,6 +32,47 @@ namespace StudioCCS.ViewModels
             UpdateRenderModeStatus();
         }
 
+        #region Scene mode
+
+        // Single source of truth for the viewport mode. The three Is*Mode wrappers
+        // exist so the toolbar's grouped RadioButtons can two-way bind to bools; the
+        // RadioButton group handles mutual exclusion, and Mode writes through to Scene.
+        private Scene.SceneMode _mode = Scene.SceneMode.Preview;
+        public Scene.SceneMode Mode
+        {
+            get => _mode;
+            set
+            {
+                if (SetField(ref _mode, value))
+                {
+                    Scene.SceneDisplay = value;
+                    OnPropertyChanged(nameof(IsPreviewMode));
+                    OnPropertyChanged(nameof(IsSceneMode));
+                    OnPropertyChanged(nameof(IsAllMode));
+                }
+            }
+        }
+
+        public bool IsPreviewMode
+        {
+            get => Mode == Scene.SceneMode.Preview;
+            set { if (value) Mode = Scene.SceneMode.Preview; }
+        }
+
+        public bool IsSceneMode
+        {
+            get => Mode == Scene.SceneMode.Scene;
+            set { if (value) Mode = Scene.SceneMode.Scene; }
+        }
+
+        public bool IsAllMode
+        {
+            get => Mode == Scene.SceneMode.All;
+            set { if (value) Mode = Scene.SceneMode.All; }
+        }
+
+        #endregion
+
         #region Status bar
 
         private string _cameraStatus = "";
