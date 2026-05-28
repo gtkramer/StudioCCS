@@ -61,12 +61,16 @@ namespace StudioCCS
 		
 		private void Clamp()
 		{
-			if(Rotation.Y > 90.0f) Rotation.Y = 90.0f;
-			if(Rotation.Y < -90.0f) Rotation.Y = -90.0f;
+			// Stop just short of straight up/down. At exactly +/-90 deg the view
+			// direction aligns with the LookAt up-vector (+Y), the camera basis
+			// becomes degenerate, and the view/gizmo flip 180 deg (gimbal lock).
+			// Clamping below the pole keeps the turntable smooth and level.
+			if(Rotation.Y > 89.9f) Rotation.Y = 89.9f;
+			if(Rotation.Y < -89.9f) Rotation.Y = -89.9f;
 			//Waiting for this to bug up
 			if(Rotation.X > 360.0f) Rotation.X = 0.0f;
 			if(Rotation.X < 0) Rotation.X = 360.0f;
-			
+
 			if(Distance < 0.1f) Distance = 0.1f;
 		}
 		
