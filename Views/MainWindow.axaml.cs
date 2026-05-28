@@ -371,8 +371,8 @@ namespace StudioCCS.Views
         private void OnViewportPointerWheel(object sender, PointerWheelEventArgs e)
         {
             // Scene's zoom math is tuned for WinForms wheel units (~120 per notch);
-            // Avalonia reports ~1.0 per notch, so scale up to match.
-            Scene.MouseWheel((float)(e.Delta.Y * 120.0));
+            // Avalonia reports ~1.0 per notch. Negated so scrolling up zooms in.
+            Scene.MouseWheel((float)(e.Delta.Y * -120.0));
         }
 
         private void OnViewportKeyDown(object sender, KeyEventArgs e)
