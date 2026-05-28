@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 
 namespace StudioCCS
@@ -34,10 +34,12 @@ namespace StudioCCS
     }
 
     /// <summary>
-    /// List of child nodes that also accepts a bare string (creating a node),
-    /// mirroring System.Windows.Forms.TreeNodeCollection.Add(string).
+    /// Observable list of child nodes that also accepts a bare string (creating a
+    /// node), mirroring System.Windows.Forms.TreeNodeCollection.Add(string). It is
+    /// observable so that TreeViews bound to it update when nodes are added/removed
+    /// after the initial build (e.g. animations added to the scene tree).
     /// </summary>
-    public class CcsTreeNodeCollection : List<CcsTreeNode>
+    public class CcsTreeNodeCollection : ObservableCollection<CcsTreeNode>
     {
         public CcsTreeNode Add(string text)
         {

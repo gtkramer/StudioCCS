@@ -1,9 +1,19 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:StudioCCS.Controls"
+        xmlns:ccs="clr-namespace:StudioCCS"
+        xmlns:vm="clr-namespace:StudioCCS.ViewModels"
         x:Class="StudioCCS.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
         Width="1100" Height="740"
         Title="StudioCCS">
+
+    <Window.Resources>
+        <!-- Shared template for the CCS object tree and the scene animations tree. -->
+        <TreeDataTemplate x:Key="CcsNodeTemplate" x:DataType="ccs:CcsTreeNode" ItemsSource="{Binding Nodes}">
+            <TextBlock Text="{Binding Text}" />
+        </TreeDataTemplate>
+    </Window.Resources>
 
     <DockPanel>
         <!-- Menu -->
@@ -18,22 +28,22 @@
                 <MenuItem Header="Dump to .SMD..." Name="miDumpSmd" IsVisible="False" Click="OnDumpSmdClick" />
             </MenuItem>
             <MenuItem Header="_Options">
-                <MenuItem Header="Default to Axis Movement" Name="miAxisMovement" ToggleType="CheckBox" Click="OnAxisMovementToggle" />
+                <MenuItem Header="Default to Axis Movement" ToggleType="CheckBox" IsChecked="{Binding DefaultToAxisMovement, Mode=TwoWay}" />
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="Wireframe" Name="miWireframe" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Vertex Colors" Name="miVertexColors" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Vertex Normals" Name="miVertexNormals" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Textured" Name="miTextured" ToggleType="CheckBox" Click="OnRenderToggle" />
+                <MenuItem Header="Wireframe" ToggleType="CheckBox" IsChecked="{Binding Wireframe, Mode=TwoWay}" />
+                <MenuItem Header="Vertex Colors" ToggleType="CheckBox" IsChecked="{Binding VertexColors, Mode=TwoWay}" />
+                <MenuItem Header="Vertex Normals" ToggleType="CheckBox" IsChecked="{Binding VertexNormals, Mode=TwoWay}" />
+                <MenuItem Header="Textured" ToggleType="CheckBox" IsChecked="{Binding Textured, Mode=TwoWay}" />
                 <Separator />
-                <MenuItem Header="Backface Culling" Name="miBackface" ToggleType="CheckBox" Click="OnRenderToggle" />
+                <MenuItem Header="Backface Culling" ToggleType="CheckBox" IsChecked="{Binding BackfaceCull, Mode=TwoWay}" />
                 <Separator />
-                <MenuItem Header="Draw Grid" Name="miGrid" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Draw Collision Meshes" Name="miCollision" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Draw Dummies" Name="miDummies" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Draw Light Helpers" Name="miLights" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Draw Axis Marker (Viewport)" Name="miAxisViewport" ToggleType="CheckBox" Click="OnRenderToggle" />
-                <MenuItem Header="Draw Axis Marker (World Center)" Name="miWorldCenter" ToggleType="CheckBox" Click="OnRenderToggle" />
+                <MenuItem Header="Draw Grid" ToggleType="CheckBox" IsChecked="{Binding DrawGrid, Mode=TwoWay}" />
+                <MenuItem Header="Draw Collision Meshes" ToggleType="CheckBox" IsChecked="{Binding DrawCollisionMeshes, Mode=TwoWay}" />
+                <MenuItem Header="Draw Dummies" ToggleType="CheckBox" IsChecked="{Binding DrawDummies, Mode=TwoWay}" />
+                <MenuItem Header="Draw Light Helpers" ToggleType="CheckBox" IsChecked="{Binding DrawLightHelpers, Mode=TwoWay}" />
+                <MenuItem Header="Draw Axis Marker (Viewport)" ToggleType="CheckBox" IsChecked="{Binding DrawAxisViewport, Mode=TwoWay}" />
+                <MenuItem Header="Draw Axis Marker (World Center)" ToggleType="CheckBox" IsChecked="{Binding DrawWorldCenter, Mode=TwoWay}" />
             </MenuItem>
         </Menu>
 
@@ -47,8 +57,8 @@
         <!-- Status bar -->
         <Border DockPanel.Dock="Bottom" BorderBrush="#40808080" BorderThickness="0,1,0,0" Padding="6,3">
             <StackPanel Orientation="Horizontal" Spacing="20">
-                <TextBlock Name="lblRenderMode" Text="" />
-                <TextBlock Name="lblCamera" Text="" />
+                <TextBlock Text="{Binding RenderModeStatus}" />
+                <TextBlock Text="{Binding CameraStatus}" />
             </StackPanel>
         </Border>
 
@@ -56,9 +66,16 @@
         <Grid RowDefinitions="*,Auto,160">
             <Grid Grid.Row="0" Name="splitGrid" ColumnDefinitions="240,Auto,*">
                 <Panel Grid.Column="0" Name="leftPanel">
-                    <TreeView Name="ccsTree" SelectionChanged="OnCcsTreeSelectionChanged" />
+                    <TreeView Name="ccsTree"
+                              ItemsSource="{Binding CcsRoots}"
+                              ItemTemplate="{StaticResource CcsNodeTemplate}"
+                              SelectionChanged="OnCcsTreeSelectionChanged"
+                              ContextRequested="OnCcsTreeContextRequested" />
                     <Grid Name="scenePanel" IsVisible="False" RowDefinitions="*,Auto,*">
-                        <TreeView Grid.Row="0" Name="sceneTree" />
+                        <TreeView Grid.Row="0" Name="sceneTree"
+                                  ItemsSource="{Binding SceneRoots}"
+                                  ItemTemplate="{StaticResource CcsNodeTemplate}"
+                                  ContextRequested="OnSceneTreeContextRequested" />
                         <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" />
                         <Border Grid.Row="2" Background="#10808080">
                             <TextBlock Text="(properties)" Opacity="0.5" Margin="6" />

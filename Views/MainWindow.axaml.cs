@@ -10,12 +10,13 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using StudioCCS.libCCS;
+using StudioCCS.ViewModels;
 
 namespace StudioCCS.Views
 {
     public partial class MainWindow : Window
     {
-        private TreeViewItem _sceneAnimationNode;
+        private readonly MainViewModel _vm = new MainViewModel();
         private bool _suppressModeEvents;
         private readonly DispatcherTimer _statusTimer;
 
@@ -26,23 +27,10 @@ namespace StudioCCS.Views
         public MainWindow(string[] startupFiles)
         {
             InitializeComponent();
-
-            // Scene animations root node.
-            _sceneAnimationNode = new TreeViewItem { Header = "Animations" };
-            ((IList)sceneTree.Items).Add(_sceneAnimationNode);
+            DataContext = _vm;
 
             // Route Logger output to the log panel (marshalled onto the UI thread).
             Logger.SetOutput(AppendLog);
-
-            // Initial render-option menu states (matches the original defaults).
-            miTextured.IsChecked = true;
-            miGrid.IsChecked = true;
-            miCollision.IsChecked = true;
-            miDummies.IsChecked = true;
-            miLights.IsChecked = true;
-            miAxisViewport.IsChecked = true;
-            miWorldCenter.IsChecked = true;
-            ApplyViewMenu();
 
             // Drag & drop CCS files onto the window.
             DragDrop.SetAllowDrop(this, true);
@@ -57,7 +45,7 @@ namespace StudioCCS.Views
             SetMode(Scene.SceneMode.Preview);
 
             _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
-            _statusTimer.Tick += (_, _) => UpdateStatus();
+            _statusTimer.Tick += (_, _) => _vm.RefreshCameraStatus();
             _statusTimer.Start();
 
             // Optional files passed on the command line (e.g. "open with").
@@ -112,7 +100,7 @@ namespace StudioCCS.Views
             // Parse on a background thread so a large file doesn't freeze the UI or
             // stall the render loop. The GL upload (InitCCSFile) MUST run with the
             // context current, so it's enqueued onto the render callback; the
-            // resulting tree node is then marshalled back to the UI thread.
+            // resulting node is then added to the bound collection on the UI thread.
             Task.Run(() =>
             {
                 foreach (var fileName in paths)
@@ -134,7 +122,7 @@ namespace StudioCCS.Views
                         CcsTreeNode node = Scene.InitCCSFile(file);
                         if (node != null)
                         {
-                            Dispatcher.UIThread.Post(() => ((IList)ccsTree.Items).Add(BuildTreeItem(node)));
+                            Dispatcher.UIThread.Post(() => _vm.CcsRoots.Add(node));
                         }
                     });
                 }
@@ -164,36 +152,69 @@ namespace StudioCCS.Views
 
         #endregion
 
-        #region Tree building & context menus
+        #region Tree selection & context menus
 
-        private TreeViewItem BuildTreeItem(CcsTreeNode node)
+        private void OnCcsTreeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var item = new TreeViewItem { Header = node.Text, Tag = node.Tag };
-
-            if (node.Tag is TreeNodeTag tag)
+            var node = ccsTree.SelectedItem as CcsTreeNode;
+            var tag = node?.Tag as TreeNodeTag;
+            Scene.SelectedPreviewItemTag = tag;
+            if (tag != null && tag.ObjectType == CCSFile.SECTION_ANIME)
             {
-                var menu = BuildContextMenu(tag, item);
-                if (menu != null) item.ContextMenu = menu;
+                var tmpAnime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
+                if (tmpAnime != null)
+                {
+                    tmpAnime.HasEnded = false;
+                    tmpAnime.CurrentFrame = 0;
+                }
             }
-
-            foreach (var child in node.Nodes)
-            {
-                ((IList)item.Items).Add(BuildTreeItem(child));
-            }
-            return item;
         }
 
-        private ContextMenu BuildContextMenu(TreeNodeTag tag, TreeViewItem item)
+        private void OnCcsTreeContextRequested(object sender, ContextRequestedEventArgs e)
         {
-            var items = new List<MenuItem>();
+            var node = (e.Source as Control)?.DataContext as CcsTreeNode;
+            if (node == null) return;
 
+            ccsTree.SelectedItem = node;
+            var menu = BuildContextMenu(node);
+            if (menu == null) return;
+
+            e.Handled = true;
+            menu.Placement = PlacementMode.Pointer;
+            menu.Open(ccsTree);
+        }
+
+        private void OnSceneTreeContextRequested(object sender, ContextRequestedEventArgs e)
+        {
+            var node = (e.Source as Control)?.DataContext as CcsTreeNode;
+            if (node == null || node == _vm.AnimationsRoot) return;
+            if (!(node.Tag is TreeNodeTag tag) || tag.ObjectType != CCSFile.SECTION_ANIME) return;
+
+            var menu = new ContextMenu();
+            ((IList)menu.Items).Add(MakeMenuItem("Remove", () =>
+            {
+                _vm.AnimationsRoot.Nodes.Remove(node);
+                var anime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
+                if (anime != null) Scene.RemoveAnime(anime);
+            }));
+
+            e.Handled = true;
+            menu.Placement = PlacementMode.Pointer;
+            menu.Open(sceneTree);
+        }
+
+        private ContextMenu BuildContextMenu(CcsTreeNode node)
+        {
+            if (!(node.Tag is TreeNodeTag tag)) return null;
+
+            var items = new List<MenuItem>();
             if (tag.Type == TreeNodeTag.NodeType.File)
             {
                 items.Add(MakeMenuItem("Unload", () =>
                 {
                     // DeInit() deletes GL resources, so run it on the render thread.
                     glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
-                    ((IList)ccsTree.Items).Remove(item);
+                    _vm.CcsRoots.Remove(node);
                 }));
                 items.Add(MakeMenuItem("View Info Report", () =>
                 {
@@ -222,7 +243,7 @@ namespace StudioCCS.Views
                         if (tmpAnime != null)
                         {
                             Scene.AddAnime(tmpAnime);
-                            ((IList)_sceneAnimationNode.Items).Add(BuildSceneAnimeItem(tmpAnime, tag));
+                            _vm.AnimationsRoot.Nodes.Add(new CcsTreeNode(tmpAnime.ToNode().Text) { Tag = tag });
                         }
                     }));
                     items.Add(MakeMenuItem("Set Pose", () =>
@@ -237,23 +258,6 @@ namespace StudioCCS.Views
             var menu = new ContextMenu();
             foreach (var mi in items) ((IList)menu.Items).Add(mi);
             return menu;
-        }
-
-        private TreeViewItem BuildSceneAnimeItem(CCSAnime anime, TreeNodeTag tag)
-        {
-            var item = new TreeViewItem
-            {
-                Header = anime.ToNode().Text,
-                Tag = tag,
-            };
-            var menu = new ContextMenu();
-            ((IList)menu.Items).Add(MakeMenuItem("Remove", () =>
-            {
-                ((IList)_sceneAnimationNode.Items).Remove(item);
-                Scene.RemoveAnime(anime);
-            }));
-            item.ContextMenu = menu;
-            return item;
         }
 
         private static MenuItem MakeMenuItem(string header, Action action)
@@ -280,51 +284,6 @@ namespace StudioCCS.Views
 
             var tmpClump = tag.File.GetObject<CCSClump>(tag.ObjectID);
             tmpClump?.LoadMatrixList(file.Path.LocalPath);
-        }
-
-        private void OnCcsTreeSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var item = ccsTree.SelectedItem as TreeViewItem;
-            var tag = item?.Tag as TreeNodeTag;
-            Scene.SelectedPreviewItemTag = tag;
-            if (tag != null && tag.ObjectType == CCSFile.SECTION_ANIME)
-            {
-                var tmpAnime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
-                if (tmpAnime != null)
-                {
-                    tmpAnime.HasEnded = false;
-                    tmpAnime.CurrentFrame = 0;
-                }
-            }
-        }
-
-        #endregion
-
-        #region View / render option menus
-
-        private void OnRenderToggle(object sender, RoutedEventArgs e)
-        {
-            ApplyViewMenu();
-        }
-
-        private void ApplyViewMenu()
-        {
-            Scene.DrawWireframe = miWireframe.IsChecked;
-            Scene.DrawVertexColors = miVertexColors.IsChecked;
-            Scene.DrawVertexNormals = miVertexNormals.IsChecked;
-            Scene.DrawTextures = miTextured.IsChecked;
-            Scene.BackfaceCull = miBackface.IsChecked;
-            Scene.DrawViewGrid = miGrid.IsChecked;
-            Scene.DrawCollisionMeshes = miCollision.IsChecked;
-            Scene.DrawDummyHelpers = miDummies.IsChecked;
-            Scene.DrawLightHelpers = miLights.IsChecked;
-            Scene.DrawViewAxis = miAxisViewport.IsChecked;
-            Scene.DrawWorldCenter = miWorldCenter.IsChecked;
-        }
-
-        private void OnAxisMovementToggle(object sender, RoutedEventArgs e)
-        {
-            Scene.DefaultToAxisMovement = miAxisMovement.IsChecked;
         }
 
         #endregion
@@ -379,36 +338,6 @@ namespace StudioCCS.Views
             {
                 Scene.DumpToSMD(dlg.ExportPath, dlg.WithNormals);
             }
-        }
-
-        #endregion
-
-        #region Status bar
-
-        private void UpdateStatus()
-        {
-            ArcBallCamera cam = Scene.CurrentCamera();
-            lblCamera.Text = string.Format(
-                "Camera: Rotation: {0}, {1}, {2}, Target: {3}, {4}, {5}, Distance: {6}",
-                cam.Rotation.X, cam.Rotation.Y, cam.Rotation.Z,
-                cam.Target.X, cam.Target.Y, cam.Target.Z, cam.Distance);
-
-            lblRenderMode.Text = RenderModeText();
-        }
-
-        private string RenderModeText()
-        {
-            if ((Scene.GetRenderMode() & 15) == 0) return "None";
-
-            var options = new List<string>();
-            if (Scene.DrawWireframe) options.Add("Wireframe");
-            if (Scene.DrawVertexColors) options.Add("Vertex Colors");
-            if (Scene.DrawVertexNormals) options.Add("Vertex Normals");
-            if (Scene.DrawTextures) options.Add("Textured");
-
-            string text = string.Join("/", options);
-            text += Scene.BackfaceCull ? " (Backface Culling)" : " (No Backface Culling)";
-            return text;
         }
 
         #endregion
