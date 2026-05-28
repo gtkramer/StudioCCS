@@ -702,7 +702,9 @@ namespace StudioCCS
 				float dYm = MouseSensitivity * dY;
 				//if(ShiftModifier == KeyStatus.Up)
 				//{
-					curCam.Rotation = new Vector3(camRot.X + dXm, camRot.Y + dYm, 0.0f);
+					// Pitch (Y) is inverted from the original: dragging up tilts the
+					// far end of the scene down, and dragging down tilts it up.
+					curCam.Rotation = new Vector3(camRot.X + dXm, camRot.Y - dYm, 0.0f);
 				//}
 				
 				//else
