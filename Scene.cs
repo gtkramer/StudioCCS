@@ -330,7 +330,7 @@ namespace StudioCCS
 			//Init other stuff here
 			AxisMarker.Init();
 			WireHelper.Init();
-			Grid.Init();
+			GridRenderer.Init();
 			TexturePreview.Init();
 
 			//PreviewCamera.Target = new Vector3(-46.28392f, -0.38321028f, -1.108414f);
@@ -345,7 +345,7 @@ namespace StudioCCS
 			}
 			AxisMarker.DeInit();
 			WireHelper.DeInit();
-			Grid.DeInit();
+			GridRenderer.DeInit();
 			TexturePreview.DeInit();
 		}
 		
@@ -530,7 +530,7 @@ namespace StudioCCS
 					RenderViewAxisGizmo(1.75f, AxisProjectionMtx, true);
 					SetMainViewport();
 				}
-				if(DrawViewGrid) Grid.Render(Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f) * ProjViewMtx, 1.0f);
+				if(DrawViewGrid) GridRenderer.Render(Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f) * ProjViewMtx, 1.0f);
 	
 				//LightHelper.RenderOmniHelper(Helper2, 1.0f);
 				

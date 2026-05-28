@@ -16,9 +16,9 @@ using System.Diagnostics;
 namespace StudioCCS
 {
 	/// <summary>
-	/// Description of Grid.
+	/// Description of GridRenderer.
 	/// </summary>
-	public static class Grid
+	public static class GridRenderer
 	{
 		public static bool WasInit = false;
 		public static Vector3[] Vertices;
