@@ -1,6 +1,11 @@
-Right work being done on the right thread (GL + UI)
-Following Avalonia UI best practices
-Source file organization
-Embedding data resources
+Source file organization in general
+Embedding data resources on built binary
 Identify dead code or test code that's not meaningful to the project
 Import functionality to unpack data.bin
+Review logging approach, should we farm this out to an external library?
+Main TODO list
+Issues on GitHub
+Are we including too many library dependencies?  OpenTK, should this be OpenTK.Mathematics to only get the parts we need?  And why do we need to list SkiaSharp explictly when Avalonia comes with this?  Are there technically two SkiaSharps installed?
+Add CLI only versions that don't run GUI stack at all, and make it easier to process large amounts of files in batches
+Improve readability of status bar
+Update README with better markdown and to be more complete and easier to read
