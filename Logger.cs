@@ -1,16 +1,15 @@
-﻿/*
+/*
  * Created by SharpDevelop.
  * User: NCDyson
  * Date: 7/21/2017
  * Time: 11:22 PM
- * 
+ *
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace StudioCCS
 {
@@ -22,29 +21,31 @@ namespace StudioCCS
 		private static Dictionary<int, bool> FiredWarnings = new Dictionary<int, bool>();
 		private static Dictionary<int, bool> FiredShots = new Dictionary<int, bool>();
 		public enum LogType {LogAll, LogOnceCode, LogOnceValue}
-		public static RichTextBox LogControl = null;
-		
-		
-		public static void SetLogControl(RichTextBox r)
+
+		// UI-agnostic sink. The view layer (Avalonia) supplies a delegate that
+		// appends the text (with the given colour) to its log panel.
+		public static Action<string, Color> Output = null;
+
+		public static void SetOutput(Action<string, Color> sink)
 		{
-			LogControl = r;
+			Output = sink;
 		}
-		
+
 		public static void LogError(string errorText, LogType logAs = LogType.LogAll, [CallerMemberName] string callingMethod = "", [CallerLineNumber] int callingLine = 0)
 		{
 			LogGeneric(errorText, Color.DarkRed, logAs, callingMethod, callingLine);
 		}
-		
+
 		public static void LogWarning(string warningText, LogType logAs = LogType.LogAll, [CallerMemberName] string callingMethod = "", [CallerLineNumber] int callingLine = 0)
 		{
 			LogGeneric(warningText, Color.Orange, logAs, callingMethod, callingLine);
 		}
-		
+
 		public static void LogInfo(string infoText, LogType logAs = LogType.LogAll, [CallerMemberName] string callingMethod = "", [CallerLineNumber] int callingLine = 0)
 		{
 			LogGeneric(infoText, Color.White, logAs, callingMethod, callingLine);
 		}
-		
+
 		private static void LogGeneric(string outputText, Color textColor, LogType logAs = LogType.LogAll, [CallerMemberName] string callingMethod = "", [CallerLineNumber] int callingLine = 0)
 		{
 			if(logAs == LogType.LogOnceCode)
@@ -59,12 +60,8 @@ namespace StudioCCS
 				if(FiredShots.ContainsKey(logTextKey)) return;
 				FiredShots[logTextKey] = true;
 			}
-			
-			if(LogControl == null) return;
-			Color oldColor = LogControl.SelectionColor;
-			LogControl.SelectionColor = textColor;
-			LogControl.AppendText(outputText);
-			LogControl.SelectionColor = oldColor;
+
+			Output?.Invoke(outputText, textColor);
 		}
 	}
 }

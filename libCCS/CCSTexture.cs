@@ -12,10 +12,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
+using SkiaSharp;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
@@ -268,8 +268,8 @@ namespace StudioCCS.libCCS
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.Repeat);
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.Repeat);
 				
-				PixelInternalFormat tmpFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
-				if(TextureType == CCS_TEXTURE_DXT5) tmpFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
+				InternalFormat tmpFormat = InternalFormat.CompressedRgbaS3tcDxt1Ext;
+				if(TextureType == CCS_TEXTURE_DXT5) tmpFormat = InternalFormat.CompressedRgbaS3tcDxt5Ext;
 				
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, tmpFormat, Width, Height, 0, TextureIndices.Length, TextureIndices);
 				GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -277,25 +277,26 @@ namespace StudioCCS.libCCS
 			}
 			else
 			{
-				Bitmap FinalTexture = ToBitmap(_clutID);
+				SKBitmap FinalTexture = ToBitmap(_clutID);
 				if(TextureID == 0) TextureID = GL.GenTexture();
-				
+
 				CurrentCLUTID = _clutID;
 				GL.BindTexture(TextureTarget.Texture2D, TextureID);
-				
+
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.Repeat);
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.Repeat);
-				
-				System.Drawing.Imaging.BitmapData textureData = FinalTexture.LockBits(new Rectangle(0, 0, Width, Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, textureData.Scan0);
-				
-				FinalTexture.UnlockBits(textureData);
-				
+
+				// SKBitmap with Rgba8888 stores bytes in R,G,B,A order, matching the
+				// GL PixelFormat.Rgba upload below (no channel swap required).
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, FinalTexture.GetPixels());
+
+				FinalTexture.Dispose();
+
 				GL.BindTexture(TextureTarget.Texture2D, 0);
-			
-				
+
+
 			}
 			return true;
 			//}
@@ -311,9 +312,9 @@ namespace StudioCCS.libCCS
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.Repeat);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.Repeat);
 			
-			PixelInternalFormat tmpFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
-			if(TextureType == CCS_TEXTURE_DXT1) tmpFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
-			else if(TextureType == CCS_TEXTURE_DXT5) tmpFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
+			InternalFormat tmpFormat = InternalFormat.CompressedRgbaS3tcDxt1Ext;
+			if(TextureType == CCS_TEXTURE_DXT1) tmpFormat = InternalFormat.CompressedRgbaS3tcDxt1Ext;
+			else if(TextureType == CCS_TEXTURE_DXT5) tmpFormat = InternalFormat.CompressedRgbaS3tcDxt5Ext;
 			else
 			{
 				GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -327,16 +328,21 @@ namespace StudioCCS.libCCS
 			return true;
 		}
 		
-		public Bitmap ToBitmap(int _clutID)
+		private static SKColor ToSK(Color c)
 		{
-			Bitmap OutBitmap = new Bitmap(Width, Height);
+			return new SKColor(c.R, c.G, c.B, c.A);
+		}
+
+		public SKBitmap ToBitmap(int _clutID)
+		{
+			SKBitmap OutBitmap = new SKBitmap(Width, Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
 			if(TextureType == CCS_TEXTURE_I4 || TextureType == CCS_TEXTURE_I8)
 			{
 				CCSClut tmpClut = ParentFile.GetObject<CCSClut>(_clutID);
 				if(tmpClut == null) return null;
-				
+
 				HasAlpha = tmpClut.HasAlpha;
-	
+
 				if(TextureType == CCS_TEXTURE_I4)
 				{
 					for(int y = 0; y < Height; y++)
@@ -345,8 +351,8 @@ namespace StudioCCS.libCCS
 						{
 							int indiceOffset = (y * (Width / 2)) + x;
 							byte indices = TextureIndices[indiceOffset];
-							OutBitmap.SetPixel(x * 2, y, tmpClut.Palette[indices & 0xf]);
-							OutBitmap.SetPixel((x * 2) + 1, y, tmpClut.Palette[(indices >> 4) & 0xf]);
+							OutBitmap.SetPixel(x * 2, y, ToSK(tmpClut.Palette[indices & 0xf]));
+							OutBitmap.SetPixel((x * 2) + 1, y, ToSK(tmpClut.Palette[(indices >> 4) & 0xf]));
 						}
 					}
 				}
@@ -357,7 +363,7 @@ namespace StudioCCS.libCCS
 						for(int x = 0; x < Width; x++)
 						{
 							int indiceOffset = (y * Width) + x;
-							OutBitmap.SetPixel(x, y, tmpClut.Palette[TextureIndices[indiceOffset]]);
+							OutBitmap.SetPixel(x, y, ToSK(tmpClut.Palette[TextureIndices[indiceOffset]]));
 						}
 					}
 				}
@@ -370,11 +376,11 @@ namespace StudioCCS.libCCS
 					for(int x = 0; x < Width; x++)
 					{
 						int i = ((y * Width) + x) * 4;
-						OutBitmap.SetPixel(x,y, Color.FromArgb(TextureIndices[i + 3], TextureIndices[i + 2], TextureIndices[i + 1], TextureIndices[i]));
+						OutBitmap.SetPixel(x, y, new SKColor(TextureIndices[i + 2], TextureIndices[i + 1], TextureIndices[i], TextureIndices[i + 3]));
 					}
 				}
 			}
-			
+
 			return OutBitmap;
 		}
 		
@@ -404,7 +410,7 @@ namespace StudioCCS.libCCS
 			return "Unknown";
 		}
 		
-		public override System.Windows.Forms.TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			var retNode = base.ToNode();
 			string textureTypeStr = string.Format("  Type: {0}", GetTextureTypeStr());
@@ -422,7 +428,7 @@ namespace StudioCCS.libCCS
 					if(tmpType == CCSFile.SECTION_CLUT)
 					{
 						CCSClut tmpClut = ParentFile.GetObject<CCSClut>(tmpID);
-						TreeNode tmpSubNode = null;
+						CcsTreeNode tmpSubNode = null;
 						if(tmpClut == null)
 						{
 							tmpSubNode = Util.NonExistantNode(ParentFile, tmpID);
@@ -477,27 +483,13 @@ namespace StudioCCS.libCCS
 				//Now, dump texture to file
 				string outputTextureFileName = string.Format("{0}.png", System.IO.Path.Combine(outputPath, textureName));
 				Logger.LogInfo(string.Format("\tDumping {0}...\n", outputTextureFileName));
-				Bitmap texture = ToBitmap(CurrentCLUTID);
-				
-				//Swap color channels
-				System.Drawing.Imaging.BitmapData sourceData = texture.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-	
-				byte[] resultBuffer = new byte[sourceData.Stride * sourceData.Height];
-				Marshal.Copy(sourceData.Scan0, resultBuffer, 0, resultBuffer.Length);
-				
-				
-				byte tmpByte = 0;
-				for(int i = 0; i < resultBuffer.Length; i += 4)
+				using(SKBitmap texture = ToBitmap(CurrentCLUTID))
+				using(SKImage image = SKImage.FromBitmap(texture))
+				using(SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+				using(FileStream outStream = new FileStream(outputTextureFileName, FileMode.Create))
 				{
-					tmpByte = resultBuffer[i];
-					resultBuffer[i] = resultBuffer[i + 2];
-					resultBuffer[i + 2] = tmpByte;
+					data.SaveTo(outStream);
 				}
-				
-				Marshal.Copy(resultBuffer, 0, sourceData.Scan0, resultBuffer.Length);
-				texture.UnlockBits(sourceData);
-				
-				texture.Save(outputTextureFileName, System.Drawing.Imaging.ImageFormat.Png);
 			}
 		}
 		

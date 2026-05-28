@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="StudioCCS.Views.ExportToObjWindow"
+        Width="460" Height="300"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="Export to .OBJ...">
+    <Grid Margin="12" RowDefinitions="Auto,Auto,*,Auto">
+
+        <TextBlock Grid.Row="0" Text="Export directory:" Margin="0,0,0,4" />
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+            <TextBox Grid.Column="0" Name="txtExportPath" />
+            <Button Grid.Column="1" Name="btnSelectDir" Content="Browse..." Margin="6,0,0,0" Click="OnBrowseClick" />
+        </Grid>
+
+        <StackPanel Grid.Row="2" Spacing="4">
+            <CheckBox Name="chkModelWithNormals" Content="Export model with normals" />
+            <CheckBox Name="chkSplitSubModels" Content="Split sub models" />
+            <CheckBox Name="chkExportCollision" Content="Export collision meshes" Click="OnExportCollisionChanged" />
+            <CheckBox Name="chkSplitCollision" Content="Split collision meshes" IsEnabled="False" />
+            <CheckBox Name="chkExportDummies" Content="Export dummies" />
+            <CheckBox Name="chkDumpAnime" Content="Dump animations to text" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Name="btnDoExport" Content="Export" IsEnabled="False" Click="OnExportClick" />
+            <Button Content="Cancel" Click="OnCancelClick" />
+        </StackPanel>
+    </Grid>
+</Window>

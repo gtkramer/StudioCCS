@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -126,7 +125,7 @@ namespace StudioCCS.libCCS
 			return true;
 		}
 		
-		public override TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			return base.ToNode();
 		}

@@ -10,14 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.IO;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Platform;
-using OpenTK.Graphics;
-using System.Windows.Forms;
 using StudioCCS;
 using StudioCCS.libCCS;
 using System.Runtime.InteropServices;
@@ -105,6 +101,8 @@ namespace StudioCCS
 		//public enum RenderMode {Wireframe, Flat, Smooth, Textured};
 		public enum SceneMode {Preview, Scene, All};
 		public enum KeyStatus {Up, Pressed, Repeated};
+		//Portable camera-control keys, mapped from the UI's key events.
+		public enum CameraKey {None, Forward, Backward, Left, Right, Up, Down, ZoomIn, ZoomOut};
 		private const int AxisViewSize = 80;
 		
 		//Draw Mode Flags for rendering
@@ -122,12 +120,11 @@ namespace StudioCCS
 
 		public static bool BackfaceCull = false;
 		
-		//public static IGraphicsContext Context = null;
-		//public static IWindowInfo WiFo = null;
-		public static GLControl control = null;
+		//The GL context + buffer swap are owned by the Avalonia OpenGlControlBase.
+		//The viewport's pixel size is pushed into ViewWidth/ViewHeight before each Render().
 		public static bool WasInit = false;
-		public static int ViewWidth;
-		public static int ViewHeight;
+		public static int ViewWidth = 1;
+		public static int ViewHeight = 1;
 		public static Stopwatch Timer = new Stopwatch();
 		
 		public static Matrix4 ProjectionMtx = Matrix4.Identity;
@@ -172,17 +169,7 @@ namespace StudioCCS
 		private static KeyStatus ZoomOut = KeyStatus.Up;
 		private static KeyStatus ShiftModifier = KeyStatus.Up;
 		private static KeyStatus ControlModifier = KeyStatus.Up;
-		
-		private static Keys MoveForward_Key = Keys.W;
-		private static Keys MoveBackward_Key = Keys.S;
-		private static Keys MoveLeft_Key = Keys.A;
-		private static Keys MoveRight_Key = Keys.D;
-		private static Keys MoveUp_Key = Keys.X;
-		private static Keys MoveDown_Key = Keys.Z;
-		
-		private static Keys ZoomIn_Key = Keys.Oemplus;
-		private static Keys ZoomOut_Key = Keys.OemMinus;
-		
+
 		//Items We'll Render
 		public static List<CCSFile> CCSFileList = new List<CCSFile>();
 		public static List<CCSAnime> ActiveAnimes = new List<CCSAnime>();
@@ -266,7 +253,7 @@ namespace StudioCCS
 			}
 		}
 		
-		public static TreeNode LoadCCSFile(string fileName)
+		public static CcsTreeNode LoadCCSFile(string fileName)
 		{
 			var tmpCCS = new CCSFile();
 			Stopwatch sw = new Stopwatch();
@@ -293,9 +280,9 @@ namespace StudioCCS
 			return true;
 		}
 		
-		public static TreeNode ToNode()
+		public static CcsTreeNode ToNode()
 		{
-			var retNode = new TreeNode();
+			var retNode = new CcsTreeNode();
 			foreach(var tmpCCS in CCSFileList)
 			{
 				retNode.Nodes.Add(tmpCCS.ToNode());
@@ -304,10 +291,10 @@ namespace StudioCCS
 			return retNode;
 		}
 		
-		public static TreeNode ToSceneNode()
+		public static CcsTreeNode ToSceneNode()
 		{
 			
-			var tmpMainAnmNode = new TreeNode("Animations");
+			var tmpMainAnmNode = new CcsTreeNode("Animations");
 			foreach(var tmpAnmNode in ActiveAnimes)
 			{
 				tmpMainAnmNode.Nodes.Add(tmpAnmNode.ToNode());
@@ -316,36 +303,32 @@ namespace StudioCCS
 			return tmpMainAnmNode;
 		}
 		
-		public static void Init(GLControl glCtrl)
+		public static void Init()
 		{
-			//WiFo = Utilities.CreateWindowsWindowInfo(ctrl.Handle);
-			//Context = new GraphicsContext(GraphicsMode.Default, WiFo);
-			//Context.MakeCurrent(WiFo);
-			//Context.LoadAll();
-			control = glCtrl;
-			control.MakeCurrent();
+			//The GL context is already current (we are called from the Avalonia
+			//OpenGlControlBase render/init callback), and bindings are loaded.
 			WasInit = true;
-			
+
 			GL.ClearColor(64 / 255.0f, 64 / 255.0f, 64 / 255.0f, 1.0f);
 			GL.Enable(EnableCap.Blend);
 			GL.Enable(EnableCap.DepthTest);
 			GL.DepthFunc(DepthFunction.Lequal);
-			GL.Enable(EnableCap.AlphaTest);
-			
-			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-			//GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-			//GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcColor);
-			
-			GL.Enable(EnableCap.Texture2D);
-			
+			//NOTE: legacy fixed-function GL.Enable(EnableCap.AlphaTest) and
+			//GL.Enable(EnableCap.Texture2D) are not valid in a core profile and have
+			//been dropped - the shaders handle texturing and alpha themselves.
+
+			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			//GL.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
+			//GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcColor);
+
 			GL.Disable(EnableCap.CullFace);
-			
+
 			//Init other stuff here
 			AxisMarker.Init();
 			WireHelper.Init();
 			Grid.Init();
 			TexturePreview.Init();
-			
+
 			//PreviewCamera.Target = new Vector3(-46.28392f, -0.38321028f, -1.108414f);
 		}
 		
@@ -465,16 +448,16 @@ namespace StudioCCS
 		
 		public static void Render()
 		{
-			MakeCurrent();
-			
+			//Context is already current; Avalonia owns MakeCurrent + buffer swap.
+
 			/*
 			if(DisplayMode == RenderMode.Wireframe)
 			{
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+				GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Line);
 			}
 			else
 			{
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+				GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
 			}
 			*/
 			
@@ -559,10 +542,6 @@ namespace StudioCCS
 				else if(SceneDisplay == SceneMode.Scene) SceneRender(CCSMatrix);
 				else AllRender(CCSMatrix);
 			//}
-			
-
-			
-			control.SwapBuffers();
 		}
 		
 		private static bool IsPreviewTexture()
@@ -698,28 +677,26 @@ namespace StudioCCS
 		
 		private static void SetMainViewport()
 		{
-			GL.Viewport(0, 0, control.Width, control.Height);
-			ProjectionMtx = Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI * (45.0f / 180.0f)), control.Width / (float)control.Height, 0.1f, 100000.0f);
+			GL.Viewport(0, 0, ViewWidth, ViewHeight);
+			ProjectionMtx = Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI * (45.0f / 180.0f)), ViewWidth / (float)ViewHeight, 0.1f, 100000.0f);
 		}
-		
+
 		private static void SetAxisViewport()
 		{
-			GL.Viewport(control.Width - AxisViewSize, control.Height - AxisViewSize, AxisViewSize, AxisViewSize);
+			GL.Viewport(ViewWidth - AxisViewSize, ViewHeight - AxisViewSize, AxisViewSize, AxisViewSize);
 			AxisProjectionMtx = Matrix4.CreatePerspectiveFieldOfView((float)(Math.PI * (45.0f / 180.0f)), 1.0f, 0.01f, 100000.0f);
 		}
 		
-		public static void MouseMove(MouseEventArgs e)
+		public static void MouseMove(float mX, float mY, bool rightButton)
 		{
-			float mX = (float)e.X;
-			float mY = (float)e.Y;
 			float dX = mX - LastMouseX;
 			float dY = mY - LastMouseY;
-			
+
 			//ArcBallCamera CurrentCam = (SceneDisplay == SceneMode.Preview) ? PreviewCamera : SceneCamera;
 			var curCam = CurrentCamera();
 			Vector3 camRot = curCam.Rotation;
 			Vector3 camTarget = curCam.Target;
-			if((e.Button & MouseButtons.Right) != 0)
+			if(rightButton)
 			{
 				float dXm = MouseSensitivity * dX;
 				float dYm = MouseSensitivity * dY;
@@ -752,45 +729,45 @@ namespace StudioCCS
 			LastMouseY = mY;	
 		}
 		
-		public static void MouseWheel(MouseEventArgs e)
+		public static void MouseWheel(float delta)
 		{
-			
+			//delta is expressed in WinForms-style units (~120 per notch) by the caller.
 			//ArcBallCamera CurrentCam = (SceneDisplay == SceneMode.Preview) ? PreviewCamera : SceneCamera;
 			var curCam = CurrentCamera();
-			float distToZoom = ((e.Delta * MouseWheelSensitivity) * DeltaTime);
+			float distToZoom = ((delta * MouseWheelSensitivity) * DeltaTime);
 			if(ShiftModifier != KeyStatus.Up) distToZoom *= 0.25f;
 			curCam.Distance += distToZoom;
-			
+
 		}
-		
-		public static void KeyPress(KeyEventArgs e)
+
+		public static void KeyPress(CameraKey key, bool shift, bool control)
 		{
-			if(e.KeyCode == MoveForward_Key) MoveForward = (MoveForward == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			else if(e.KeyCode == MoveBackward_Key) MoveBackward = (MoveBackward == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			else if(e.KeyCode == MoveLeft_Key) MoveLeft = (MoveLeft == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			else if(e.KeyCode == MoveRight_Key) MoveRight = (MoveRight == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			else if(e.KeyCode == MoveUp_Key) MoveUp = (MoveUp == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			else if(e.KeyCode == MoveDown_Key) MoveDown = (MoveDown == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;			
-			else if(e.KeyCode == ZoomIn_Key) ZoomIn = (ZoomIn == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			else if(e.KeyCode == ZoomOut_Key) ZoomOut = (ZoomOut == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			
-			if(e.Shift) ShiftModifier = (ShiftModifier == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
-			if(e.Control) ControlModifier = (ControlModifier == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			if(key == CameraKey.Forward) MoveForward = (MoveForward == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.Backward) MoveBackward = (MoveBackward == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.Left) MoveLeft = (MoveLeft == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.Right) MoveRight = (MoveRight == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.Up) MoveUp = (MoveUp == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.Down) MoveDown = (MoveDown == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.ZoomIn) ZoomIn = (ZoomIn == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			else if(key == CameraKey.ZoomOut) ZoomOut = (ZoomOut == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+
+			if(shift) ShiftModifier = (ShiftModifier == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+			if(control) ControlModifier = (ControlModifier == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
 		}
-		
-		public static void KeyRelease(KeyEventArgs e)
+
+		public static void KeyRelease(CameraKey key, bool shift, bool control)
 		{
-			if(e.KeyCode == MoveForward_Key) MoveForward = KeyStatus.Up;
-			else if(e.KeyCode == MoveBackward_Key) MoveBackward = KeyStatus.Up;
-			else if(e.KeyCode == MoveLeft_Key) MoveLeft = KeyStatus.Up;
-			else if(e.KeyCode == MoveRight_Key) MoveRight = KeyStatus.Up;
-			else if(e.KeyCode == MoveUp_Key) MoveUp = KeyStatus.Up;
-			else if(e.KeyCode == MoveDown_Key) MoveDown = KeyStatus.Up;
-			else if(e.KeyCode == ZoomIn_Key) ZoomIn = KeyStatus.Up;
-			else if(e.KeyCode == ZoomOut_Key) ZoomOut = KeyStatus.Up;
-			
-			if(!e.Shift) ShiftModifier = KeyStatus.Up;
-			if(!e.Control) ControlModifier = KeyStatus.Up;
+			if(key == CameraKey.Forward) MoveForward = KeyStatus.Up;
+			else if(key == CameraKey.Backward) MoveBackward = KeyStatus.Up;
+			else if(key == CameraKey.Left) MoveLeft = KeyStatus.Up;
+			else if(key == CameraKey.Right) MoveRight = KeyStatus.Up;
+			else if(key == CameraKey.Up) MoveUp = KeyStatus.Up;
+			else if(key == CameraKey.Down) MoveDown = KeyStatus.Up;
+			else if(key == CameraKey.ZoomIn) ZoomIn = KeyStatus.Up;
+			else if(key == CameraKey.ZoomOut) ZoomOut = KeyStatus.Up;
+
+			if(!shift) ShiftModifier = KeyStatus.Up;
+			if(!control) ControlModifier = KeyStatus.Up;
 		}
 		
 		
@@ -800,12 +777,6 @@ namespace StudioCCS
 			if(SceneDisplay == SceneMode.Preview) return PreviewCamera;
 			if(SceneDisplay == SceneMode.Scene) return SceneCamera;
 			return AllCamera;
-		}
-		
-		public static void MakeCurrent()
-		{
-			//Debug.WriteLine("Making Context Current...");
-			control.MakeCurrent();
 		}
 		
 		public static void DumpToObj(string outputPath, bool collision, bool splitSubModels, bool splitCollision, bool withNormals, bool dummies, bool animes)

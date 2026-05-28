@@ -8,7 +8,7 @@
  */
 using System;
 using System.IO;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
 using System.Diagnostics;

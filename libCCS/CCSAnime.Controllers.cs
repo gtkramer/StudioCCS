@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
-using OpenTK;
+using OpenTK.Mathematics;
 
 namespace StudioCCS.libCCS
 {

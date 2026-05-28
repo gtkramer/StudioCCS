@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
 
@@ -507,9 +506,9 @@ namespace StudioCCS.libCCS
 				GL.Uniform1(UniformSelectionID, SelectedBoneID);
 				GL.UniformMatrix4(UniformMatrix, false, ref projView);
 				GL.Uniform1(UniformMatrixList, 1);
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+				GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Line);
 				GL.DrawArrays(PrimitiveType.Points, 0, NodeCount);
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+				GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
 				GL.UseProgram(0);
 				GL.BindVertexArray(0);
 			}
@@ -519,15 +518,15 @@ namespace StudioCCS.libCCS
 			
 		}
 		
-		public override TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			var retNode = base.ToNode();
-			List<TreeNode> tNodes = new List<TreeNode>();
+			List<CcsTreeNode> tNodes = new List<CcsTreeNode>();
 			//Add child nodes.
 			for(int i = 0; i < NodeCount; i++)
 			{
 				CCSObject childObject = ParentFile.GetObject<CCSObject>(NodeIDs[i]);
-				TreeNode tmpNode = null;
+				CcsTreeNode tmpNode = null;
 				if(childObject != null)
 				{
 					tmpNode = childObject.ToNode();

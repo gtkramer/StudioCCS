@@ -8,7 +8,6 @@
  */
 using System;
 using System.IO;
-using System.Windows.Forms;
 
 namespace StudioCCS.libCCS
 {
@@ -21,9 +20,9 @@ namespace StudioCCS.libCCS
 		public int ObjectType = 0;
 		public CCSFile ParentFile;
 		
-		public virtual TreeNode ToNode()
+		public virtual CcsTreeNode ToNode()
 		{
-			TreeNode retNode = new TreeNode(string.Format("{0}: {1}", ObjectID, ParentFile.GetSubObjectName(ObjectID)))
+			CcsTreeNode retNode = new CcsTreeNode(string.Format("{0}: {1}", ObjectID, ParentFile.GetSubObjectName(ObjectID)))
 			{
 				Tag = new TreeNodeTag(ParentFile, ObjectID, ObjectType)
 			};

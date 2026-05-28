@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -718,7 +717,7 @@ namespace StudioCCS.libCCS
 			return modelTypeStr;
 		}
 		
-		public override TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			var retNode = base.ToNode();
 			string modelTypeStr = string.Format(" Type: {0}", GetModelTypeStr());
@@ -728,7 +727,7 @@ namespace StudioCCS.libCCS
 			{
 				if((ModelType & CCS_MODEL_SHADOW) == CCS_MODEL_SHADOW)
 				{
-					TreeNode tmpSubNode = new TreeNode(string.Format("Sub Model {0}", i))
+					CcsTreeNode tmpSubNode = new CcsTreeNode(string.Format("Sub Model {0}", i))
 					{
 						Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
 					};
@@ -742,7 +741,7 @@ namespace StudioCCS.libCCS
 					//string subModelName = ParentFile.GetSubObjectName(tmpSubModel.ParentObjectRef.ModelID);
 					CCSObject tmpObject = ClumpRef.GetObject(tmpSubModel.ParentID);
 					string subModelName = ParentFile.GetSubObjectName(ClumpRef.GetObject(tmpSubModel.ParentID).ObjectID);
-					TreeNode tmpSubNode = new TreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
+					CcsTreeNode tmpSubNode = new CcsTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
 					{
 						Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
 					};
@@ -753,7 +752,7 @@ namespace StudioCCS.libCCS
 				{
 					var tmpSubModel = SubModels[i];
 					string subModelName = ParentFile.GetSubObjectName(tmpSubModel.ParentID);
-					var tmpSubNode = new TreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
+					var tmpSubNode = new CcsTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
 					{
 						Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
 					};
@@ -838,7 +837,7 @@ namespace StudioCCS.libCCS
 			int fillMode = extraOptions & -2;
 			if(fillMode != 0)
 			{
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+				GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
 				Vector4 SelectionColor = new Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 				
 				if((fillMode & Scene.SCENE_DRAW_VERTEX_COLORS) == 0 && (fillMode & Scene.SCENE_DRAW_SMOOTH) == 0)
@@ -860,7 +859,7 @@ namespace StudioCCS.libCCS
 			{
 				//var texturingEnabled = GL.GetBoolean(GetPName.Texture2D);
 				//GL.Disable(EnableCap.Texture2D);
-				GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+				GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Line);
 				
 				if((extraOptions & Scene.SCENE_DRAW_SELECTION) != 0)
 				{

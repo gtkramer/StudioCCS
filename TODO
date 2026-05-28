@@ -1,0 +1,6 @@
+Right work being done on the right thread (GL + UI)
+Following Avalonia UI best practices
+Source file organization
+Embedding data resources
+Identify dead code or test code that's not meaningful to the project
+Import functionality to unpack data.bin

@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Drawing;
 
 namespace StudioCCS.libCCS

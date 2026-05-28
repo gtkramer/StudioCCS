@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Diagnostics;
@@ -139,7 +138,7 @@ namespace StudioCCS.libCCS
 						GL.Uniform4(UniformColor, tmpGroup.Color);
 						GL.DrawArrays(PrimitiveType.Triangles, 0, tmpGroup.VertexCount);
 					}
-					GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+					GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Line);
 					
 					if(i == _selectedID) GL.Uniform4(UniformColor, 1.0f, 1.0f, 1.0f, 1.0f);
 					else GL.Uniform4(UniformColor, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -147,11 +146,11 @@ namespace StudioCCS.libCCS
 					
 					GL.DrawArrays(PrimitiveType.Triangles, 0, tmpGroup.VertexCount);
 					
-					GL.PolygonMode(MaterialFace.FrontAndBack, curMode);
+					GL.PolygonMode(TriangleFace.FrontAndBack, curMode);
 					
 					GL.BindVertexArray(0);
 				}
-				catch (NullReferenceException e)
+				catch (NullReferenceException)
 				{
 					Logger.LogError(string.Format("Null Reference expetion caught when attempting render of Hitmesh {0} Submesh {1}...\n", ParentFile.GetSubObjectName(ObjectID), i), Logger.LogType.LogOnceValue);
 				}
@@ -180,13 +179,13 @@ namespace StudioCCS.libCCS
 				GL.DrawArrays(PrimitiveType.Triangles, 0, tmpGroup.VertexCount);
 			}
 			
-			GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+			GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Line);
 			
 			GL.Uniform4(UniformColor, 1.0f, 1.0f, 1.0f, 1.0f);
 			
 			GL.DrawArrays(PrimitiveType.Triangles, 0, tmpGroup.VertexCount);
 			
-			GL.PolygonMode(MaterialFace.FrontAndBack, curMode);
+			GL.PolygonMode(TriangleFace.FrontAndBack, curMode);
 			
 			GL.BindVertexArray(0);
 			GL.UseProgram(0);
@@ -263,12 +262,12 @@ namespace StudioCCS.libCCS
 			return true;
 		}
 		
-		public override TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			var retNode = base.ToNode();
 			for(int i = 0; i < HitGroupCount; i++)
 			{
-				TreeNode tmpGroupNode = new TreeNode(string.Format("HitGroup {0}", i))
+				CcsTreeNode tmpGroupNode = new CcsTreeNode(string.Format("HitGroup {0}", i))
 				{
 					Tag = new TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
 				};

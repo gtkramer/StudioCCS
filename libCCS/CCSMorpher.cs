@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 
@@ -51,7 +50,7 @@ namespace StudioCCS.libCCS
 			return true;
 		}
 		
-		public override TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			var retNode =  base.ToNode();
 			retNode.Text += string.Format(" Base: {0}", ParentFile.GetSubObjectName(BaseModelID));

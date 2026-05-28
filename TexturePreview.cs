@@ -7,7 +7,7 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
 
@@ -146,7 +146,7 @@ namespace StudioCCS
 			GL.UseProgram(ProgramID);
 			
 			GL.BindVertexArray(ArrayID);
-			GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+			GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
 			GL.Uniform1(UniformTexture, 1);
 			GL.Uniform3(UniformTextureSize, textureWidth, textureHeight, 0.1f);
 			Matrix4 id = Matrix4.Identity; //* matrix;
@@ -158,7 +158,7 @@ namespace StudioCCS
 			
 			GL.BindVertexArray(0);
 			GL.UseProgram(0);
-			GL.PolygonMode(MaterialFace.FrontAndBack, currentMode);
+			GL.PolygonMode(TriangleFace.FrontAndBack, currentMode);
 			
 		}
 	}

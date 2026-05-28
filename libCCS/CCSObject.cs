@@ -12,8 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Diagnostics;
 
 namespace StudioCCS.libCCS
@@ -67,7 +66,7 @@ namespace StudioCCS.libCCS
 			return true;
 		}
 		
-		public override TreeNode ToNode()
+		public override CcsTreeNode ToNode()
 		{
 			//TODO: CCSObject::ToNode(): Make it Heirarchal or Heirarchical or an actual tree.
 			var retNode = base.ToNode();

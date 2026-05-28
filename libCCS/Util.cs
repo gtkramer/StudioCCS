@@ -9,8 +9,7 @@
 using System;
 using System.IO;
 using System.Drawing;
-using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 
 namespace StudioCCS.libCCS
 {
@@ -195,9 +194,9 @@ namespace StudioCCS.libCCS
 			
 		}
 		
-		public static TreeNode NonExistantNode(CCSFile _file, int _objectID)
+		public static CcsTreeNode NonExistantNode(CCSFile _file, int _objectID)
 		{
-			TreeNode retNode = new TreeNode(string.Format("{0}: {1}", _objectID, _file.GetSubObjectName(_objectID)))
+			CcsTreeNode retNode = new CcsTreeNode(string.Format("{0}: {1}", _objectID, _file.GetSubObjectName(_objectID)))
 			{
 				Tag = new TreeNodeTag(_file, _objectID, 0),
 				ForeColor = Color.Red

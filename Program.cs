@@ -1,32 +1,32 @@
-﻿/*
- * Created by SharpDevelop.
- * User: NCDyson
- * Date: 7/21/2017
- * Time: 9:06 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
 using System;
-using System.Windows.Forms;
-using System.Diagnostics;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.OpenGL;
 
 namespace StudioCCS
 {
-	/// <summary>
-	/// Class with program entry point.
-	/// </summary>
-	internal sealed class Program
-	{
-		/// <summary>
-		/// Program entry point.
-		/// </summary>
-		[STAThread]
-		private static void Main(string[] args)
-		{
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
-		}
-		
-	}
+    internal sealed class Program
+    {
+        [STAThread]
+        public static void Main(string[] args) =>
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .With(new X11PlatformOptions
+                {
+                    // The CCS shaders are desktop GLSL #version 330 (and use geometry
+                    // shaders), so we must negotiate a desktop OpenGL 3.3 context rather
+                    // than the GLES default.
+                    GlProfiles = new List<GlVersion>
+                    {
+                        new GlVersion(GlProfileType.OpenGL, 3, 3),
+                        new GlVersion(GlProfileType.OpenGL, 3, 2),
+                        new GlVersion(GlProfileType.OpenGL, 4, 0),
+                    },
+                })
+                .WithInterFont()
+                .LogToTrace();
+    }
 }

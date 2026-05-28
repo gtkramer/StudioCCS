@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="StudioCCS.Views.EditBoneWindow"
+        Width="620" Height="460"
+        Title="Edit Bones">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Clear Rotation Values" Click="OnClearRotation" />
+                <MenuItem Header="Clear Scale Values" Click="OnClearScale" />
+                <Separator />
+                <MenuItem Header="Save Pose..." Click="OnSavePose" />
+                <MenuItem Header="Load Pose..." Click="OnLoadPose" />
+            </MenuItem>
+        </Menu>
+
+        <Grid ColumnDefinitions="*,Auto" Margin="6">
+            <TreeView Grid.Column="0" Name="treeBones" SelectionChanged="OnBoneSelected" />
+
+            <StackPanel Grid.Column="1" Width="240" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Selected bone:" />
+                <TextBlock Name="lblBoneName" FontWeight="Bold" Text="(none)" />
+
+                <Grid ColumnDefinitions="Auto,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,8,0,0">
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="X" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Y" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Z" HorizontalAlignment="Center" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Pos" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Name="txtPosX" />
+                    <TextBox Grid.Row="1" Grid.Column="2" Name="txtPosY" />
+                    <TextBox Grid.Row="1" Grid.Column="3" Name="txtPosZ" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Rot" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Name="txtRotX" />
+                    <TextBox Grid.Row="2" Grid.Column="2" Name="txtRotY" />
+                    <TextBox Grid.Row="2" Grid.Column="3" Name="txtRotZ" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Scale" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Name="txtScaleX" />
+                    <TextBox Grid.Row="3" Grid.Column="2" Name="txtScaleY" />
+                    <TextBox Grid.Row="3" Grid.Column="3" Name="txtScaleZ" />
+                </Grid>
+
+                <Button Name="btnUpdate" Content="Update" HorizontalAlignment="Right" Margin="0,8,0,0" Click="OnUpdateClick" />
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -7,9 +7,8 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
-using System.Drawing.Drawing2D;
 using System.IO;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
 using System.Diagnostics;

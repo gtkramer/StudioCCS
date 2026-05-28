@@ -9,7 +9,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Diagnostics;
 
@@ -153,7 +153,7 @@ namespace StudioCCS
 			if(!WasInit || ProgramID == -1) return;
 			
 			var currentMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
-			GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+			GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
 			//Matrix4 FinalMtx = matrix * Matrix4.Identity;
 			
 			GL.UseProgram(ProgramID);
@@ -173,7 +173,7 @@ namespace StudioCCS
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.UseProgram(0);
 			
-			GL.PolygonMode(MaterialFace.FrontAndBack, currentMode);
+			GL.PolygonMode(TriangleFace.FrontAndBack, currentMode);
 		}
 	}
 }
