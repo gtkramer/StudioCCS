@@ -28,6 +28,9 @@ namespace StudioCCS.Views
                 txtRotX, txtRotY, txtRotZ,
                 txtScaleX, txtScaleY, txtScaleZ,
             };
+
+            // Let a whole tree row toggle expand/collapse, not just the chevron.
+            treeBones.Tapped += TreeViewExpand.ToggleOnTap;
         }
 
         public void SetClump(CCSClump clump)

@@ -31,6 +31,10 @@ namespace StudioCCS.Views
             // Route Logger output to the log panel (marshalled onto the UI thread).
             Logger.SetOutput(AppendLog);
 
+            // Let a whole tree row toggle expand/collapse, not just the chevron.
+            ccsTree.Tapped += TreeViewExpand.ToggleOnTap;
+            sceneTree.Tapped += TreeViewExpand.ToggleOnTap;
+
             // Drag & drop CCS files onto the window.
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, OnDragOver);
