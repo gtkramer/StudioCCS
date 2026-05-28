@@ -1,19 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:StudioCCS.Controls"
-        xmlns:ccs="clr-namespace:StudioCCS"
         xmlns:vm="clr-namespace:StudioCCS.ViewModels"
         x:Class="StudioCCS.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Width="1100" Height="740"
         Title="StudioCCS">
-
-    <Window.Resources>
-        <!-- Shared template for the CCS object tree and the scene animations tree. -->
-        <TreeDataTemplate x:Key="CcsNodeTemplate" x:DataType="ccs:CcsTreeNode" ItemsSource="{Binding Nodes}">
-            <TextBlock Text="{Binding Text}" />
-        </TreeDataTemplate>
-    </Window.Resources>
 
     <DockPanel>
         <!-- Menu -->

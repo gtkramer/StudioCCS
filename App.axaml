@@ -1,7 +1,16 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ccs="clr-namespace:StudioCCS"
              x:Class="StudioCCS.App"
              RequestedThemeVariant="Default">
+
+    <Application.Resources>
+        <!-- Shared template for every CcsTreeNode tree (CCS objects, scene
+             animations, clump bones). Recurses children via Nodes. -->
+        <TreeDataTemplate x:Key="CcsNodeTemplate" x:DataType="ccs:CcsTreeNode" ItemsSource="{Binding Nodes}">
+            <TextBlock Text="{Binding Text}" />
+        </TreeDataTemplate>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />

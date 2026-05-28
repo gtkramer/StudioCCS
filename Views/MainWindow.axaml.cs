@@ -82,11 +82,7 @@ namespace StudioCCS.Views
             {
                 Title = "Select CCS Files to load",
                 AllowMultiple = true,
-                FileTypeFilter = new[]
-                {
-                    new FilePickerFileType("CCS Files") { Patterns = new[] { "*.ccs", "*.tmp" } },
-                    new FilePickerFileType("All Files") { Patterns = new[] { "*" } },
-                },
+                FileTypeFilter = new[] { FileFilters.Ccs, FileFilters.All },
             });
 
             LoadFiles(files.Select(f => f.Path.LocalPath));
@@ -172,72 +168,64 @@ namespace StudioCCS.Views
 
         private void OnCcsTreeContextRequested(object sender, ContextRequestedEventArgs e)
         {
-            var node = (e.Source as Control)?.DataContext as CcsTreeNode;
+            var node = ContextNode(e);
             if (node == null) return;
 
             ccsTree.SelectedItem = node;
-            var menu = BuildContextMenu(node);
-            if (menu == null) return;
-
-            e.Handled = true;
-            menu.Placement = PlacementMode.Pointer;
-            menu.Open(ccsTree);
+            OpenNodeMenu(e, ccsTree, BuildCcsNodeMenu(node));
         }
 
         private void OnSceneTreeContextRequested(object sender, ContextRequestedEventArgs e)
         {
-            var node = (e.Source as Control)?.DataContext as CcsTreeNode;
+            var node = ContextNode(e);
             if (node == null || node == _vm.AnimationsRoot) return;
-            if (!(node.Tag is TreeNodeTag tag) || tag.ObjectType != CCSFile.SECTION_ANIME) return;
+            if (node.Tag is not TreeNodeTag tag || tag.ObjectType != CCSFile.SECTION_ANIME) return;
 
-            var menu = new ContextMenu();
-            ((IList)menu.Items).Add(MakeMenuItem("Remove", () =>
+            OpenNodeMenu(e, sceneTree, Menu(MakeMenuItem("Remove", () =>
             {
                 _vm.AnimationsRoot.Nodes.Remove(node);
                 var anime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
                 if (anime != null) Scene.RemoveAnime(anime);
-            }));
-
-            e.Handled = true;
-            menu.Placement = PlacementMode.Pointer;
-            menu.Open(sceneTree);
+            })));
         }
 
-        private ContextMenu BuildContextMenu(CcsTreeNode node)
+        private ContextMenu BuildCcsNodeMenu(CcsTreeNode node)
         {
-            if (!(node.Tag is TreeNodeTag tag)) return null;
+            if (node.Tag is not TreeNodeTag tag) return null;
 
-            var items = new List<MenuItem>();
             if (tag.Type == TreeNodeTag.NodeType.File)
             {
-                items.Add(MakeMenuItem("Unload", () =>
-                {
-                    // DeInit() deletes GL resources, so run it on the render thread.
-                    glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
-                    _vm.CcsRoots.Remove(node);
-                }));
-                items.Add(MakeMenuItem("View Info Report", () =>
-                {
-                    var reportForm = new InfoWindow();
-                    reportForm.SetReportText(tag.File.GetReport());
-                    reportForm.Show();
-                }));
+                return Menu(
+                    MakeMenuItem("Unload", () =>
+                    {
+                        // DeInit() deletes GL resources, so run it on the render thread.
+                        glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
+                        _vm.CcsRoots.Remove(node);
+                    }),
+                    MakeMenuItem("View Info Report", () =>
+                    {
+                        var reportForm = new InfoWindow();
+                        reportForm.SetReportText(tag.File.GetReport());
+                        reportForm.Show();
+                    }));
             }
-            else if (tag.Type == TreeNodeTag.NodeType.Main)
+
+            if (tag.Type == TreeNodeTag.NodeType.Main && tag.ObjectType == CCSFile.SECTION_CLUMP)
             {
-                if (tag.ObjectType == CCSFile.SECTION_CLUMP)
-                {
-                    items.Add(MakeMenuItem("Load Matrix...", () => LoadMatrix(tag)));
-                    items.Add(MakeMenuItem("Edit Bones", () =>
+                return Menu(
+                    MakeMenuItem("Load Matrix...", () => LoadMatrix(tag)),
+                    MakeMenuItem("Edit Bones", () =>
                     {
                         var editFrm = new EditBoneWindow();
                         editFrm.SetClump(tag.File.GetObject<CCSClump>(tag.ObjectID));
                         editFrm.Show();
                     }));
-                }
-                else if (tag.ObjectType == CCSFile.SECTION_ANIME)
-                {
-                    items.Add(MakeMenuItem("Add to Scene", () =>
+            }
+
+            if (tag.Type == TreeNodeTag.NodeType.Main && tag.ObjectType == CCSFile.SECTION_ANIME)
+            {
+                return Menu(
+                    MakeMenuItem("Add to Scene", () =>
                     {
                         var tmpAnime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
                         if (tmpAnime != null)
@@ -245,16 +233,34 @@ namespace StudioCCS.Views
                             Scene.AddAnime(tmpAnime);
                             _vm.AnimationsRoot.Nodes.Add(new CcsTreeNode(tmpAnime.ToNode().Text) { Tag = tag });
                         }
-                    }));
-                    items.Add(MakeMenuItem("Set Pose", () =>
+                    }),
+                    MakeMenuItem("Set Pose", () =>
                     {
                         var tmpAnime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
                         tmpAnime?.FrameForward();
                     }));
-                }
             }
 
-            if (items.Count == 0) return null;
+            return null;
+        }
+
+        // ----- Context-menu helpers (shared by both trees) -----
+
+        private static CcsTreeNode ContextNode(ContextRequestedEventArgs e)
+        {
+            return (e.Source as Control)?.DataContext as CcsTreeNode;
+        }
+
+        private static void OpenNodeMenu(ContextRequestedEventArgs e, Control owner, ContextMenu menu)
+        {
+            if (menu == null) return;
+            e.Handled = true;
+            menu.Placement = PlacementMode.Pointer;
+            menu.Open(owner);
+        }
+
+        private static ContextMenu Menu(params MenuItem[] items)
+        {
             var menu = new ContextMenu();
             foreach (var mi in items) ((IList)menu.Items).Add(mi);
             return menu;
@@ -273,11 +279,7 @@ namespace StudioCCS.Views
             {
                 Title = "Select Binary File to load",
                 AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
-                    new FilePickerFileType("Bin Files") { Patterns = new[] { "*.bin" } },
-                    new FilePickerFileType("All Files") { Patterns = new[] { "*" } },
-                },
+                FileTypeFilter = new[] { FileFilters.Bin, FileFilters.All },
             });
             var file = files.FirstOrDefault();
             if (file == null) return;

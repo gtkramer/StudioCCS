@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,11 +12,6 @@ namespace StudioCCS.Views
 {
     public partial class EditBoneWindow : Window
     {
-        public class BoneNodeTag
-        {
-            public CCSObject Bone;
-        }
-
         public CCSFile OperatingFile = null;
         public CCSClump OperatingClump = null;
         public CCSObject OperatingObject = null;
@@ -42,18 +36,15 @@ namespace StudioCCS.Views
             OperatingFile = clump.ParentFile;
             OperatingClump.RenderBones = true;
 
-            string clumpName = OperatingFile.GetSubObjectName(OperatingClump.ObjectID);
-
-            var mainNodes = new List<TreeViewItem>();
-            var nodes = new List<TreeViewItem>();
+            // Build the bone hierarchy as CcsTreeNodes (Tag = the bone) and bind it;
+            // the shared CcsNodeTemplate renders it. Each node is parented under its
+            // bone's parent, mirroring the clump's skeleton.
+            var roots = new List<CcsTreeNode>();
+            var nodes = new List<CcsTreeNode>();
             for (int i = 0; i < OperatingClump.NodeCount; i++)
             {
                 var tmpBone = OperatingClump.GetObject(i);
-                var tmpNode = new TreeViewItem
-                {
-                    Header = OperatingFile.GetSubObjectName(tmpBone.ObjectID),
-                    Tag = new BoneNodeTag { Bone = tmpBone },
-                };
+                var tmpNode = new CcsTreeNode(OperatingFile.GetSubObjectName(tmpBone.ObjectID)) { Tag = tmpBone };
                 nodes.Add(tmpNode);
 
                 int parentObjectID = tmpBone.ParentObjectID;
@@ -62,26 +53,23 @@ namespace StudioCCS.Views
                     int parentNodeID = OperatingClump.SearchNodeID(parentObjectID);
                     if (parentNodeID == -1)
                     {
-                        mainNodes.Add(tmpNode);
+                        roots.Add(tmpNode);
                     }
                     else
                     {
-                        ((IList)nodes[parentNodeID].Items).Add(tmpNode);
+                        nodes[parentNodeID].Nodes.Add(tmpNode);
                     }
                 }
                 else
                 {
-                    mainNodes.Add(tmpNode);
+                    roots.Add(tmpNode);
                 }
             }
 
-            Debug.WriteLine(string.Format("BoneTree has {0} Nodes...", mainNodes.Count));
-            foreach (var tmpNode in mainNodes)
-            {
-                ((IList)treeBones.Items).Add(tmpNode);
-            }
+            Debug.WriteLine(string.Format("BoneTree has {0} root nodes...", roots.Count));
+            treeBones.ItemsSource = roots;
 
-            Title = string.Format("Edit Bones for {0}...", clumpName);
+            Title = string.Format("Edit Bones for {0}...", OperatingFile.GetSubObjectName(OperatingClump.ObjectID));
         }
 
         private void OnUpdateClick(object sender, RoutedEventArgs e)
@@ -129,39 +117,36 @@ namespace StudioCCS.Views
 
         private void OnBoneSelected(object sender, SelectionChangedEventArgs e)
         {
-            var tmpNode = treeBones.SelectedItem as TreeViewItem;
-            if (tmpNode == null) return;
-            var tmpTag = tmpNode.Tag as BoneNodeTag;
-            if (tmpTag != null)
+            var bone = (treeBones.SelectedItem as CcsTreeNode)?.Tag as CCSObject;
+            if (bone == null) return;
+
+            OperatingObject = bone;
+            OperatingClump.SelectedBoneID = OperatingObject.NodeID;
+
+            Vector3 tmpPos = OperatingClump.BindPositions[OperatingObject.NodeID];
+            Vector3 tmpRot = OperatingClump.BindRotations[OperatingObject.NodeID];
+            Vector3 tmpScale = OperatingClump.BindScales[OperatingObject.NodeID];
+            if (OperatingFile.GetVersion() == CCSFileHeader.CCSVersion.Gen1)
             {
-                OperatingObject = tmpTag.Bone;
-                OperatingClump.SelectedBoneID = OperatingObject.NodeID;
-
-                Vector3 tmpPos = OperatingClump.BindPositions[OperatingObject.NodeID];
-                Vector3 tmpRot = OperatingClump.BindRotations[OperatingObject.NodeID];
-                Vector3 tmpScale = OperatingClump.BindScales[OperatingObject.NodeID];
-                if (OperatingFile.GetVersion() == CCSFileHeader.CCSVersion.Gen1)
-                {
-                    tmpPos = OperatingClump.PosePositions[OperatingObject.NodeID];
-                    tmpRot = OperatingClump.PoseRotations[OperatingObject.NodeID];
-                    tmpScale = OperatingClump.PoseScales[OperatingObject.NodeID];
-                }
-
-                txtPosX.Text = tmpPos.X.ToString();
-                txtPosY.Text = tmpPos.Y.ToString();
-                txtPosZ.Text = tmpPos.Z.ToString();
-
-                float pi = 3.14159265f;
-                txtRotX.Text = (tmpRot.X * 180.0f / pi).ToString();
-                txtRotY.Text = (tmpRot.Y * 180.0f / pi).ToString();
-                txtRotZ.Text = (tmpRot.Z * 180.0f / pi).ToString();
-
-                txtScaleX.Text = tmpScale.X.ToString();
-                txtScaleY.Text = tmpScale.Y.ToString();
-                txtScaleZ.Text = tmpScale.Z.ToString();
-
-                lblBoneName.Text = OperatingFile.GetSubObjectName(OperatingObject.ObjectID);
+                tmpPos = OperatingClump.PosePositions[OperatingObject.NodeID];
+                tmpRot = OperatingClump.PoseRotations[OperatingObject.NodeID];
+                tmpScale = OperatingClump.PoseScales[OperatingObject.NodeID];
             }
+
+            txtPosX.Text = tmpPos.X.ToString();
+            txtPosY.Text = tmpPos.Y.ToString();
+            txtPosZ.Text = tmpPos.Z.ToString();
+
+            float pi = 3.14159265f;
+            txtRotX.Text = (tmpRot.X * 180.0f / pi).ToString();
+            txtRotY.Text = (tmpRot.Y * 180.0f / pi).ToString();
+            txtRotZ.Text = (tmpRot.Z * 180.0f / pi).ToString();
+
+            txtScaleX.Text = tmpScale.X.ToString();
+            txtScaleY.Text = tmpScale.Y.ToString();
+            txtScaleZ.Text = tmpScale.Z.ToString();
+
+            lblBoneName.Text = OperatingFile.GetSubObjectName(OperatingObject.ObjectID);
         }
 
         private void OnClearRotation(object sender, RoutedEventArgs e)
@@ -220,11 +205,7 @@ namespace StudioCCS.Views
 
         private static IReadOnlyList<FilePickerFileType> PoseFileTypes()
         {
-            return new[]
-            {
-                new FilePickerFileType("Bin Files") { Patterns = new[] { "*.bin" } },
-                new FilePickerFileType("All Files") { Patterns = new[] { "*" } },
-            };
+            return new[] { FileFilters.Bin, FileFilters.All };
         }
 
         protected override void OnClosed(System.EventArgs e)
