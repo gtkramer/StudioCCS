@@ -26,10 +26,14 @@ namespace StudioCCS.Controls
         private bool _bindingsLoaded;
         private bool _sceneInit;
 
-        // Work that must run with the GL context current. Avalonia only makes the
-        // context current on the render thread inside OnOpenGlRender, so any GL
-        // resource creation triggered from the UI thread (loading/unloading a CCS
-        // file builds shaders, textures, VBOs) must be funneled through here.
+        // Work that must run with the GL context current. The context is only
+        // current *inside* the OnOpenGlInit/OnOpenGlRender callbacks (which Avalonia
+        // invokes on the UI thread in this configuration). Any GL resource work
+        // triggered from a normal UI handler (loading/unloading a CCS file builds
+        // shaders, textures, VBOs) therefore runs with NO current context unless it
+        // is funneled through here to be executed during the next render callback.
+        // ConcurrentQueue is used defensively in case Avalonia ever renders the
+        // control on a dedicated render thread.
         private readonly ConcurrentQueue<Action> _glJobs = new ConcurrentQueue<Action>();
 
         /// <summary>
