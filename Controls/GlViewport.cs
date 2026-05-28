@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
+using Avalonia.Threading;
 using OpenTK.Graphics.OpenGL;
 
 namespace StudioCCS.Controls
@@ -37,13 +38,21 @@ namespace StudioCCS.Controls
         private readonly ConcurrentQueue<Action> _glJobs = new ConcurrentQueue<Action>();
 
         /// <summary>
-        /// Queues an action to run on the render thread with the GL context current,
-        /// then requests a frame so it runs promptly.
+        /// Queues an action to run inside the next render callback with the GL
+        /// context current. Safe to call from any thread (e.g. a background parse
+        /// task); the render wake-up is marshalled to the UI thread.
         /// </summary>
         public void EnqueueGlJob(Action job)
         {
             _glJobs.Enqueue(job);
-            RequestNextFrameRendering();
+            if (Dispatcher.UIThread.CheckAccess())
+            {
+                RequestNextFrameRendering();
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(RequestNextFrameRendering);
+            }
         }
 
         protected override void OnOpenGlInit(GlInterface gl)

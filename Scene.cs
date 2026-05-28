@@ -253,23 +253,27 @@ namespace StudioCCS
 			}
 		}
 		
-		public static CcsTreeNode LoadCCSFile(string fileName)
+		// Loading is split into two phases so the heavy CPU parse can run off the UI
+		// thread while the GL upload stays on the render callback (the only place the
+		// GL context is current):
+		//   1. ReadCCSFile(path)  - parses the file (CPU only, safe on any thread).
+		//   2. InitCCSFile(file)  - creates GL resources; MUST run with the context
+		//                           current (i.e. inside GlViewport's render callback).
+		public static CCSFile ReadCCSFile(string fileName)
 		{
 			var tmpCCS = new CCSFile();
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
-			if(tmpCCS.Read(fileName))
+			if(tmpCCS.Read(fileName)) return tmpCCS;
+			Debug.WriteLine("Failed to read {0}...", fileName);
+			return null;
+		}
+
+		public static CcsTreeNode InitCCSFile(CCSFile file)
+		{
+			if(file != null && file.Init())
 			{
-				if(tmpCCS.Init())
-				{
-					sw.Stop();
-					Debug.WriteLine("Read and Initialized {0} in {1}ms...", fileName, sw.ElapsedMilliseconds);
-					CCSFileList.Add(tmpCCS);
-					return tmpCCS.ToNode();
-				}
+				CCSFileList.Add(file);
+				return file.ToNode();
 			}
-			sw.Stop();
-			Debug.WriteLine("Failed to read {0} in {1}ms...", fileName, sw.ElapsedMilliseconds);
 			return null;
 		}
 		

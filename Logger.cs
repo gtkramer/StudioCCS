@@ -20,6 +20,9 @@ namespace StudioCCS
 	{
 		private static Dictionary<int, bool> FiredWarnings = new Dictionary<int, bool>();
 		private static Dictionary<int, bool> FiredShots = new Dictionary<int, bool>();
+		// Parsing now runs on a background thread, so logging (and its de-dup
+		// bookkeeping) can be invoked from multiple threads concurrently.
+		private static readonly object DedupLock = new object();
 		public enum LogType {LogAll, LogOnceCode, LogOnceValue}
 
 		// UI-agnostic sink. The view layer (Avalonia) supplies a delegate that
@@ -51,14 +54,20 @@ namespace StudioCCS
 			if(logAs == LogType.LogOnceCode)
 			{
 				int logDictKey = string.Format("{0}:{1}", callingMethod, callingLine).GetHashCode();
-				if(FiredWarnings.ContainsKey(logDictKey)) return;
-				FiredWarnings[logDictKey] = true;
+				lock(DedupLock)
+				{
+					if(FiredWarnings.ContainsKey(logDictKey)) return;
+					FiredWarnings[logDictKey] = true;
+				}
 			}
 			else if(logAs == LogType.LogOnceValue)
 			{
 				int logTextKey = outputText.GetHashCode();
-				if(FiredShots.ContainsKey(logTextKey)) return;
-				FiredShots[logTextKey] = true;
+				lock(DedupLock)
+				{
+					if(FiredShots.ContainsKey(logTextKey)) return;
+					FiredShots[logTextKey] = true;
+				}
 			}
 
 			Output?.Invoke(outputText, textColor);

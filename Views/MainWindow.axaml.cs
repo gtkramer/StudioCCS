@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -107,16 +108,17 @@ namespace StudioCCS.Views
 
         private void AppendLog(string text, System.Drawing.Color color)
         {
-            Console.Write(text);
-            if (Dispatcher.UIThread.CheckAccess())
-            {
-                _logView.Text += text;
-                _logView.CaretIndex = _logView.Text.Length;
-            }
-            else
+            // Logging can originate on the background parse thread; marshal to the UI
+            // thread first so the console echo and TextBox update happen exactly once.
+            if (!Dispatcher.UIThread.CheckAccess())
             {
                 Dispatcher.UIThread.Post(() => AppendLog(text, color));
+                return;
             }
+
+            Console.Write(text);
+            _logView.Text += text;
+            _logView.CaretIndex = _logView.Text.Length;
         }
 
         #endregion
@@ -144,19 +146,34 @@ namespace StudioCCS.Views
             var paths = fileNames.ToList();
             if (paths.Count == 0) return;
 
-            // CCSFile.Init() creates GL resources (shaders, textures, buffers), so it
-            // must run with the context current — i.e. on the render thread. Parse +
-            // GL-upload there, then marshal the resulting tree node back to the UI.
-            _glViewport.EnqueueGlJob(() =>
+            // Parse on a background thread so a large file doesn't freeze the UI or
+            // stall the render loop. The GL upload (InitCCSFile) MUST run with the
+            // context current, so it's enqueued onto the render callback; the
+            // resulting tree node is then marshalled back to the UI thread.
+            Task.Run(() =>
             {
                 foreach (var fileName in paths)
                 {
-                    CcsTreeNode ccsNode = Scene.LoadCCSFile(fileName);
-                    if (ccsNode != null)
+                    CCSFile file;
+                    try
                     {
-                        var node = ccsNode;
-                        Dispatcher.UIThread.Post(() => ((IList)_ccsTree.Items).Add(BuildTreeItem(node)));
+                        file = Scene.ReadCCSFile(fileName);
                     }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(string.Format("Failed to load {0}: {1}\n", fileName, ex.Message));
+                        continue;
+                    }
+                    if (file == null) continue;
+
+                    _glViewport.EnqueueGlJob(() =>
+                    {
+                        CcsTreeNode node = Scene.InitCCSFile(file);
+                        if (node != null)
+                        {
+                            Dispatcher.UIThread.Post(() => ((IList)_ccsTree.Items).Add(BuildTreeItem(node)));
+                        }
+                    });
                 }
             });
         }
