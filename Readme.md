@@ -1,4 +1,4 @@
-﻿StudioCCS - CCS Model Viewer
+StudioCCS - CCS Model Viewer
 
 This is an early alpha release. Many of the planned features are currently unimplemented.
 Also, this readme is a train wreck.

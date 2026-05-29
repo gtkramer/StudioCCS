@@ -1,0 +1,10 @@
+root = true
+
+# Store every text file as UTF-8 *without* a BOM. "utf-8" here means no BOM;
+# "utf-8-bom" would be the opt-in variant. This stops Windows editors (Visual
+# Studio, older Notepad/PowerShell) from silently re-adding the EF BB BF marker
+# that was stripped from the tree. Line endings are handled by .gitattributes
+# (LF in the repo); end_of_line below keeps editors consistent with that.
+[*]
+charset = utf-8
+end_of_line = lf
