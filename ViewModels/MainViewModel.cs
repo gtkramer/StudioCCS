@@ -93,8 +93,10 @@ namespace StudioCCS.ViewModels
         public void RefreshCameraStatus()
         {
             ArcBallCamera cam = Scene.CurrentCamera();
+            // Fixed-width fields (monospace status bar) keep the readout from jittering as it
+            // refreshes ~10x/sec; grouped labels make each axis legible at a glance.
             CameraStatus = string.Format(
-                "Camera: Rotation: {0}, {1}, {2}, Target: {3}, {4}, {5}, Distance: {6}",
+                "Rot {0,6:0.#}° {1,6:0.#}° {2,6:0.#}°     Target {3,5:0.#} {4,5:0.#} {5,5:0.#}     Dist {6,5:0.#}",
                 cam.Rotation.X, cam.Rotation.Y, cam.Rotation.Z,
                 cam.Target.X, cam.Target.Y, cam.Target.Z, cam.Distance);
         }

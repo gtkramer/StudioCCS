@@ -47,14 +47,6 @@
             <RadioButton GroupName="ViewMode" Content="All" IsChecked="{Binding IsAllMode, Mode=TwoWay}" />
         </StackPanel>
 
-        <!-- Status bar -->
-        <Border DockPanel.Dock="Bottom" BorderBrush="#40808080" BorderThickness="0,1,0,0" Padding="6,3">
-            <StackPanel Orientation="Horizontal" Spacing="20">
-                <TextBlock Text="{Binding RenderModeStatus}" />
-                <TextBlock Text="{Binding CameraStatus}" />
-            </StackPanel>
-        </Border>
-
         <!-- Main area: tree | viewport, with a resizable log below -->
         <Grid RowDefinitions="*,Auto,160">
             <Grid Grid.Row="0" Name="splitGrid" ColumnDefinitions="240,Auto,*">
@@ -78,20 +70,50 @@
 
                 <GridSplitter Grid.Column="1" Name="treeSplitter" Width="4" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-                <!-- The GL surface composites its framebuffer but isn't a reliable
-                     hit-test target, so it never receives pointer events. We catch
-                     input on a transparent, focusable Border over it and forward to
-                     Scene; the GL control is marked input-transparent. -->
-                <Border Grid.Column="2" Name="viewportHost"
-                        Background="Transparent" Focusable="True"
-                        PointerPressed="OnViewportPointerPressed"
-                        PointerMoved="OnViewportPointerMoved"
-                        PointerReleased="OnViewportPointerReleased"
-                        PointerWheelChanged="OnViewportPointerWheel"
-                        KeyDown="OnViewportKeyDown"
-                        KeyUp="OnViewportKeyUp">
-                    <controls:GlViewport Name="glViewport" IsHitTestVisible="False" />
-                </Border>
+                <!-- Viewport column: GL surface on top, render-info status bar docked
+                     directly beneath it so the camera/mode readout stays grouped with
+                     what it describes (rather than spanning the whole window). -->
+                <DockPanel Grid.Column="2">
+                    <!-- Top bar: render mode. Kept above the viewport because the mode
+                         list grows as more views are toggled on, so it needs the full
+                         viewport width rather than sharing a line with the camera. -->
+                    <Border DockPanel.Dock="Top" Background="#202020"
+                            BorderBrush="#40808080" BorderThickness="0,0,0,1" Padding="10,4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Mode" Foreground="#808890" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding RenderModeStatus}"
+                                       FontWeight="SemiBold" Foreground="#E0E0E0"
+                                       TextWrapping="NoWrap" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Bottom bar: live camera readout. -->
+                    <Border DockPanel.Dock="Bottom" Background="#202020"
+                            BorderBrush="#40808080" BorderThickness="0,1,0,0" Padding="10,4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Camera" Foreground="#808890" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding CameraStatus}"
+                                       FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,monospace"
+                                       Foreground="#B0B8C0"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- The GL surface composites its framebuffer but isn't a reliable
+                         hit-test target, so it never receives pointer events. We catch
+                         input on a transparent, focusable Border over it and forward to
+                         Scene; the GL control is marked input-transparent. -->
+                    <Border Name="viewportHost"
+                            Background="Transparent" Focusable="True"
+                            PointerPressed="OnViewportPointerPressed"
+                            PointerMoved="OnViewportPointerMoved"
+                            PointerReleased="OnViewportPointerReleased"
+                            PointerWheelChanged="OnViewportPointerWheel"
+                            KeyDown="OnViewportKeyDown"
+                            KeyUp="OnViewportKeyUp">
+                        <controls:GlViewport Name="glViewport" IsHitTestVisible="False" />
+                    </Border>
+                </DockPanel>
             </Grid>
 
             <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" />
