@@ -1,0 +1,10 @@
+# Normalize line endings. Store text with LF in the repo, but check it out with
+# each platform's native ending (CRLF on Windows, LF elsewhere) so working trees
+# stay friendly to local tooling while the repo stays consistent.
+* text=auto
+
+# Binary assets: never normalized or diffed as text.
+*.dds   binary
+*.png   binary
+*.bin   binary
+*.ccs   binary
