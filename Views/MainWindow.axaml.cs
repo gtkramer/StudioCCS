@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
@@ -20,6 +22,13 @@ namespace StudioCCS.Views
         private readonly MainViewModel _vm = new MainViewModel();
         private readonly DispatcherTimer _statusTimer;
 
+        // The log panel's backing store. Capped so a heavy parse can't grow it
+        // without bound; oldest lines are dropped first. Touched only on the UI
+        // thread (AppendLog marshals there first).
+        private readonly ObservableCollection<LogLine> _logLines = new();
+        private readonly Dictionary<uint, IBrush> _brushCache = new();
+        private const int MaxLogLines = 2000;
+
         public MainWindow() : this(null)
         {
         }
@@ -28,6 +37,8 @@ namespace StudioCCS.Views
         {
             InitializeComponent();
             DataContext = _vm;
+
+            logView.ItemsSource = _logLines;
 
             // Configure logging: the framework owns levels/filtering and the stdout
             // sink; our custom provider routes to the log panel (marshalled onto the
@@ -76,7 +87,7 @@ namespace StudioCCS.Views
         private void AppendLog(string text, System.Drawing.Color color)
         {
             // Logging can originate on the background parse thread; marshal to the UI
-            // thread first so the TextBox update happens exactly once. (stdout is
+            // thread first so the list mutation happens on the UI thread. (stdout is
             // handled separately by the framework's console provider.)
             if (!Dispatcher.UIThread.CheckAccess())
             {
@@ -84,8 +95,23 @@ namespace StudioCCS.Views
                 return;
             }
 
-            logView.Text += text;
-            logView.CaretIndex = logView.Text.Length;
+            var line = new LogLine(text, BrushFor(color));
+            _logLines.Add(line);
+            if (_logLines.Count > MaxLogLines) _logLines.RemoveAt(0);
+            logView.ScrollIntoView(line);
+        }
+
+        // Severity colours come from the logging provider as System.Drawing.Color;
+        // cache the Avalonia brushes since only a handful of distinct colours occur.
+        private IBrush BrushFor(System.Drawing.Color c)
+        {
+            uint key = (uint)c.ToArgb();
+            if (!_brushCache.TryGetValue(key, out var brush))
+            {
+                brush = new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
+                _brushCache[key] = brush;
+            }
+            return brush;
         }
 
         #endregion
