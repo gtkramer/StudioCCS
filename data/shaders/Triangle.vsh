@@ -7,6 +7,6 @@ uniform mat4 modelView;
 
 void main()
 {
-	gl_Position = modelView * vec4(vPosition, 1.0);
-	color = vec4(vColor, 1.0);
+    gl_Position = modelView * vec4(vPosition, 1.0);
+    color = vec4(vColor, 1.0);
 }

@@ -9,12 +9,12 @@ dir = os.path.dirname(bpy.data.filepath)
 if not dir in sys.path:
     sys.path.append(dir)
 
-    
+
 def makeDummy(name, position, rotation, options):
     tmpDummy = bpy.data.objects.get(name, None)
     if tmpDummy is not None:
         bpy.data.objects.remove(tmpDummy, True)
-    
+
     tmpDummy = bpy.data.objects.new(name, object_data=None)
     bpy.context.scene.objects.link(tmpDummy)
     tmpDummy.empty_draw_size = 0.25
@@ -31,7 +31,7 @@ class HackCCSDummyImport_SelectTextFile(Operator):
     bl_label = "..."
     filepath = bpy.props.StringProperty(subtype="FILE_PATH")
     filter_glob = bpy.props.StringProperty(default='*.txt', options={'HIDDEN'})
-    
+
     def execute(self, context):
         HackCCSDummyImport_ImportDummies.fileName = self.filepath
         return {'FINISHED'}
@@ -54,26 +54,26 @@ def doLoadTextFile(fileName, context, options):
             makeDummy(tmpName, tmpPos, tmpRot, options)
 
 
-    
+
 class HackCCSDummyImport_ImportDummies(Operator):
     bl_idname = "hackimport.importdummies"
     bl_label = "Import .hack CCS Dummies from Text"
-    
+
     fileName = ""
     options = {}
-    
+
     def execute(self, context):
         doLoadTextFile(HackCCSDummyImport_ImportDummies.fileName, context, HackCCSDummyImport_ImportDummies.options)
         return {"FINISHED"}
-        
-    
+
+
 class HackCCSDummyImportPanel(Panel):
     bl_idname = "hackimport.importdummypanel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_label = "Import Hack CCS Dummies From Text"
     bl_category = ".hack"
-    
+
     def draw(self, context):
         scene = context.scene
         layout = self.layout
@@ -88,18 +88,18 @@ class HackCCSDummyImportPanel(Panel):
         HackCCSDummyImport_ImportDummies.options["draw_type"] = "CUBE"
         row.prop(scene.ccsdummyimport, 'showNames')
         HackCCSDummyImport_ImportDummies.options["show_names"] = scene.ccsdummyimport.showNames
-            
+
         if(textFileName != ""):
             row = layout.row()
             row.operator(HackCCSDummyImport_ImportDummies.bl_idname)
-        
+
         context.area.tag_redraw()
-    
-    
+
+
 class HackCCSDummyImportSettings(bpy.types.PropertyGroup):
     showNames = bpy.props.BoolProperty(name="Show Names", description="Set Dummies to show names", default=True)
-    
-    
+
+
 def register():
     #bpy.utils.register_module(__name__)
     bpy.utils.register_class(HackCCSDummyImportPanel)
@@ -108,14 +108,14 @@ def register():
     bpy.utils.register_class(HackCCSDummyImportSettings)
     bpy.types.Scene.ccsdummyimport = bpy.props.PointerProperty(type=HackCCSDummyImportSettings)
 
-    
+
 def unregister():
     bpy.utils.unregister_class(HackCCSDummyImportPanel)
     bpy.utils.unregister_class(HackCCSDummyImport_SelectTextFile)
     bpy.utils.unregister_class(HackCCSDummyImport_ImportDummies)
     del(bpy.types.Scene.ccsdummyimport)
     bpy.utils.unregister_class(HackCCSDummyImportSettings)
-    
+
 
 if __name__ == "__main__":
     register()

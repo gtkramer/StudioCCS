@@ -1,10 +1,157 @@
 root = true
 
+# ---------------------------------------------------------------------------
+# Defaults for every text file.
+#
 # Store every text file as UTF-8 *without* a BOM. "utf-8" here means no BOM;
 # "utf-8-bom" would be the opt-in variant. This stops Windows editors (Visual
 # Studio, older Notepad/PowerShell) from silently re-adding the EF BB BF marker
-# that was stripped from the tree. Line endings are handled by .gitattributes
-# (LF in the repo); end_of_line below keeps editors consistent with that.
+# that was stripped from the tree. Line endings are normalized to LF by
+# .gitattributes (LF in the repo, native on checkout); end_of_line below keeps
+# editors writing LF so working trees match what Git stores.
+# ---------------------------------------------------------------------------
 [*]
 charset = utf-8
 end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Markdown: a line ending in two spaces is a hard line break, so trimming
+# trailing whitespace here would silently change rendering.
+[*.md]
+trim_trailing_whitespace = false
+
+# MSBuild / project files conventionally use 2-space indentation.
+[*.{csproj,props,targets,sln}]
+indent_size = 2
+
+# YAML / JSON conventionally use 2-space indentation.
+[*.{yml,yaml,json}]
+indent_size = 2
+
+# XAML and GLSL shaders follow the 4-space default; listed for clarity.
+[*.{axaml,xaml}]
+indent_size = 4
+
+[*.{vsh,fsh,gsh,glsl}]
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# C# — Microsoft coding conventions.
+# https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions
+#
+# Severities: rules that `dotnet format` should auto-apply are :warning;
+# stylistic preferences that should only surface as IDE hints (and not rewrite
+# the legacy tree wholesale) are :suggestion.
+# ---------------------------------------------------------------------------
+[*.cs]
+indent_size = 4
+
+# using directives: outside the namespace, System.* sorted first, one group.
+csharp_using_directive_placement = outside_namespace:warning
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# Use language keywords (int, string) instead of BCL type names (Int32, String).
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# Do not prefix member access with this.
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# Accessibility modifiers required except where the default is obvious.
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+dotnet_style_readonly_field = true:suggestion
+
+# var: prefer explicit types for built-ins, var when the type is apparent.
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Always use braces, even for single-statement blocks.
+csharp_prefer_braces = true:warning
+
+# Allman braces — opening brace on its own line.
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# Indentation details.
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_labels = one_less_than_current
+
+# Spacing.
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_before_open_square_brackets = false
+
+# Prefer file-scoped namespaces (C# 10+). Suggestion only, to avoid rewriting
+# every legacy block-scoped file in one pass.
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# Expression-level preferences.
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+csharp_style_throw_expression = true:suggestion
+
+# --- Naming (suggestion only: renaming legacy symbols is out of scope) ---
+
+# Interfaces are PascalCase prefixed with I.
+dotnet_naming_rule.interfaces_begin_with_i.severity = suggestion
+dotnet_naming_rule.interfaces_begin_with_i.symbols = interface_symbols
+dotnet_naming_rule.interfaces_begin_with_i.style = i_prefixed_pascal
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_style.i_prefixed_pascal.required_prefix = I
+dotnet_naming_style.i_prefixed_pascal.capitalization = pascal_case
+
+# Types and non-field members are PascalCase.
+dotnet_naming_rule.members_are_pascal_case.severity = suggestion
+dotnet_naming_rule.members_are_pascal_case.symbols = type_and_member_symbols
+dotnet_naming_rule.members_are_pascal_case.style = pascal_case
+dotnet_naming_symbols.type_and_member_symbols.applicable_kinds = class,struct,enum,delegate,method,property,event,namespace
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# Private fields are _camelCase.
+dotnet_naming_rule.private_fields_underscore.severity = suggestion
+dotnet_naming_rule.private_fields_underscore.symbols = private_field_symbols
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
+dotnet_naming_symbols.private_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_field_symbols.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+
+# Constants are PascalCase.
+dotnet_naming_rule.constants_are_pascal_case.severity = suggestion
+dotnet_naming_rule.constants_are_pascal_case.symbols = constant_symbols
+dotnet_naming_rule.constants_are_pascal_case.style = pascal_case
+dotnet_naming_symbols.constant_symbols.applicable_kinds = field,local
+dotnet_naming_symbols.constant_symbols.required_modifiers = const
+
+# Parameters and locals are camelCase.
+dotnet_naming_rule.parameters_are_camel_case.severity = suggestion
+dotnet_naming_rule.parameters_are_camel_case.symbols = parameter_symbols
+dotnet_naming_rule.parameters_are_camel_case.style = camel_case
+dotnet_naming_symbols.parameter_symbols.applicable_kinds = parameter,local
+dotnet_naming_style.camel_case.capitalization = camel_case

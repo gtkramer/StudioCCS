@@ -9,7 +9,7 @@ out vec4 FragmentBaseColor;
 
 void main()
 {
-	vec3 Scaled = Position * Scale;
-	gl_Position = Matrix * vec4(Scaled, 1.0);
-	FragmentBaseColor = Color;
+    vec3 Scaled = Position * Scale;
+    gl_Position = Matrix * vec4(Scaled, 1.0);
+    FragmentBaseColor = Color;
 }

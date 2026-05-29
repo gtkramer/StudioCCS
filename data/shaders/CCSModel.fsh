@@ -19,28 +19,28 @@ out vec4 color;
 
 void main()
 {
-	vec2 texCoords = fTextureCoords;
-	if((fRenderMode & RENDER_FLIP_UVS) != 0)
-	{
-		texCoords = vec2(fTextureCoords.x, 1.0 - fTextureCoords.y);
-	}
-	
-	vec2 finalTexCoord = texCoords + fTextureOffset;
-	vec4 textureColor = texture(uTexture, finalTexCoord);
-	color = vec4(fSelectionColor.xyz, 1.0);
-	
-	if(fDrawOptions != 0)
-	{
-		color.a = ((0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z)) * 2;
-	}
-	
-	if((fRenderMode & RENDER_TEXTURE) != 0)
-	{
-		color = textureColor;
-	}
-	
-	if((fRenderMode & RENDER_VERTEX_COLORS) != 0)
-	{
-		color *= fColor;
-	}
+    vec2 texCoords = fTextureCoords;
+    if((fRenderMode & RENDER_FLIP_UVS) != 0)
+    {
+        texCoords = vec2(fTextureCoords.x, 1.0 - fTextureCoords.y);
+    }
+
+    vec2 finalTexCoord = texCoords + fTextureOffset;
+    vec4 textureColor = texture(uTexture, finalTexCoord);
+    color = vec4(fSelectionColor.xyz, 1.0);
+
+    if(fDrawOptions != 0)
+    {
+        color.a = ((0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z)) * 2;
+    }
+
+    if((fRenderMode & RENDER_TEXTURE) != 0)
+    {
+        color = textureColor;
+    }
+
+    if((fRenderMode & RENDER_VERTEX_COLORS) != 0)
+    {
+        color *= fColor;
+    }
 }

@@ -23,12 +23,12 @@ flat out int fRenderMode;
 
 void main()
 {
-	gl_Position = mMatrix * vec4(vPosition, 1.0);
-	fColor = vec4(vColor.xyz, vColor.w * mAlpha);
-	fTextureCoords = vTexCoords;
-	fTextureOffset = mTextureOffset;
-	fNormal = vNormal;
-	fDrawOptions = mDrawOptions;
-	fSelectionColor = mSelectionColor;
-	fRenderMode = mRenderMode;
+    gl_Position = mMatrix * vec4(vPosition, 1.0);
+    fColor = vec4(vColor.xyz, vColor.w * mAlpha);
+    fTextureCoords = vTexCoords;
+    fTextureOffset = mTextureOffset;
+    fNormal = vNormal;
+    fDrawOptions = mDrawOptions;
+    fSelectionColor = mSelectionColor;
+    fRenderMode = mRenderMode;
 }

@@ -121,7 +121,10 @@ namespace StudioCCS.Views
         private void OnBoneSelected(object sender, SelectionChangedEventArgs e)
         {
             var bone = (treeBones.SelectedItem as CcsTreeNode)?.Tag as CCSObject;
-            if (bone == null) return;
+            if (bone == null)
+            {
+                return;
+            }
 
             OperatingObject = bone;
             OperatingClump.SelectedBoneID = OperatingObject.NodeID;
@@ -185,7 +188,10 @@ namespace StudioCCS.Views
                 FileTypeChoices = PoseFileTypes(),
                 DefaultExtension = "bin",
             });
-            if (file == null) return;
+            if (file == null)
+            {
+                return;
+            }
 
             OperatingClump.SavePose(file.Path.LocalPath);
             Log.Info(string.Format("Saved pose for {0} to {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
@@ -200,7 +206,10 @@ namespace StudioCCS.Views
                 FileTypeFilter = PoseFileTypes(),
             });
             var file = files.FirstOrDefault();
-            if (file == null) return;
+            if (file == null)
+            {
+                return;
+            }
 
             OperatingClump.LoadPose(file.Path.LocalPath);
             Log.Info(string.Format("Loaded pose for {0} from {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));

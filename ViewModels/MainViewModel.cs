@@ -56,19 +56,37 @@ namespace StudioCCS.ViewModels
         public bool IsPreviewMode
         {
             get => Mode == Scene.SceneMode.Preview;
-            set { if (value) Mode = Scene.SceneMode.Preview; }
+            set
+            {
+                if (value)
+                {
+                    Mode = Scene.SceneMode.Preview;
+                }
+            }
         }
 
         public bool IsSceneMode
         {
             get => Mode == Scene.SceneMode.Scene;
-            set { if (value) Mode = Scene.SceneMode.Scene; }
+            set
+            {
+                if (value)
+                {
+                    Mode = Scene.SceneMode.Scene;
+                }
+            }
         }
 
         public bool IsAllMode
         {
             get => Mode == Scene.SceneMode.All;
-            set { if (value) Mode = Scene.SceneMode.All; }
+            set
+            {
+                if (value)
+                {
+                    Mode = Scene.SceneMode.All;
+                }
+            }
         }
 
         #endregion
@@ -104,10 +122,25 @@ namespace StudioCCS.ViewModels
         private void UpdateRenderModeStatus()
         {
             var options = new List<string>();
-            if (_wireframe) options.Add("Wireframe");
-            if (_vertexColors) options.Add("Vertex Colors");
-            if (_vertexNormals) options.Add("Vertex Normals");
-            if (_textured) options.Add("Textured");
+            if (_wireframe)
+            {
+                options.Add("Wireframe");
+            }
+
+            if (_vertexColors)
+            {
+                options.Add("Vertex Colors");
+            }
+
+            if (_vertexNormals)
+            {
+                options.Add("Vertex Normals");
+            }
+
+            if (_textured)
+            {
+                options.Add("Textured");
+            }
 
             if (options.Count == 0)
             {
@@ -163,49 +196,91 @@ namespace StudioCCS.ViewModels
         public bool DrawGrid
         {
             get => _drawGrid;
-            set { if (SetField(ref _drawGrid, value)) Scene.DrawViewGrid = value; }
+            set
+            {
+                if (SetField(ref _drawGrid, value))
+                {
+                    Scene.DrawViewGrid = value;
+                }
+            }
         }
 
         private bool _drawCollisionMeshes;
         public bool DrawCollisionMeshes
         {
             get => _drawCollisionMeshes;
-            set { if (SetField(ref _drawCollisionMeshes, value)) Scene.DrawCollisionMeshes = value; }
+            set
+            {
+                if (SetField(ref _drawCollisionMeshes, value))
+                {
+                    Scene.DrawCollisionMeshes = value;
+                }
+            }
         }
 
         private bool _drawDummies;
         public bool DrawDummies
         {
             get => _drawDummies;
-            set { if (SetField(ref _drawDummies, value)) Scene.DrawDummyHelpers = value; }
+            set
+            {
+                if (SetField(ref _drawDummies, value))
+                {
+                    Scene.DrawDummyHelpers = value;
+                }
+            }
         }
 
         private bool _drawLightHelpers;
         public bool DrawLightHelpers
         {
             get => _drawLightHelpers;
-            set { if (SetField(ref _drawLightHelpers, value)) Scene.DrawLightHelpers = value; }
+            set
+            {
+                if (SetField(ref _drawLightHelpers, value))
+                {
+                    Scene.DrawLightHelpers = value;
+                }
+            }
         }
 
         private bool _drawAxisViewport;
         public bool DrawAxisViewport
         {
             get => _drawAxisViewport;
-            set { if (SetField(ref _drawAxisViewport, value)) Scene.DrawViewAxis = value; }
+            set
+            {
+                if (SetField(ref _drawAxisViewport, value))
+                {
+                    Scene.DrawViewAxis = value;
+                }
+            }
         }
 
         private bool _drawWorldCenter;
         public bool DrawWorldCenter
         {
             get => _drawWorldCenter;
-            set { if (SetField(ref _drawWorldCenter, value)) Scene.DrawWorldCenter = value; }
+            set
+            {
+                if (SetField(ref _drawWorldCenter, value))
+                {
+                    Scene.DrawWorldCenter = value;
+                }
+            }
         }
 
         private bool _defaultToAxisMovement;
         public bool DefaultToAxisMovement
         {
             get => _defaultToAxisMovement;
-            set { if (SetField(ref _defaultToAxisMovement, value)) Scene.DefaultToAxisMovement = value; }
+            set
+            {
+                if (SetField(ref _defaultToAxisMovement, value))
+                {
+                    Scene.DefaultToAxisMovement = value;
+                }
+            }
         }
 
         #endregion

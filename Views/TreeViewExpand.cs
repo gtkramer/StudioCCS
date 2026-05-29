@@ -15,11 +15,17 @@ namespace StudioCCS.Views
     {
         public static void ToggleOnTap(object sender, TappedEventArgs e)
         {
-            if (!(e.Source is Visual source)) return;
+            if (!(e.Source is Visual source))
+            {
+                return;
+            }
 
             // The expand/collapse chevron is a ToggleButton that already toggles
             // itself; ignore taps on it so we don't toggle twice (a no-op).
-            if (source.FindAncestorOfType<ToggleButton>(includeSelf: true) != null) return;
+            if (source.FindAncestorOfType<ToggleButton>(includeSelf: true) != null)
+            {
+                return;
+            }
 
             var item = source.FindAncestorOfType<TreeViewItem>(includeSelf: true);
             if (item != null && item.ItemCount > 0)

@@ -10,9 +10,9 @@ out vec2 fTexCoords;
 
 void main()
 {
-	float vX = vPosition.x * mSize.x;
-	float vY = vPosition.y * mSize.y;
-	vec3 vPos1 = vec3(vX * mSize.z, vY * mSize.z, 0.0);
-	gl_Position = mMatrix * vec4(vPos1, 1.0);
-	fTexCoords = vTexCoord;
+    float vX = vPosition.x * mSize.x;
+    float vY = vPosition.y * mSize.y;
+    vec3 vPos1 = vec3(vX * mSize.z, vY * mSize.z, 0.0);
+    gl_Position = mMatrix * vec4(vPos1, 1.0);
+    fTexCoords = vTexCoord;
 }

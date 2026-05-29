@@ -7,6 +7,6 @@ out vec4 BaseColor;
 
 void main()
 {
-	gl_Position = mMatrix * vec4(vPosition, 1.0);
-	BaseColor = vColor;
+    gl_Position = mMatrix * vec4(vPosition, 1.0);
+    BaseColor = vColor;
 }

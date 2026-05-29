@@ -18,62 +18,62 @@ out vec4 color;
 
 void main()
 {
-	
-	//vec2 finalTexCoord = fTextureCoords + fTextureOffset;
-	
-	//color = fColor;
-	////Flat Shaded with Texture/
-	//if(fSelectionColor.w == 0.5)
-	//{
-	//	color = texture2D(fTexture, finalTexCoord) * fColor;
-	//}
-	
-	//if(fDrawOptions == 9)
-	//{
-	//	//color.a = color.x;
-	//	//percieved lum
-	//	//color.a = (0.299 * color.x) + (0.587 * color.y) + (0.114 * color.z);
-	//	//standard lum
-	//	color.a = (0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z);
-	//}
-	
-	//if(fSelectionColor.w == 1.0)
-	//{
-	//	color = vec4(fSelectionColor.xyz, 1.0);
-	//}
-	
-	
-	vec2 finalTexCoord = fTextureCoords + fTextureOffset;
-	vec4 textureColor = texture(fTexture, finalTexCoord);
-	color = vec4(fSelectionColor.xyz, 1.0);
-	
-	
-	if((fRenderMode & RENDER_TEXTURE) != 0)
-	{
-		color = textureColor;
-		if(fDrawOptions != 0)
-		{
-			color.a = ((0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z)) * 2;
-		}
-		
-		//if(color.a < 0.5)
-		//{
-	//		discard;
-	//	}
-	}
-	
-	if((fRenderMode & RENDER_VERTEX_COLORS) != 0)
-	{
-		color *= fColor;
-	}
-	
-	//if(fDrawOptions == 9)
-	//{
-	//	//color.a = color.x;
-	//	//percieved lum
-	//	//color.a = (0.299 * color.x) + (0.587 * color.y) + (0.114 * color.z);
-	//	//standard lum
-	//	color.a = (0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z);
-	//}
-	
+
+    //vec2 finalTexCoord = fTextureCoords + fTextureOffset;
+
+    //color = fColor;
+    ////Flat Shaded with Texture/
+    //if(fSelectionColor.w == 0.5)
+    //{
+    // color = texture2D(fTexture, finalTexCoord) * fColor;
+    //}
+
+    //if(fDrawOptions == 9)
+    //{
+    // //color.a = color.x;
+    // //percieved lum
+    // //color.a = (0.299 * color.x) + (0.587 * color.y) + (0.114 * color.z);
+    // //standard lum
+    // color.a = (0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z);
+    //}
+
+    //if(fSelectionColor.w == 1.0)
+    //{
+    // color = vec4(fSelectionColor.xyz, 1.0);
+    //}
+
+
+    vec2 finalTexCoord = fTextureCoords + fTextureOffset;
+    vec4 textureColor = texture(fTexture, finalTexCoord);
+    color = vec4(fSelectionColor.xyz, 1.0);
+
+
+    if((fRenderMode & RENDER_TEXTURE) != 0)
+    {
+        color = textureColor;
+        if(fDrawOptions != 0)
+        {
+            color.a = ((0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z)) * 2;
+        }
+
+        //if(color.a < 0.5)
+        //{
+    //  discard;
+    // }
+    }
+
+    if((fRenderMode & RENDER_VERTEX_COLORS) != 0)
+    {
+        color *= fColor;
+    }
+
+    //if(fDrawOptions == 9)
+    //{
+    // //color.a = color.x;
+    // //percieved lum
+    // //color.a = (0.299 * color.x) + (0.587 * color.y) + (0.114 * color.z);
+    // //standard lum
+    // color.a = (0.2126 * color.x) + (0.7152 * color.y) + (0.0722 * color.z);
+    //}
+
 }

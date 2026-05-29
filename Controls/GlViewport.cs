@@ -106,7 +106,10 @@ namespace StudioCCS.Controls
         [Conditional("DEBUG")]
         private void EnableDebugOutput(int major, int minor)
         {
-            if (major < 4 || (major == 4 && minor < 3)) return;
+            if (major < 4 || (major == 4 && minor < 3))
+            {
+                return;
+            }
 
             _debugProc = DebugCallback;
             GL.Enable(EnableCap.DebugOutput);
@@ -117,7 +120,11 @@ namespace StudioCCS.Controls
         private static void DebugCallback(DebugSource source, DebugType type, int id,
             DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
         {
-            if (severity == DebugSeverity.DebugSeverityNotification) return;
+            if (severity == DebugSeverity.DebugSeverityNotification)
+            {
+                return;
+            }
+
             string text = Marshal.PtrToStringUTF8(message, length);
             Log.Warning(string.Format("GL [{0}/{1}]: {2}\n", severity, type, text));
         }

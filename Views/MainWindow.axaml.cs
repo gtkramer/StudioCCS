@@ -12,9 +12,9 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using OpenTK.Mathematics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using OpenTK.Mathematics;
 using StudioCCS.libCCS;
 using StudioCCS.ViewModels;
 
@@ -79,7 +79,10 @@ namespace StudioCCS.Views
             // Mode is set before this handler is attached).
             _vm.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(MainViewModel.Mode)) ApplyModeLayout(_vm.Mode);
+                if (e.PropertyName == nameof(MainViewModel.Mode))
+                {
+                    ApplyModeLayout(_vm.Mode);
+                }
             };
             ApplyModeLayout(_vm.Mode);
 
@@ -126,7 +129,11 @@ namespace StudioCCS.Views
 
             var line = new LogLine(tag, message, BrushFor(color));
             _logLines.Add(line);
-            if (_logLines.Count > MaxLogLines) _logLines.RemoveAt(0);
+            if (_logLines.Count > MaxLogLines)
+            {
+                _logLines.RemoveAt(0);
+            }
+
             logView.ScrollIntoView(line);
         }
 
@@ -162,7 +169,10 @@ namespace StudioCCS.Views
         private void LoadFiles(IEnumerable<string> fileNames)
         {
             var paths = fileNames.ToList();
-            if (paths.Count == 0) return;
+            if (paths.Count == 0)
+            {
+                return;
+            }
 
             // Parse on a background thread so a large file doesn't freeze the UI or
             // stall the render loop. The GL upload (InitCCSFile) MUST run with the
@@ -182,7 +192,10 @@ namespace StudioCCS.Views
                         Log.Error(string.Format("Failed to load {0}: {1}\n", fileName, ex.Message));
                         continue;
                     }
-                    if (file == null) continue;
+                    if (file == null)
+                    {
+                        continue;
+                    }
 
                     glViewport.EnqueueGlJob(() =>
                     {
@@ -213,7 +226,11 @@ namespace StudioCCS.Views
         private void OnDrop(object sender, DragEventArgs e)
         {
             var items = e.DataTransfer.TryGetFiles();
-            if (items == null) return;
+            if (items == null)
+            {
+                return;
+            }
+
             LoadFiles(items.Select(i => i.Path.LocalPath));
         }
 
@@ -240,7 +257,10 @@ namespace StudioCCS.Views
         private void OnCcsTreeContextRequested(object sender, ContextRequestedEventArgs e)
         {
             var node = ContextNode(e);
-            if (node == null) return;
+            if (node == null)
+            {
+                return;
+            }
 
             ccsTree.SelectedItem = node;
             OpenNodeMenu(e, ccsTree, BuildCcsNodeMenu(node));
@@ -249,20 +269,33 @@ namespace StudioCCS.Views
         private void OnSceneTreeContextRequested(object sender, ContextRequestedEventArgs e)
         {
             var node = ContextNode(e);
-            if (node == null || node == _vm.AnimationsRoot) return;
-            if (node.Tag is not TreeNodeTag tag || tag.ObjectType != CCSFile.SECTION_ANIME) return;
+            if (node == null || node == _vm.AnimationsRoot)
+            {
+                return;
+            }
+
+            if (node.Tag is not TreeNodeTag tag || tag.ObjectType != CCSFile.SECTION_ANIME)
+            {
+                return;
+            }
 
             OpenNodeMenu(e, sceneTree, Menu(MakeMenuItem("Remove", () =>
             {
                 _vm.AnimationsRoot.Nodes.Remove(node);
                 var anime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
-                if (anime != null) Scene.RemoveAnime(anime);
+                if (anime != null)
+                {
+                    Scene.RemoveAnime(anime);
+                }
             })));
         }
 
         private ContextMenu BuildCcsNodeMenu(CcsTreeNode node)
         {
-            if (node.Tag is not TreeNodeTag tag) return null;
+            if (node.Tag is not TreeNodeTag tag)
+            {
+                return null;
+            }
 
             if (tag.Type == TreeNodeTag.NodeType.File)
             {
@@ -324,7 +357,11 @@ namespace StudioCCS.Views
 
         private static void OpenNodeMenu(ContextRequestedEventArgs e, Control owner, ContextMenu menu)
         {
-            if (menu == null) return;
+            if (menu == null)
+            {
+                return;
+            }
+
             e.Handled = true;
             menu.Placement = PlacementMode.Pointer;
             menu.Open(owner);
@@ -333,7 +370,11 @@ namespace StudioCCS.Views
         private static ContextMenu Menu(params MenuItem[] items)
         {
             var menu = new ContextMenu();
-            foreach (var mi in items) ((IList)menu.Items).Add(mi);
+            foreach (var mi in items)
+            {
+                ((IList)menu.Items).Add(mi);
+            }
+
             return menu;
         }
 
@@ -353,7 +394,10 @@ namespace StudioCCS.Views
                 FileTypeFilter = new[] { FileFilters.Bin, FileFilters.All },
             });
             var file = files.FirstOrDefault();
-            if (file == null) return;
+            if (file == null)
+            {
+                return;
+            }
 
             var tmpClump = tag.File.GetObject<CCSClump>(tag.ObjectID);
             tmpClump?.LoadMatrixList(file.Path.LocalPath);

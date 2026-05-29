@@ -8,13 +8,13 @@ uniform vec4 Color;
 
 out BBox
 {
-	vec3 bMin;
-	vec3 bMax;
+    vec3 bMin;
+    vec3 bMax;
 } box;
 
 void main(){
-	gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
-	box.bMin = Min;
-	box.bMax = Max;
+    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+    box.bMin = Min;
+    box.bMax = Max;
 }
 
