@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.OpenGL;
@@ -26,6 +28,15 @@ namespace StudioCCS.Controls
 
         private bool _bindingsLoaded;
         private bool _sceneInit;
+
+        // Cleared if the negotiated context is older than our 3.2 minimum; the
+        // render callback then skips Scene work instead of binding shaders that
+        // never compiled and spamming GL errors on a black viewport every frame.
+        private bool _contextSupported = true;
+
+        // The debug callback is handed to the driver as a function pointer, so a
+        // managed reference must outlive the call to keep it from being collected.
+        private static DebugProc _debugProc;
 
         // Work that must run with the GL context current. The context is only
         // current *inside* the OnOpenGlInit/OnOpenGlRender callbacks (which Avalonia
@@ -65,7 +76,48 @@ namespace StudioCCS.Controls
                     GL.GetString(StringName.Version),
                     GL.GetString(StringName.ShadingLanguageVersion),
                     GL.GetString(StringName.Renderer)));
+
+                // The CCS shaders need a desktop GL 3.2+ core context (geometry
+                // shaders, texture buffers, #version 330). If a platform negotiates
+                // something older, fail loudly here rather than letting every shader
+                // fail to compile and render nothing with no explanation.
+                GL.GetInteger(GetPName.MajorVersion, out int major);
+                GL.GetInteger(GetPName.MinorVersion, out int minor);
+                if (major < 3 || (major == 3 && minor < 2))
+                {
+                    _contextSupported = false;
+                    Log.Error(string.Format(
+                        "Unsupported OpenGL context: got {0}.{1}, but StudioCCS needs 3.2 or " +
+                        "newer (core profile with geometry shaders). The 3D viewport is disabled.\n",
+                        major, minor));
+                    return;
+                }
+
+                EnableDebugOutput(major, minor);
             }
+        }
+
+        // Routes the driver's debug messages into our log in debug builds. KHR_debug
+        // is core in GL 4.3; on older contexts (e.g. macOS' 4.1) it is unavailable
+        // and we simply skip it - the capability guard above still catches hard
+        // failures. No-op entirely in release builds.
+        [Conditional("DEBUG")]
+        private void EnableDebugOutput(int major, int minor)
+        {
+            if (major < 4 || (major == 4 && minor < 3)) return;
+
+            _debugProc = DebugCallback;
+            GL.Enable(EnableCap.DebugOutput);
+            GL.Enable(EnableCap.DebugOutputSynchronous);
+            GL.DebugMessageCallback(_debugProc, IntPtr.Zero);
+        }
+
+        private static void DebugCallback(DebugSource source, DebugType type, int id,
+            DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        {
+            if (severity == DebugSeverity.DebugSeverityNotification) return;
+            string text = Marshal.PtrToStringUTF8(message, length);
+            Log.Warning(string.Format("GL [{0}/{1}]: {2}\n", severity, type, text));
         }
 
         protected override void OnOpenGlDeinit(GlInterface gl)
@@ -79,6 +131,16 @@ namespace StudioCCS.Controls
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
+            if (!_contextSupported)
+            {
+                // Distinct fill signals the disabled viewport; the explanation is
+                // in the log. Return without requesting another frame so we do not
+                // spin on a context we cannot draw into.
+                GL.ClearColor(0.15f, 0.0f, 0.0f, 1.0f);
+                GL.Clear(ClearBufferMask.ColorBufferBit);
+                return;
+            }
+
             double scaling = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
             int pw = Math.Max(1, (int)(Bounds.Width * scaling));
             int ph = Math.Max(1, (int)(Bounds.Height * scaling));
