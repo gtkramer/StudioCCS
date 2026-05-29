@@ -15,7 +15,6 @@ namespace StudioCCS
         {
             new GlVersion(GlProfileType.OpenGL, 4, 0),
             new GlVersion(GlProfileType.OpenGL, 3, 3),
-            new GlVersion(GlProfileType.OpenGL, 3, 2),
         };
 
         [STAThread]

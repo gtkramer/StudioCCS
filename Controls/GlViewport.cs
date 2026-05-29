@@ -77,17 +77,19 @@ namespace StudioCCS.Controls
                     GL.GetString(StringName.ShadingLanguageVersion),
                     GL.GetString(StringName.Renderer)));
 
-                // The CCS shaders need a desktop GL 3.2+ core context (geometry
-                // shaders, texture buffers, #version 330). If a platform negotiates
+                // The CCS shaders are #version 330, so the context must be desktop
+                // GL 3.3+ (core profile, geometry shaders, texture buffers). 3.3 is
+                // the floor on every platform; macOS satisfies it with a 4.1 context
+                // (it offers only 3.2 or 4.1 core, never 3.3). If a platform negotiates
                 // something older, fail loudly here rather than letting every shader
                 // fail to compile and render nothing with no explanation.
                 GL.GetInteger(GetPName.MajorVersion, out int major);
                 GL.GetInteger(GetPName.MinorVersion, out int minor);
-                if (major < 3 || (major == 3 && minor < 2))
+                if (major < 3 || (major == 3 && minor < 3))
                 {
                     _contextSupported = false;
                     Log.Error(string.Format(
-                        "Unsupported OpenGL context: got {0}.{1}, but StudioCCS needs 3.2 or " +
+                        "Unsupported OpenGL context: got {0}.{1}, but StudioCCS needs 3.3 or " +
                         "newer (core profile with geometry shaders). The 3D viewport is disabled.\n",
                         major, minor));
                     return;
