@@ -180,9 +180,10 @@ namespace StudioCCS.libCCS
 		public static string ReadString(BinaryReader bStream, int stringSize = 0x20)
 		{
 			byte[] sBytes = bStream.ReadBytes(stringSize);
-			//return BitConverter.ToString(sBytes);
-			//return System.Text.Encoding.Default.GetString(sBytes).Replace("\0", string.Empty);
-			string retVal = System.Text.Encoding.Default.GetString(sBytes);
+			// CCS asset names are ASCII. Encoding.Default is platform-dependent
+			// (Windows-1252 on Windows, UTF-8 elsewhere), which would decode any
+			// byte >= 0x80 differently per OS; ASCII keeps parsing deterministic.
+			string retVal = System.Text.Encoding.ASCII.GetString(sBytes);
 			int strL = retVal.IndexOf('\0');
 			
 			if(strL > 0)
