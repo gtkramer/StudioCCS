@@ -3,18 +3,21 @@ using Avalonia.Media;
 namespace StudioCCS.Views
 {
 	/// <summary>
-	/// One rendered line in the log panel: the formatted text (already carrying
-	/// its "&lt;level&gt;: " prefix) plus the brush for its severity colour.
+	/// One rendered line in the log panel: the severity tag (e.g. "warn") and its
+	/// colour, plus the message. Only the tag is coloured; the message is rendered
+	/// in a neutral colour by the template, matching the console.
 	/// </summary>
 	public sealed class LogLine
 	{
-		public string Text { get; }
-		public IBrush Brush { get; }
+		public string Tag { get; }
+		public string Message { get; }
+		public IBrush TagBrush { get; }
 
-		public LogLine(string text, IBrush brush)
+		public LogLine(string tag, string message, IBrush tagBrush)
 		{
-			Text = text;
-			Brush = brush;
+			Tag = tag;
+			Message = message;
+			TagBrush = tagBrush;
 		}
 	}
 }

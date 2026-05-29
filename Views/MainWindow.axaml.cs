@@ -86,24 +86,24 @@ namespace StudioCCS.Views
 
         #region Logging
 
-        private void AppendLog(string text, System.Drawing.Color color)
+        private void AppendLog(string tag, string message, System.Drawing.Color color)
         {
             // Logging can originate on the background parse thread; marshal to the UI
             // thread first so the list mutation happens on the UI thread. (stdout is
             // handled separately by the framework's console provider.)
             if (!Dispatcher.UIThread.CheckAccess())
             {
-                Dispatcher.UIThread.Post(() => AppendLog(text, color));
+                Dispatcher.UIThread.Post(() => AppendLog(tag, message, color));
                 return;
             }
 
-            var line = new LogLine(text, BrushFor(color));
+            var line = new LogLine(tag, message, BrushFor(color));
             _logLines.Add(line);
             if (_logLines.Count > MaxLogLines) _logLines.RemoveAt(0);
             logView.ScrollIntoView(line);
         }
 
-        // Severity colours come from the logging provider as System.Drawing.Color;
+        // The tag colour comes from the logging provider as System.Drawing.Color;
         // cache the Avalonia brushes since only a handful of distinct colours occur.
         private IBrush BrushFor(System.Drawing.Color c)
         {

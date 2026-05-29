@@ -115,10 +115,14 @@
                     </Style>
                 </ListBox.Styles>
                 <ListBox.ItemTemplate>
+                    <!-- Only the severity tag is coloured; ": " and the message are
+                         a neutral light grey, mirroring the console. -->
                     <DataTemplate x:DataType="views:LogLine">
-                        <TextBlock Text="{Binding Text}"
-                                   Foreground="{Binding Brush}"
-                                   TextWrapping="NoWrap" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Tag}" Foreground="{Binding TagBrush}" TextWrapping="NoWrap" />
+                            <TextBlock Text=": " Foreground="#DCDCDC" />
+                            <TextBlock Text="{Binding Message}" Foreground="#DCDCDC" TextWrapping="NoWrap" />
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

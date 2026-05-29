@@ -24,8 +24,11 @@ namespace StudioCCS
 			string message = logEntry.Formatter?.Invoke(logEntry.State, logEntry.Exception);
 			if (string.IsNullOrEmpty(message) && logEntry.Exception == null) return;
 
+			// Colour only the level tag (message left at the terminal default), to
+			// match the panel. Suppressed when stdout is redirected so piped/captured
+			// logs stay free of escape codes.
 			bool colour = !Console.IsOutputRedirected;
-			if (colour) textWriter.Write(AnsiFor(logEntry.LogLevel));
+			if (colour) textWriter.Write(LogPalette.Ansi(logEntry.LogLevel));
 			textWriter.Write(LogLevelTag.Of(logEntry.LogLevel));
 			if (colour) textWriter.Write("\x1b[0m");
 			textWriter.Write(": ");
@@ -33,13 +36,5 @@ namespace StudioCCS
 
 			if (logEntry.Exception != null) textWriter.WriteLine(logEntry.Exception);
 		}
-
-		private static string AnsiFor(LogLevel level) => level switch
-		{
-			LogLevel.Warning => "\x1b[33m",                  // yellow
-			LogLevel.Error or LogLevel.Critical => "\x1b[31m", // red
-			LogLevel.Information => "\x1b[32m",              // green
-			_ => "\x1b[90m",                                 // bright black (trace/debug)
-		};
 	}
 }
