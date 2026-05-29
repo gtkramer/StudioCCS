@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 in ivec2 vEndpoints;
 
 uniform mat4 uMatrix;
