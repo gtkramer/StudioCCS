@@ -12,6 +12,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using StudioCCS.libCCS;
 using StudioCCS.ViewModels;
 
@@ -45,7 +46,8 @@ namespace StudioCCS.Views
             // UI thread by AppendLog).
             Log.Init(b => b
                 .SetMinimumLevel(LogLevel.Information)
-                .AddSimpleConsole(o => o.SingleLine = true)
+                .AddConsole(o => o.FormatterName = CompactConsoleFormatter.FormatterName)
+                .AddConsoleFormatter<CompactConsoleFormatter, ConsoleFormatterOptions>()
                 .AddProvider(new PanelLoggerProvider(AppendLog)));
 
             // Let a whole tree row toggle expand/collapse, not just the chevron.

@@ -40,23 +40,11 @@ namespace StudioCCS
 				if (!IsEnabled(logLevel)) return;
 				string text = formatter(state, exception);
 				if (string.IsNullOrEmpty(text)) return;
-				// Mirror the console provider's "<level>: <message>" shape (minus the
-				// redundant category) so the panel reads like a copy of stdout. One
-				// log call == one panel line, so no trailing newline here.
-				_sink($"{ShortName(logLevel)}: {text}", ColorFor(logLevel));
+				// Mirror the console's "<level>: <message>" shape (minus the redundant
+				// category) so the panel reads like a copy of stdout. One log call ==
+				// one panel line, so no trailing newline here.
+				_sink($"{LogLevelTag.Of(logLevel)}: {text}", ColorFor(logLevel));
 			}
-
-			// Matches the abbreviations the SimpleConsole provider prints on stdout.
-			private static string ShortName(LogLevel level) => level switch
-			{
-				LogLevel.Trace => "trce",
-				LogLevel.Debug => "dbug",
-				LogLevel.Information => "info",
-				LogLevel.Warning => "warn",
-				LogLevel.Error => "fail",
-				LogLevel.Critical => "crit",
-				_ => "info",
-			};
 
 			// Bright variants chosen to stay readable on the panel's dark background.
 			private static Color ColorFor(LogLevel level) => level switch
