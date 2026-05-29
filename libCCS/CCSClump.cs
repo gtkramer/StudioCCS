@@ -622,7 +622,7 @@ namespace StudioCCS.libCCS
 		{
 			FrameForward();
 			string outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + ".smd";
-			using(var fs = new FileStream(outputFileName, FileMode.Truncate))
+			using(var fs = new FileStream(outputFileName, FileMode.Create))
 			{
 				using(var outf = new StreamWriter(fs))
 				{
@@ -675,7 +675,7 @@ namespace StudioCCS.libCCS
 					
 				}
 			}
-			/*
+
 			outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + "_bind.smd";
 			Log.Info(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
 			using(var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
@@ -683,7 +683,7 @@ namespace StudioCCS.libCCS
 				using(var outf = new StreamWriter(fs))
 				{
 					outf.WriteLine("version 1");
-					
+
 					outf.WriteLine("nodes");
 					for(int i = 0; i < NodeCount; i++)
 					{
@@ -704,7 +704,6 @@ namespace StudioCCS.libCCS
 					outf.WriteLine("end");
 				}
 			}
-			*/
 		}
 		
 		public int SearchNodeID(int _objectID)

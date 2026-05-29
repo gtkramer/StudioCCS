@@ -1529,24 +1529,29 @@ namespace StudioCCS.libCCS
 						else
 						{
 						*/
-							//Write Vertices
+							//Write Vertices (position + vertex color)
 							for(int v = 0; v < tmpSubModel.VertexCount; v++)
 							{
 								ModelVertex tmpVert = tmpSubModel.Vertices[v];
 								//Vector3 vPos = Vector3.TransformPosition(tmpVert.Position, finalMtx);
-								
+
 								/*
 								firstMatrix = ClumpRef.GetFinalMatrix(tmpVert.BoneIDs.Bone1);
 								secondMatrix = ClumpRef.GetFinalMatrix(tmpVert.BoneIDs.Bone2);
-								
+
 								Vector3 vPos = Util.SkinVertex(tmpVert.Position, firstMatrix, secondMatrix, tmpVert.Weights.X, tmpVert.Weights.Y);
 								*/
-								
+
 								Vector3 vPos = SoftSkinVertex(tmpVert);
-								//write Position
-								fStream.WriteLine(string.Format("v\t{0}\t{1}\t{2}", -vPos.X, vPos.Y, -vPos.Z));
-								//write texture coordinates
-								//TODO: CCSModel::DumpToObj() Export texture coordinates with material's texture coordinate offset.
+								Vector4 vCol = tmpVert.Color;
+								//write Position followed by per-vertex RGB color
+								fStream.WriteLine(string.Format("v\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}", -vPos.X, vPos.Y, -vPos.Z, vCol.X, vCol.Y, vCol.Z));
+							}
+							//write texture coordinates
+							//TODO: CCSModel::DumpToObj() Export texture coordinates with material's texture coordinate offset.
+							for(int v = 0; v < tmpSubModel.VertexCount; v++)
+							{
+								ModelVertex tmpVert = tmpSubModel.Vertices[v];
 								CCSTexture tmpTexture = tmpSubModel.ParentTextureRef;
 								if(tmpTexture != null)
 								{
@@ -1563,8 +1568,11 @@ namespace StudioCCS.libCCS
 								{
 									fStream.WriteLine(string.Format("vt\t{0}\t{1}", tmpVert.TexCoords.X, 1.0 - tmpVert.TexCoords.Y));
 								}
-								
-								//write normal
+							}
+							//write normals
+							for(int v = 0; v < tmpSubModel.VertexCount; v++)
+							{
+								ModelVertex tmpVert = tmpSubModel.Vertices[v];
 								fStream.WriteLine(string.Format("vn\t{0}\t{1}\t{2}", tmpVert.Normal.X, tmpVert.Normal.Y, tmpVert.Normal.Z));
 							}
 						/*	
