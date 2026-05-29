@@ -10,10 +10,13 @@ namespace StudioCCS
         // The CCS shaders are desktop GLSL #version 330 and use geometry shaders,
         // so every platform must hand us a desktop OpenGL 3.3 (or newer) core
         // context rather than the GLES/ANGLE default. Listed newest-first; the
-        // backend negotiates the first one the driver can provide.
+        // backend negotiates the first one the driver can provide. We ask for 4.6
+        // (the highest GL version) so capable drivers also light up the KHR_debug
+        // output we register in debug builds (core in 4.3); 3.3 is the floor the
+        // shaders actually require, used when the driver cannot grant anything newer.
         private static List<GlVersion> DesktopGlProfiles() => new List<GlVersion>
         {
-            new GlVersion(GlProfileType.OpenGL, 4, 0),
+            new GlVersion(GlProfileType.OpenGL, 4, 6),
             new GlVersion(GlProfileType.OpenGL, 3, 3),
         };
 
