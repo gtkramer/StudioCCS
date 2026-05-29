@@ -75,7 +75,8 @@ namespace StudioCCS.libCCS
 
 		//Fields
 		public List<Controller> Controllers = new List<Controller>();
-		public List<AnimationFrame> Frames = new List<AnimationFrame>();
+        public List<Controller> FixedControllers = new List<Controller>();
+        public List<AnimationFrame> Frames = new List<AnimationFrame>();
 		public int FrameCount = 0;
 		public int PlaybackType = 0;
 		public int CurrentFrame = 0;
@@ -337,15 +338,52 @@ namespace StudioCCS.libCCS
 			
 		}
 		
-		public void DumpToText(StreamWriter outf)
+		public void DumpPreviewToSMD(string outputPath, bool withNormals)
 		{
-			outf.WriteLine(ParentFile.GetSubObjectName(ObjectID));
-			outf.WriteLine(Controllers.Count.ToString());
+			int controllerCount = -1;
 			foreach(var tmpController in Controllers)
 			{
-				tmpController.DumpToText(outf);
+				controllerCount++;
+				tmpController.SetFrame(CurrentFrame);
+				var tmpExt = ParentFile.GetObject<CCSExt>(tmpController.ObjectID);
+				if(tmpExt != null)
+				{
+					var tmpObj = ParentFile.GetObject<CCSObject>(tmpExt.ReferencedObjectID);
+					if(tmpObj != null)
+					{
+						tmpObj.ParentClump.BindMatrixList();
+						tmpObj.ParentClump.DumpToSMD(outputPath, withNormals, ParentFile.TextureList, controllerCount);
+					}
+				}
 			}
 		}
-
+		
+		public void DumpToText(StreamWriter outf)
+		{
+			string lastModelName = "";
+			string lastValue = "";
+			outf.WriteLine("\n\n" + ParentFile.GetSubObjectName(ObjectID));
+			outf.WriteLine(Controllers.Count.ToString());
+			outf.WriteLine("Frames: " + FrameCount.ToString());
+			foreach(var tmpController in Controllers)
+			{
+				lastModelName = "";
+				lastValue = "";
+				for(int i = 0; i < FrameCount; i++)
+				{
+					tmpController.SetFrame(i);
+					var tmpExt = ParentFile.GetObject<CCSExt>(tmpController.ObjectID);
+					if(tmpExt != null)
+					{
+						var tmpObj = ParentFile.GetObject<CCSObject>(tmpExt.ReferencedObjectID);
+						if(tmpObj != null)
+						{
+							tmpObj.ParentClump.BindMatrixList();
+							tmpController.DumpToText(outf, ref lastModelName, ref lastValue, i);
+						}
+					}
+				}
+			}
+		}
 	}
 }

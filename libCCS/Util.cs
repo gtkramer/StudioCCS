@@ -43,12 +43,13 @@ namespace StudioCCS.libCCS
 		
 		public static Vector3 FixAxisRotation(Vector3 input)
 		{
-			//return input;
-			//Works pretty good:
-			return new Vector3(input.Z, -input.Y, input.X);
-			
-			//return new Vector3(input.Z, input.Y, input.X);
-		}
+            return input;
+            //Works pretty good:
+            //return new Vector3(input.Z, -input.Y, input.X);
+            
+			//return new Vector3(input.X, input.Y, input.Z);
+            //return new Vector3(input.Z, input.Y, input.X);
+        }
 		
 		public static Vector3 UnFixAxisRotation(Vector3 input)
 		{
@@ -105,9 +106,10 @@ namespace StudioCCS.libCCS
 			
 			
 			float pi = 3.141592653589793f;
-			//float toRads = pi / 180.0f;
-			//return new Vector3(-rZ * toRads, rY * toRads, -rX * toRads); //FixAxis(new Vector3(rX, rY, rZ));
-			return FixAxisRotation(new Vector3((rX * pi) / 180.0f, (rY * pi) / 180.0f, (rZ * pi) / 180.0f));
+			float toRads = pi / 180.0f;
+			return new Vector3(rX * toRads, rY * toRads, rZ * toRads); //FixAxis(new Vector3(rX, rY, rZ));
+			//return FixAxisRotation(new Vector3(rX * toRads, rY * toRads, rZ * toRads));
+			//return FixAxisRotation(new Vector3(rZ * toRads, rX * toRads, -rY * toRads));
 		}
 		
 		public static Vector3 ReadVec3Scale(BinaryReader bStream)
@@ -320,5 +322,10 @@ namespace StudioCCS.libCCS
 		{
 			return (float)(what * Math.PI) / 180.0f;
 		}
-	}
+
+        public static float toDeg(float what)
+        {
+            return (float)(180f / Math.PI) * what;
+        }
+    }
 }

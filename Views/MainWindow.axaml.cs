@@ -71,6 +71,7 @@ namespace StudioCCS.Views
             // SMD export was a debug-only feature in the original (gated behind #if DEBUG).
 #if DEBUG
             miDumpSmd.IsVisible = true;
+            miDumpPreviewSmd.IsVisible = true;
 #endif
 
             // The toolbar RadioButtons set _vm.Mode; mirror mode changes into the
@@ -396,6 +397,18 @@ namespace StudioCCS.Views
             if (await dlg.ShowDialog<bool>(this))
             {
                 Scene.DumpToSMD(dlg.ExportPath, dlg.WithNormals);
+            }
+        }
+
+        // Exports the currently previewed animation (its posed clumps, one SMD per
+        // frame) rather than the whole loaded scene. Ported from taarna23's fork.
+        private async void OnDumpPreviewSmdClick(object sender, RoutedEventArgs e)
+        {
+            var dlg = new ExportToObjWindow();
+            dlg.ConfigureForSmd();
+            if (await dlg.ShowDialog<bool>(this))
+            {
+                Scene.DumpPreviewToSMD(dlg.ExportPath, dlg.WithNormals);
             }
         }
 

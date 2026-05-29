@@ -19,6 +19,7 @@
             <MenuItem Header="_Scene">
                 <MenuItem Header="Dump to .OBJ..." Click="OnDumpObjClick" />
                 <MenuItem Header="Dump to .SMD..." Name="miDumpSmd" IsVisible="False" Click="OnDumpSmdClick" />
+                <MenuItem Header="Dump Preview to .SMD..." Name="miDumpPreviewSmd" IsVisible="False" Click="OnDumpPreviewSmdClick" />
             </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem Header="Default to Axis Movement" ToggleType="CheckBox" IsChecked="{Binding DefaultToAxisMovement, Mode=TwoWay}" />

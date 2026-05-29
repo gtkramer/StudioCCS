@@ -618,22 +618,103 @@ namespace StudioCCS.libCCS
 			return totalVertCount;
 		}
 		
-		public void DumpToSMD(string outputPath, bool withNormals)
+		public void DumpPreviewToSMD(string outputPath, bool withNormals)
 		{
 			FrameForward();
 			string outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + ".smd";
+			using(var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
+			{
+				using(var outf = new StreamWriter(fs))
+				{
+					Log.Info(string.Format("Dumping {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
+					outf.WriteLine("version 1");
+					outf.WriteLine("nodes");
+					for(int i = 0; i < NodeCount; i++)
+					{
+						string boneName = ParentFile.GetSubObjectName(NodeIDs[i]).Replace(" ", "_");
+						CCSObject b = GetObject(i);
+						if(b == null) continue;
+						int pId = SearchNodeID(b.ParentObjectID);
+						outf.WriteLine(string.Format("{0} \"{1}\" {2}", i, boneName, pId));
+					}
+					outf.WriteLine("end");
+					outf.WriteLine("skeleton");
+					outf.WriteLine("time 0");
+					for(int i = 0; i < NodeCount; i++)
+					{
+						string pStr = string.Format("{0} {1} {2}", BindPositions[i].X, BindPositions[i].Y, BindPositions[i].Z);
+						string rStr = string.Format("{0} {1} {2}", BindRotations[i].X, BindRotations[i].Y, -BindRotations[i].Z);
+						outf.WriteLine(string.Format("{0} {1} {2}", i, pStr, rStr));
+					}
+					outf.WriteLine("end");
+					outf.WriteLine("triangles");
+					for(int i = 0; i < NodeCount; i++)
+					{
+						CCSObject tmpObj = GetObject(i);
+						if(tmpObj == null) continue;
+						tmpObj.DumpToSMD(outf, withNormals);
+					}
+					outf.WriteLine("end");
+				}
+			}
+			
+			outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + "_bind.smd";
+			Log.Info(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
+			using(var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
+			{
+				using(var outf = new StreamWriter(fs))
+				{
+					outf.WriteLine("version 1");
+					outf.WriteLine("nodes");
+					for(int i = 0; i < NodeCount; i++)
+					{
+						string boneName = ParentFile.GetSubObjectName(NodeIDs[i]);
+						CCSObject b = GetObject(i);
+						if(b == null) continue;
+						int pId = SearchNodeID(b.ParentObjectID);
+						outf.WriteLine(string.Format("{0} \"{1}\" {2}", i, boneName, pId));
+					}
+					outf.WriteLine("end");
+					outf.WriteLine("skeleton");
+					outf.WriteLine("time 0");
+					for(int i = 0; i < NodeCount; i++)
+					{
+						string pStr = string.Format("{0} {1} {2}", BindPositions[i].X, BindPositions[i].Y, BindPositions[i].Z);
+						string rStr = string.Format("{0} {1} {2}", BindRotations[i].X, BindRotations[i].Y, BindRotations[i].Z);
+						outf.WriteLine(string.Format("{0} {1} {2}", i, pStr, rStr));
+					}
+					outf.WriteLine("end");
+				}
+			}
+		}
+
+		public void DumpToSMD(string outputPath, bool withNormals, List<CCSTexture> TextureList, int dumpID = -1)
+		{
+			FrameForward();
+			string outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + dumpID.ToString() + ".smd";
+
+			//Log.Info("Don't need mtl but do need textures - dumping...\n");
+			//using (System.IO.StreamWriter fStream = new StreamWriter(outputFileName + ".mtl", false))
+			//{
+			//    foreach (var tmpTexture in TextureList)
+			//    {
+			//        tmpTexture.DumpToMtl(fStream, Path.GetDirectoryName(outputFileName + ".mtl"));
+			//    }
+			//}
+
 			using(var fs = new FileStream(outputFileName, FileMode.Create))
 			{
 				using(var outf = new StreamWriter(fs))
 				{
 					Log.Info(string.Format("Dumping {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
 					outf.WriteLine("version 1");
-					
+
 					outf.WriteLine("nodes");
 					for(int i = 0; i < NodeCount; i++)
 					{
 						string boneName = ParentFile.GetSubObjectName(NodeIDs[i]).Replace(" ", "_");
 						CCSObject b = GetObject(i);
+						if (b == null) continue;
 						int pId = SearchNodeID(b.ParentObjectID);
 						outf.WriteLine(string.Format("{0} \"{1}\" {2}", i, boneName, pId));
 					}
@@ -646,7 +727,7 @@ namespace StudioCCS.libCCS
 						outf.WriteLine(string.Format("{0} 0.0 0.0 0.0 0.0 0.0 0.0", i));
 					}
 					*/
-					
+
 					outf.WriteLine("time 0");
 					for(int i = 0; i < NodeCount; i++)
 					{
@@ -660,23 +741,24 @@ namespace StudioCCS.libCCS
 						//string rStr = "0.0 0.0 0.0";
 						outf.WriteLine(string.Format("{0} {1} {2}", i, pStr, rStr));
 					}
-					
+
 					outf.WriteLine("end");
-					
-					
+
+
 					outf.WriteLine("triangles");
 					//Now, write out the models...
 					for(int i = 0; i < NodeCount; i++)
 					{
 						CCSObject tmpObj = GetObject(i);
+						if (tmpObj == null) continue;
 						tmpObj.DumpToSMD(outf, withNormals);
 					}
 					outf.WriteLine("end");
-					
+
 				}
 			}
 
-			outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + "_bind.smd";
+			outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + dumpID.ToString() + "_bind.smd";
 			Log.Info(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
 			using(var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
 			{
@@ -689,6 +771,7 @@ namespace StudioCCS.libCCS
 					{
 						string boneName = ParentFile.GetSubObjectName(NodeIDs[i]);
 						CCSObject b = GetObject(i);
+						if (b == null) continue;
 						int pId = SearchNodeID(b.ParentObjectID);
 						outf.WriteLine(string.Format("{0} \"{1}\" {2}", i, boneName, pId));
 					}

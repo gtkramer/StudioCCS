@@ -51,7 +51,8 @@ namespace StudioCCS.libCCS
 			
 			public abstract string GetReport(int level = 0);
 			
-			public abstract void DumpToText(StreamWriter outf);
+			//public abstract void DumpToText(StreamWriter outf);
+			public abstract void DumpToText(StreamWriter outf, ref string cName, ref string lName, int frame = 0);
 		}
 		
 		
@@ -115,9 +116,9 @@ namespace StudioCCS.libCCS
 					var tmpObj = ParentFile.GetObject<CCSObject>(tmpExt.ReferencedObjectID);
 					if(tmpObj != null)
 					{
-						Vector3 pK = PositionTrack.GetInterpolatedValue(frameNum);
-						Vector3 rK = RotationTrack.GetInterpolatedValue(frameNum);
-						Vector3 sK = ScaleTrack.GetInterpolatedValue(frameNum);
+						Vector3 rK = RotationTrack.GetInterpolatedValue(frameNum, ParentFile.GetSubObjectName(ObjectID));
+						Vector3 pK = PositionTrack.GetInterpolatedValue(frameNum, rK, ParentFile.GetSubObjectName(ObjectID));
+						Vector3 sK = ScaleTrack.GetInterpolatedValue(frameNum, pK, rK, ParentFile.GetSubObjectName(ObjectID));
 						
 						//if(tmpScale != null) sK = tmpScale.Value();
 						tmpObj.SetPose(pK, rK, sK);
@@ -128,7 +129,7 @@ namespace StudioCCS.libCCS
 				
 			}
 			
-			public override void DumpToText(StreamWriter outf)
+			public override void DumpToText(StreamWriter outf, ref string lastModelName, ref string lastValue, int frame)
 			{
 				var tmpExt = ParentFile.GetObject<CCSExt>(ObjectID);
 				if(tmpExt != null)
@@ -138,17 +139,24 @@ namespace StudioCCS.libCCS
 					{
 						if(tmpObj.ModelID != 0)
 						{
-							outf.WriteLine(ParentFile.GetSubObjectName(tmpObj.ModelID));
-							Vector3 tmpP = PositionTrack.GetValue(0).Value();
-							Vector3 tmpR = RotationTrack.GetValue(0).Value();
-							Vector3 tmpS = ScaleTrack.GetValue(0).Value();
+							string currModelName = ParentFile.GetSubObjectName(tmpObj.ModelID);
+							if(lastModelName == string.Empty || !currModelName.Equals(lastModelName))
+							{
+								outf.WriteLine(ParentFile.GetSubObjectName(tmpObj.ModelID));
+							}
+							lastModelName = currModelName;
 							
-							var fmtStr = "{0} {1} {2}";
-							var pStr = string.Format(fmtStr, tmpP.X, tmpP.Y, tmpP.Z);
-							var rStr = string.Format(fmtStr, tmpR.X, tmpR.Y, tmpR.Z);
-							var sStr = string.Format(fmtStr, tmpS.X, tmpS.Y, tmpS.Z);
-							
-							outf.WriteLine(string.Format(fmtStr, pStr, rStr, sStr));
+							Vector3 tmpR = RotationTrack.GetInterpolatedValue(frame, ParentFile.GetSubObjectName(tmpObj.ModelID));
+							Vector3 tmpP = PositionTrack.GetInterpolatedValue(frame, tmpR, ParentFile.GetSubObjectName(tmpObj.ModelID));
+							Vector3 tmpS = ScaleTrack.GetInterpolatedValue(frame, tmpP, tmpR, ParentFile.GetSubObjectName(tmpObj.ModelID));
+							string fmtStr = "pos: {0}	rot: {1}   scl: {2}";
+							string fmtStr2 = "{0} {1} {2}";
+							string pStr = string.Format(fmtStr2, tmpP.X, tmpP.Y, tmpP.Z);
+							string rStr = string.Format(fmtStr2, Util.toDeg(tmpR.X), Util.toDeg(tmpR.Y), Util.toDeg(tmpR.Z));
+							string sStr = string.Format(fmtStr2, tmpS.X, tmpS.Y, tmpS.Z);
+							string currStr = string.Format(fmtStr, pStr, rStr, sStr);
+							outf.WriteLine(currStr);
+							lastValue = currStr;
 						}
 					}
 				}
@@ -238,14 +246,14 @@ namespace StudioCCS.libCCS
 					var tmpObj = ParentFile.GetObject<CCSObject>(tmpExt.ReferencedObjectID);
 					if(tmpObj != null)
 					{
-						Vector3 pK = PositionTrack.GetInterpolatedValue(frameNum);
+						Vector3 pK = PositionTrack.GetInterpolatedValue(frameNum, Vector3.One, ParentFile.GetSubObjectName(ObjectID));
 						Quaternion rK = Quaternion.Identity;
 						//rK.W = -rK.W;
 						Vector3 sK = Vector3.One;
 						float aK = 1.0f;
 						
 						//rK = Rotation4Track.GetInterpolatedValue(frameNum, ParentAnime.FrameCount); //tmpRot.Value();
-						rK = Quaternion.FromEulerAngles(RotationTrack.GetInterpolatedValue(frameNum));
+						rK = Quaternion.FromEulerAngles(RotationTrack.GetInterpolatedValue(frameNum, ParentFile.GetSubObjectName(ObjectID)));
 						
 						
 						if(tmpScale != null) sK = tmpScale.Value();
@@ -263,7 +271,7 @@ namespace StudioCCS.libCCS
 				return Util.Indent(level) + string.Format("Object Controller for object 0x{0:X}, {1}\n", ObjectID, ParentFile.GetSubObjectName(ObjectID));
 			}
 			
-			public override void DumpToText(StreamWriter outf)
+			public override void DumpToText(StreamWriter outf, ref string currModelName, ref string lastModelName, int f)
 			{
 				var tmpExt = ParentFile.GetObject<CCSExt>(ObjectID);
 				if(tmpExt != null)
@@ -274,16 +282,15 @@ namespace StudioCCS.libCCS
 						if(tmpObj.ModelID != 0)
 						{
 							outf.WriteLine(ParentFile.GetSubObjectName(tmpObj.ModelID));
-							Vector3 tmpP = PositionTrack.GetValue(0).Value();
-							Vector3 tmpR = RotationTrack.GetValue(0).Value();
-							Vector3 tmpS = ScaleTrack.GetValue(0).Value();
-							
-							var fmtStr = "{0} {1} {2}";
-							var pStr = string.Format(fmtStr, tmpP.X, tmpP.Y, tmpP.Z);
-							var rStr = string.Format(fmtStr, tmpR.X, tmpR.Y, tmpR.Z);
-							var sStr = string.Format(fmtStr, tmpS.X, tmpS.Y, tmpS.Z);
-							
-							outf.WriteLine(string.Format(fmtStr, pStr, rStr, sStr));
+							Vector3 tmpP = PositionTrack.GetValue(f).Value();
+							Vector3 tmpR = RotationTrack.GetValue(f).Value();
+							Vector3 tmpS = ScaleTrack.GetValue(f).Value();
+							string fmtStr = "{0},  {1},	 {2}";
+							string fmtStr2 = "Pos: {0}	  Rot: {1}	  Scl: {2}";
+							string pStr = string.Format(fmtStr, tmpP.X, tmpP.Y, tmpP.Z);
+							string rStr = string.Format(fmtStr, tmpR.X, tmpR.Y, tmpR.Z);
+							string sStr = string.Format(fmtStr, tmpS.X, tmpS.Y, tmpS.Z);
+							outf.WriteLine(string.Format(fmtStr2, pStr, rStr, sStr));
 						}
 					}
 				}
@@ -336,7 +343,7 @@ namespace StudioCCS.libCCS
 				return Util.Indent(level) + string.Format("Material Controller for material 0x{0:X}, {1}\n", ObjectID, ParentFile.GetSubObjectName(ObjectID));
 			}
 			
-			public override void DumpToText(StreamWriter outf)
+			public override void DumpToText(StreamWriter outf, ref string currModelName, ref string lastModelName, int f)
 			{
 				
 			}
@@ -376,7 +383,7 @@ namespace StudioCCS.libCCS
 				return Util.Indent(level) + string.Format("Directional Light Controller for light 0x{0:X}, {1}\n", ObjectID, ParentFile.GetSubObjectName(ObjectID));
 			}
 			
-			public override void DumpToText(StreamWriter outf)
+			public override void DumpToText(StreamWriter outf, ref string currModelName, ref string lastModelName, int f)
 			{
 				
 			}
@@ -426,7 +433,7 @@ namespace StudioCCS.libCCS
 				return Util.Indent(level) + string.Format("Omni Light Controller for light 0x{0:X}, {1}\n", ObjectID, ParentFile.GetSubObjectName(ObjectID));
 			}
 			
-			public override void DumpToText(StreamWriter outf)
+			public override void DumpToText(StreamWriter outf, ref string currModelName, ref string lastModelName, int f)
 			{
 				
 			}

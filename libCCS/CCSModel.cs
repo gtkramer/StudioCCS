@@ -995,15 +995,15 @@ namespace StudioCCS.libCCS
 				// Can we derive proper order from normal direction? Probably not.
 				if(triFlag == 0)
 				{
-					if((sCount % 2) == 0)
-					{
-						_subModel.Triangles[tCount] = new ModelTriangle(i, i - 1, i - 2);	
-					}
-					else
-					{
-						_subModel.Triangles[tCount] = new ModelTriangle(i - 2, i - 1, i);	
-					}
-					
+					//if((sCount % 2) == 0)
+					//{
+						_subModel.Triangles[tCount] = new ModelTriangle(i, i - 1, i - 2);
+					//}
+					//else
+					//{
+					//	_subModel.Triangles[tCount] = new ModelTriangle(i - 2, i - 1, i);
+					//}
+
 					tCount += 1;
 					sCount += 1;
 					lastFlag = triFlag;
@@ -1110,15 +1110,15 @@ namespace StudioCCS.libCCS
 				byte triFlag = bStream.ReadByte();
 				if(triFlag == 0)
 				{
-					if((sCount % 2) == 0)
-					{
-						_subModel.Triangles[tCount] = new ModelTriangle(i, i - 1, i - 2);	
-					}
-					else
-					{
-						_subModel.Triangles[tCount] = new ModelTriangle(i - 2, i - 1, i);	
-					}
-					
+					//if((sCount % 2) == 0)
+					//{
+						_subModel.Triangles[tCount] = new ModelTriangle(i, i - 1, i - 2);
+					//}
+					//else
+					//{
+					//	_subModel.Triangles[tCount] = new ModelTriangle(i - 2, i - 1, i);
+					//}
+
 					tCount += 1;
 					sCount += 1;
 					lastFlag = triFlag;
@@ -1207,23 +1207,23 @@ namespace StudioCCS.libCCS
 					tmpVert.BoneIDs = new BoneID(boneID1, boneID2);
 				}
 				tmpVert.Weights = new Vector4(weight1, weight2, 0.0f, 0.0f);
-				
+
 				//Read Vertex Normals, and Triangle Info
 				bStream.BaseStream.Seek(tOffs, SeekOrigin.Begin);
 				tmpVert.Normal = Util.ReadVec3Normal8(bStream);
-				
+
 				byte triFlag = bStream.ReadByte();
 				if(triFlag == 0)
 				{
-					if((sCount % 2) == 0)
-					{
-						_subModel.Triangles[tCount] = new ModelTriangle(i, i - 1, i - 2);	
-					}
-					else
-					{
-						_subModel.Triangles[tCount] = new ModelTriangle(i - 2, i - 1, i);	
-					}
-					
+					//if((sCount % 2) == 0)
+					//{
+						_subModel.Triangles[tCount] = new ModelTriangle(i, i - 1, i - 2);
+					//}
+					//else
+					//{
+						_subModel.Triangles[tCount] = new ModelTriangle(i - 2, i - 1, i);
+					//}
+
 					tCount += 1;
 					sCount += 1;
 					lastFlag = triFlag;

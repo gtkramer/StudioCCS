@@ -841,7 +841,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -870,7 +870,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Vec4Color_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     if(Keys.Count > 0)
@@ -911,7 +911,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -940,7 +940,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Vec3Rotation_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     
@@ -957,36 +957,264 @@ namespace StudioCCS.libCCS
             //TODO: Vec3Rotation_Track::Read(): Warn about unkown track type.
         }
 
-        public Vector3 GetInterpolatedValue(int frameNumber)
+        public Vector3 GetInterpolatedValue(int frameNumber, string filename)
         {
-            if(KeyCount == 0) return FixedValue.Value();
-            
-            if(frameNumber == 0) CurrentKey = 0;
-            
+            //if(KeyCount == 0) return FixedValue.Value();
+
+            if (frameNumber == 0) CurrentKey = 0;
+
             var CurrentValue = GetValue(CurrentKey);
-            if(frameNumber >= CurrentValue.GetFrameCount())
+            if (frameNumber >= CurrentValue.GetFrameCount())
             {
-            	CurrentKey += 1;
-            	if(CurrentKey > (Keys.Count - 1)) CurrentKey = 0;
+                CurrentKey += 1;
+                if (CurrentKey > (Keys.Count - 1)) CurrentKey = 0;
             }
             CurrentValue = GetValue(CurrentKey);
-            
+
             int NextKey = CurrentKey + 1;
-            if(NextKey > (Keys.Count - 1))
+            if (NextKey > (Keys.Count - 1))
             {
-            	
-            	NextKey = 0;
+
+                NextKey = 0;
             }
             var NextValue = GetValue(NextKey);
-            
-            float range = 1.0f / (CurrentValue.GetFrameCount() - CurrentValue.FrameNumber());
+
+            Vector3 temp = new Vector3(1, 1, 1);
+            temp.X = CurrentValue.Value().X;
+            temp.Y = CurrentValue.Value().Y;
+            temp.Z = CurrentValue.Value().Z;
+            if (((Math.Abs(CurrentValue.Value().Z) > 2.85 && Math.Abs(CurrentValue.Value().Z) < 3.15) &&
+            (int)Math.Abs(CurrentValue.Value().X) == 1) ||
+            ((int)Math.Abs(CurrentValue.Value().Z) == 2 && (int)Math.Abs(CurrentValue.Value().X) == 1))
+            {
+                temp.Y = -temp.Y;
+                temp.X = -temp.X;
+            }
+            if (((Math.Round(Math.Abs(CurrentValue.Value().Z), 1) == 1.5) || Math.Round(Math.Abs(CurrentValue.Value().Z), 1) == 1.6))
+            {
+                //temp.Y = -temp.Y;
+                temp.X = -temp.X;
+            }
+
+            Vector3 temp2 = new Vector3(1, 1, 1);
+            temp2.X = CurrentValue.Value().X;
+            temp2.Y = -CurrentValue.Value().Y;
+            temp2.Z = CurrentValue.Value().Z;
+
+            Vector3 temp2next = new Vector3(1, 1, 1);
+            temp2next.X = NextValue.Value().X;
+            temp2next.Y = -NextValue.Value().Y;
+            temp2next.Z = NextValue.Value().Z;
+
+            if (((Math.Abs(CurrentValue.Value().Z) > 2.85 && Math.Abs(CurrentValue.Value().Z) < 3.15) &&
+            (int)Math.Abs(CurrentValue.Value().X) == 1) ||
+            ((int)Math.Abs(CurrentValue.Value().Z) == 2 && (int)Math.Abs(CurrentValue.Value().X) == 1))
+            {
+                //temp2.Y = -temp2.Y;
+                //temp2.X = -temp2.X;
+                //temp2.Z = -temp2.Z;
+            }
+            if (((Math.Round(Math.Abs(CurrentValue.Value().Z), 1) == 1.5) || Math.Round(Math.Abs(CurrentValue.Value().Z), 1) == 1.6))
+            {
+                //temp2.Y = -temp2.Y;
+                //temp2.X = -temp2.X;
+                //temp2.Z = -temp2.Z;
+            }
+
+            switch (filename)
+            {
+                case "OBJ_trall":
+                    //temp2.X = Util.toRads(0);
+                    //temp2.Y = Util.toRads(0);
+                    //temp2.Z = Util.toRads(0);
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0":
+                    //temp2.X = Util.toRads(180);
+                    //temp2.Y = Util.toRads(90);
+                    //temp2.Z = Util.toRads(0);
+                    //temp2.Y -= Util.toRads(90);
+                    //temp2.Y -= Util.toRads(90);
+                    //temp2.X += Util.toRads(90);
+                    //temp2.Z -= Util.toRads(90);
+                    //temp2.Z = -temp2.Z;
+                    temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;
+                    temp2next.X = -temp2next.X;
+                    temp2next.Y = -temp2next.Y;
+                    break;
+                case "OBJ_t0 pelvis":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                break;
+                case "OBJ_t0 footsteps":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 spine":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 spine1":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 neck":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 head":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 r clavicle":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l clavicle":
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;//
+                    break;
+                case "OBJ_t0 r upperarm":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l upperarm":
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;//
+                    break;
+                case "OBJ_t0 r forearm":
+                    //temp2.X = -temp2.X;//
+                    //temp2.X -= Util.toRads(45);
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l forearm":
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;//
+                    break;
+                case "OBJ_t0 r hand":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l hand":
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;//
+                    break;
+                case "OBJ_t0 r finger0":
+                    //temp2.X = -temp2.X;//
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l finger0":
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;//
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.Z = -temp2.Z;//
+                    break;
+                case "OBJ_t0 r thigh":
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.X = -temp2.X;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l thigh":
+                    //temp2.Z = -temp2.Z;
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    break;
+                case "OBJ_t0 r calf":
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.X = -temp2.X;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l calf":
+                    //temp2.Z = -temp2.Z;
+                    ////temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    break;
+                case "OBJ_t0 r foot":
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    //temp2.X = -temp2.X;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l foot":
+                    //temp2.Z = -temp2.Z;
+                    //temp2.X = -temp2.X;
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    break;
+                case "OBJ_t0 r belt1":
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    break;
+                case "OBJ_t0 l belt1":
+                    temp2.Y = -temp2.Y;
+                    temp2next.Y = -temp2next.Y;
+                    break;
+
+            }
+
+            float range;
+            if (CurrentValue.GetFrameCount() - CurrentValue.FrameNumber() == 0)
+            {
+                range = 1.0f;
+            }
+            else
+            {
+                range = 1.0f / (CurrentValue.GetFrameCount() - CurrentValue.FrameNumber());
+            }
             int percent = frameNumber - CurrentValue.FrameNumber();
             //return Util.Slerp(range * percent, CurrentValue.Value(), NextValue.Value());
             //return Util.V3Slerp(range * percent, CurrentValue.Value(), NextValue.Value());
-            
+            //return Util.Slerp(range * percent, temp, temp2);
+
             //TODO: Fix vector3 slerping
-            return Vector3.Lerp(CurrentValue.Value(), NextValue.Value(), range * percent);
-            
+            //return Vector3.Lerp(CurrentValue.Value(), NextValue.Value(), range * percent);
+
+            //return CurrentValue.Value();
+            if (KeyCount == 0)
+            {
+                return temp;
+            }
+            //else
+            //{
+                //return CurrentValue.Value();
+            //    return temp2;
+            //}
+            return Vector3.Lerp(temp2, temp2next, range * percent);
 
         }
     }
@@ -1004,7 +1232,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -1033,7 +1261,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Vec4Key_Rotation: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     if(Keys.Count > 0)
@@ -1074,7 +1302,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -1103,7 +1331,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Vec3Position_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     if(Keys.Count > 0)
@@ -1119,15 +1347,89 @@ namespace StudioCCS.libCCS
             //TODO: Vec3Position_Track::Read(): Warn about unkown track type.
         }
 
-        public Vector3 GetInterpolatedValue(int frameNumber)
+        public Vector3 GetInterpolatedValue(int frameNumber, Vector3 rotation, string filename)
         {
             //Placeholder
             //TODO: Vec3Position_Track::GetInterpolatedValue();
-            if(KeyCount == 0) return FixedValue.Value();
+            //if (KeyCount == 0) return FixedValue.Value();
 
-            if(frameNumber == 0) CurrentKey = 0;
-            
-            return GetValue(CurrentKey).Value();
+            if (frameNumber == 0) CurrentKey = 0;
+
+            var CurrentValue = GetValue(CurrentKey);
+            if (frameNumber >= CurrentValue.GetFrameCount())
+            {
+                CurrentKey += 1;
+                if (CurrentKey > (Keys.Count - 1)) CurrentKey = 0;
+            }
+            CurrentValue = GetValue(CurrentKey);
+
+            int NextKey = CurrentKey + 1;
+            if (NextKey > (Keys.Count - 1))
+            {
+
+                NextKey = 0;
+            }
+            var NextValue = GetValue(NextKey);
+
+            Vector3 temp = new Vector3(1, 1, 1);
+            temp.X = CurrentValue.Value().X;
+            temp.Y = CurrentValue.Value().Y;
+            temp.Z = CurrentValue.Value().Z;
+            if (((Math.Abs(rotation.Z) > 2.85 && Math.Abs(rotation.Z) < 3.15) &&
+            (int)Math.Abs(rotation.X) == 1) ||
+            ((int)Math.Abs(rotation.Z) == 2 && (int)Math.Abs(rotation.X) == 1))
+            {
+                //temp.X = -temp.X;
+                //temp.Y = -temp.Y;
+            }
+
+            Vector3 temp2 = new Vector3(1, 1, 1);
+            temp2.X = CurrentValue.Value().X;
+            temp2.Y = CurrentValue.Value().Y;
+            temp2.Z = CurrentValue.Value().Z;
+            if (((Math.Abs(rotation.Z) > 2.85 && Math.Abs(rotation.Z) < 3.15) &&
+            (int)Math.Abs(rotation.X) == 1) ||
+            ((int)Math.Abs(rotation.Z) == 2 && (int)Math.Abs(rotation.X) == 1))
+            {
+                //temp2.Y = -temp2.Y;
+                //temp2.X = -temp2.X;
+                //temp2.Z = -temp2.Z;
+            }
+            if (((Math.Round(Math.Abs(rotation.Z), 1) == 1.5) || Math.Round(Math.Abs(rotation.Z), 1) == 1.6))
+            {
+                //temp2.X = -temp2.X;
+                //temp2.Y = -temp2.Y;
+                //temp2.Z = -temp2.Z;
+            }
+
+            switch (filename)
+            {
+                case "OBJ_trall":
+                    //temp2.X = 0;
+                    //temp2.Y = 0;
+                    //temp2.Z = 0;
+                    break;
+            }
+
+                    float range = 1.0f / (CurrentValue.GetFrameCount() - CurrentValue.FrameNumber());
+            int percent = frameNumber - CurrentValue.FrameNumber();
+            //return Util.Slerp(range * percent, CurrentValue.Value(), NextValue.Value());
+            //return Util.V3Slerp(range * percent, CurrentValue.Value(), NextValue.Value());
+
+            //TODO: Fix vector3 slerping
+            //return Vector3.Lerp(CurrentValue.Value(), NextValue.Value(), range * percent);
+
+            if (KeyCount == 0)
+            {
+                return temp;
+            }
+            else
+            {
+                //return CurrentValue.Value();
+                return temp2;
+            }
+            //return Vector3.Lerp(temp, temp2, range * percent);
+            //return CurrentValue.Value();
         }
     }
 
@@ -1144,7 +1446,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -1173,7 +1475,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Vec3Scale_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     
@@ -1190,31 +1492,146 @@ namespace StudioCCS.libCCS
             //TODO: Vec3Scale_Track::Read(): Warn about unkown track type.
         }
 
-        public Vector3 GetInterpolatedValue(int frameNumber)
+        public Vector3 GetInterpolatedValue(int frameNumber, Vector3 position, Vector3 rotation, string filename)
         {
-            if(KeyCount == 0) return FixedValue.Value();
+            //if (KeyCount == 0) return FixedValue.Value();
 
-            if(frameNumber == 0) CurrentKey = 0;
-            
+            if (frameNumber == 0) CurrentKey = 0;
+
             var CurrentValue = GetValue(CurrentKey);
-            if(frameNumber >= CurrentValue.GetFrameCount())
+            if (frameNumber >= CurrentValue.GetFrameCount())
             {
-            	CurrentKey += 1;
-            	if(CurrentKey > (Keys.Count - 1)) CurrentKey = 0;
+                CurrentKey += 1;
+                if (CurrentKey > (Keys.Count - 1)) CurrentKey = 0;
             }
             CurrentValue = GetValue(CurrentKey);
-            
+
             int NextKey = CurrentKey + 1;
-            if(NextKey > (Keys.Count - 1))
+            if (NextKey > (Keys.Count - 1))
             {
-            	NextKey = 0;
+                NextKey = 0;
             }
             var NextValue = GetValue(NextKey);
-            
+
+            Vector3 temp = new Vector3(1, 1, 1);
+            temp.X = CurrentValue.Value().X;
+            temp.Y = CurrentValue.Value().Y;
+            temp.Z = CurrentValue.Value().Z;
+            if (((Math.Abs(temp.Z) > 2.85 && Math.Abs(temp.Z) < 3.15) &&
+            (int)Math.Abs(temp.X) == 1) ||
+            ((int)Math.Abs(temp.Z) == 2 && (int)Math.Abs(temp.X) == 1))
+            {
+                temp.Y = -temp.Y;
+                //temp.X = -temp.X;
+            }
+            if (((Math.Round(Math.Abs(rotation.Z), 1) == 1.5) || Math.Round(Math.Abs(rotation.Z), 1) == 1.6) && filename.Contains("OBJ_w"))
+            {
+                temp.Y = -temp.Y;
+                //temp.X = -temp.X;
+            }
+
+            Vector3 temp2 = Vector3.Zero;
+            temp2.X = CurrentValue.Value().X;
+            temp2.Y = CurrentValue.Value().Y;
+            temp2.Z = CurrentValue.Value().Z;
+            if (((Math.Abs(rotation.Z) > 2.85 && Math.Abs(rotation.Z) < 3.15) &&
+            (int)Math.Abs(rotation.X) == 1) ||
+            ((int)Math.Abs(rotation.Z) == 2 && (int)Math.Abs(rotation.X) == 1))
+            {
+                //temp2.Z = -temp2.Z;
+                //temp2.Y = -temp2.Y;
+                //temp2.X = -temp2.X;
+            }
+            if (((Math.Round(Math.Abs(rotation.Z), 1) == 1.5) || Math.Round(Math.Abs(rotation.Z), 1) == 1.6))
+            {
+                //temp2.Z = -temp2.Z;
+                //temp2.Y = -temp2.Y;
+                //temp2.X = -temp2.X;
+            }
+
+            switch (filename)
+            {
+                case "OBJ_t0 r thigh":
+                    //temp2.Y = -temp2.Y;
+                    //temp2.X = -temp2.X;
+                    //temp2.Z = -temp2.Z;
+                    break;
+                case "OBJ_t0 l thigh":
+                    //temp2.Z = -temp2.Z;
+                    //temp2.X = -temp2.X;
+                    //temp2.Y = -temp2.Y;
+                    break;
+                case "OBJ_t0 r clavicle":
+                    //temp2.X = -temp2.X;/**/
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;
+                    //temp.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 l clavicle":
+                    //temp2.X = -temp2.X;
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;/**/
+                    //temp2.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 r upperarm":
+                    //temp2.X = -temp2.X;/**/
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;
+                    //temp.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 l upperarm":
+                    //temp2.X = -temp2.X;
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;/**/
+                    //temp2.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 r forearm":
+                    //temp2.X = -temp2.X;/**/
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;
+                    //temp.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 l forearm":
+                    //temp2.X = -temp2.X;
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;/**/
+                    //temp2.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 r hand":
+                    //temp2.X = -temp2.X;/**/
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;
+                    //temp.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 l hand":
+                    //temp2.X = -temp2.X;
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;/**/
+                    //temp2.X += Util.toRads(90f);
+                    break;
+                case "OBJ_t0 spine 1":
+                    //temp2.X = -temp2.X;
+                    //temp2.Y = -temp2.Y;/**/
+                    //temp2.Z = -temp2.Z;/**/
+                    //temp2.X += Util.toRads(90f);
+                    break;
+            }
+
             float range = 1.0f / (CurrentValue.GetFrameCount() - CurrentValue.FrameNumber());
             int percent = frameNumber - CurrentValue.FrameNumber();
-            
-            return Vector3.Lerp(CurrentValue.Value(), NextValue.Value(), range * percent);
+
+            //return CurrentValue.Value();
+            //return Vector3.Lerp(CurrentValue.Value(), NextValue.Value(), range * percent);
+            //return Vector3.Lerp(temp, temp2, range * percent);
+            if (Keys.Count == 1)
+            {
+                return temp;
+            }
+            else
+            {
+                //return CurrentValue.Value();
+                return temp2;
+            }
         }
     }
 
@@ -1231,7 +1648,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -1260,7 +1677,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Vec2UV_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     
@@ -1302,7 +1719,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -1331,7 +1748,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: F32_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     if(Keys.Count > 0)
@@ -1390,7 +1807,7 @@ namespace StudioCCS.libCCS
             {
                 return FixedValue;
             }
-            else if(keyID < KeyCount)
+            else if(keyID < Keys.Count)
             {
                 return Keys[keyID];
             }
@@ -1419,7 +1836,7 @@ namespace StudioCCS.libCCS
                         {
                             //kill duplicate keyframe...
                             //TODO: Int32_Track: Properly handle duplicate keyframes
-                            Keys.Remove(lastKeyframe);
+                            //Keys.Remove(lastKeyframe);
                         }
                     }
                     if(Keys.Count > 0)

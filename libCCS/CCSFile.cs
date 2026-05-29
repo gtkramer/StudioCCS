@@ -819,7 +819,7 @@ namespace StudioCCS.libCCS
 			
 				foreach(var tmpClump in ClumpList)
 				{
-					tmpClump.DumpToSMD(fullPath, withNormals);
+					tmpClump.DumpToSMD(fullPath, withNormals, TextureList);
 				}
 				
 				Log.Info("Done.");
