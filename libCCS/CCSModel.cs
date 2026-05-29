@@ -199,7 +199,7 @@ namespace StudioCCS.libCCS
 						/*
 						else
 						{
-							Logger.LogError(string.Format("Error initializing Model {0}, SubModel({1}), Non-Existent Material referenced: 0x{2:X}\n", ObjectID, i, tmpSubModel.ParentMaterialRef));
+							Log.Error(string.Format("Error initializing Model {0}, SubModel({1}), Non-Existent Material referenced: 0x{2:X}\n", ObjectID, i, tmpSubModel.ParentMaterialRef));
 							return false;
 						}
 						*/
@@ -338,8 +338,8 @@ namespace StudioCCS.libCCS
 				
 				if(RigidProgram.AttribPosition == -1 || RigidProgram.AttribTexCoord == -1 RigidProgram.AttribColor == -1)
 				{
-					Logger.LogError("Error getting CCSModel Rigid Shader Attributes:");
-					Logger.LogError(string.Format("\tPosition: {0}, TexCoord: {1}, Normal: {2}, Color: {3}", RigidProgram.AttribPosition, RigidProgram.AttribTexCoord, RigidProgram.AttribNormal, RigidProgram.AttribColor));
+					Log.Error("Error getting CCSModel Rigid Shader Attributes:");
+					Log.Error(string.Format("\tPosition: {0}, TexCoord: {1}, Normal: {2}, Color: {3}", RigidProgram.AttribPosition, RigidProgram.AttribTexCoord, RigidProgram.AttribNormal, RigidProgram.AttribColor));
 					return false;
 				}
 				
@@ -353,8 +353,8 @@ namespace StudioCCS.libCCS
 				RigidProgram.UniformRenderMode = GL.GetUniformLocation(rp, "mRenderMode");
 				if(RigidProgram.UniformMatrix == -1 || RigidProgram.UniformAlpha == -1 || RigidProgram.UniformTextureOffset == -1 || RigidProgram.UniformDrawOptions == -1 || RigidProgram.UniformRenderMode == -1)
 				{
-					Logger.LogError("Error getting CCSModel Rigid Shader Uniforms:");
-					Logger.LogError(string.Format("\tMatrix: {0}, Alpha: {1}, TextureOffset: {2}, DrawOptions: {3}, RenderMode: {4}", RigidProgram.UniformMatrix, RigidProgram.UniformAlpha, RigidProgram.UniformTextureOffset, RigidProgram.UniformDrawOptions, RigidProgram.UniformRenderMode));
+					Log.Error("Error getting CCSModel Rigid Shader Uniforms:");
+					Log.Error(string.Format("\tMatrix: {0}, Alpha: {1}, TextureOffset: {2}, DrawOptions: {3}, RenderMode: {4}", RigidProgram.UniformMatrix, RigidProgram.UniformAlpha, RigidProgram.UniformTextureOffset, RigidProgram.UniformDrawOptions, RigidProgram.UniformRenderMode));
 					return false;
 				}
 			}
@@ -382,8 +382,8 @@ namespace StudioCCS.libCCS
 				
 				if(AttribPosition == -1 || AttribTexCoord == -1 || AttribColor == -1 || AttribBoneIDs == -1 || AttribBoneWeights == -1)
 				{
-					Logger.LogError("Error getting CCSModel Shader Attributes:\n");
-					Logger.LogError(string.Format("\tPosition: {0}, TexCoord: {1}, Normal: {2}, Color: {3}, BoneIDs: {4}, BoneWeights: {5}\n", AttribPosition, AttribTexCoord, AttribNormal, AttribColor, AttribBoneIDs, AttribBoneWeights));
+					Log.Error("Error getting CCSModel Shader Attributes:\n");
+					Log.Error(string.Format("\tPosition: {0}, TexCoord: {1}, Normal: {2}, Color: {3}, BoneIDs: {4}, BoneWeights: {5}\n", AttribPosition, AttribTexCoord, AttribNormal, AttribColor, AttribBoneIDs, AttribBoneWeights));
 					//return false;
 				}
 				
@@ -398,8 +398,8 @@ namespace StudioCCS.libCCS
 				
 				if(UniformMatrix == -1 || UniformAlpha == -1 || UniformTextureOffset == -1 || UniformDrawOptions == -1 || UniformSelectionColor == -1 || UniformRenderMode == -1 || UniformTexture == -1 || UniformMatrixList == -1)
 				{
-					Logger.LogError("Error getting CCSModel Shader Uniforms:\n");
-					Logger.LogError(string.Format("\tMatrix: {0}, Alpha: {1}, TextureOffset: {2}, DrawOptions: {3}, Selection Color: {4}, Render Mode: {5}, Texture: {6}, Matrix List: {7}\n", UniformMatrix, UniformAlpha, UniformTextureOffset, UniformDrawOptions, UniformSelectionColor, UniformRenderMode, UniformTexture, UniformMatrixList));
+					Log.Error("Error getting CCSModel Shader Uniforms:\n");
+					Log.Error(string.Format("\tMatrix: {0}, Alpha: {1}, TextureOffset: {2}, DrawOptions: {3}, Selection Color: {4}, Render Mode: {5}, Texture: {6}, Matrix List: {7}\n", UniformMatrix, UniformAlpha, UniformTextureOffset, UniformDrawOptions, UniformSelectionColor, UniformRenderMode, UniformTexture, UniformMatrixList));
 				}
 			}
 			
@@ -572,7 +572,7 @@ namespace StudioCCS.libCCS
 						{
 							if(tmpSubModel.ParentID > gifShit)
 							{
-								Logger.LogError(string.Format("Model 0x{0}: {1}, Sub Model {2}, Lookup table indice out of bounds.", ObjectID, ParentFile.GetSubObjectName(ObjectID), i));
+								Log.Error(string.Format("Model 0x{0}: {1}, Sub Model {2}, Lookup table indice out of bounds.", ObjectID, ParentFile.GetSubObjectName(ObjectID), i));
 							}
 							else
 							{
@@ -608,7 +608,7 @@ namespace StudioCCS.libCCS
 						var tVertCount = bStream.ReadInt32();
 						if((tVertCount % 3) != 0)
 						{
-							Logger.LogWarning(string.Format("Shadow Model {0:X}:{1} has an bad number of triangle verts!", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
+							Log.Warning(string.Format("Shadow Model {0:X}:{1} has an bad number of triangle verts!", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
 							//return false;
 						}
 						tmpSubModel.TriangleCount = tVertCount / 3;
@@ -618,7 +618,7 @@ namespace StudioCCS.libCCS
 				}
 				else
 				{
-					Logger.LogError(string.Format("Model {0}: Unknown model type: 0x{1:X}\n", ParentFile.GetSubObjectName(ObjectID), ModelType));
+					Log.Error(string.Format("Model {0}: Unknown model type: 0x{1:X}\n", ParentFile.GetSubObjectName(ObjectID), ModelType));
 					return false;
 				}
 			}
@@ -941,7 +941,7 @@ namespace StudioCCS.libCCS
 			int boneID = ParentFile.SearchClump(ParentFile.LastObject.ObjectID);
 			if(boneID == -1)
 			{
-				Logger.LogError(string.Format("CCSModel::Read(): Model {0:X} at 0x{1:X}, Last Bone object ID is not part of a clump that have been read yet...\n", ObjectID, subModelPosition));
+				Log.Error(string.Format("CCSModel::Read(): Model {0:X} at 0x{1:X}, Last Bone object ID is not part of a clump that have been read yet...\n", ObjectID, subModelPosition));
 				boneID = 0;
 			}
 			

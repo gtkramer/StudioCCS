@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using StudioCCS.libCCS;
 using StudioCCS.ViewModels;
 
@@ -28,8 +29,13 @@ namespace StudioCCS.Views
             InitializeComponent();
             DataContext = _vm;
 
-            // Route Logger output to the log panel (marshalled onto the UI thread).
-            Logger.SetOutput(AppendLog);
+            // Configure logging: the framework owns levels/filtering and the stdout
+            // sink; our custom provider routes to the log panel (marshalled onto the
+            // UI thread by AppendLog).
+            Log.Init(b => b
+                .SetMinimumLevel(LogLevel.Information)
+                .AddSimpleConsole(o => o.SingleLine = true)
+                .AddProvider(new PanelLoggerProvider(AppendLog)));
 
             // Let a whole tree row toggle expand/collapse, not just the chevron.
             ccsTree.Tapped += TreeViewExpand.ToggleOnTap;
@@ -70,14 +76,14 @@ namespace StudioCCS.Views
         private void AppendLog(string text, System.Drawing.Color color)
         {
             // Logging can originate on the background parse thread; marshal to the UI
-            // thread first so the console echo and TextBox update happen exactly once.
+            // thread first so the TextBox update happens exactly once. (stdout is
+            // handled separately by the framework's console provider.)
             if (!Dispatcher.UIThread.CheckAccess())
             {
                 Dispatcher.UIThread.Post(() => AppendLog(text, color));
                 return;
             }
 
-            Console.Write(text);
             logView.Text += text;
             logView.CaretIndex = logView.Text.Length;
         }
@@ -118,7 +124,7 @@ namespace StudioCCS.Views
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(string.Format("Failed to load {0}: {1}\n", fileName, ex.Message));
+                        Log.Error(string.Format("Failed to load {0}: {1}\n", fileName, ex.Message));
                         continue;
                     }
                     if (file == null) continue;

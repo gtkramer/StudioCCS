@@ -52,7 +52,7 @@ namespace StudioCCS
 			ProgramID = Scene.LoadProgram("WireHelper");
 			if(ProgramID == -1)
 			{
-				Logger.LogError("Error loading LightHelper shader program");
+				Log.Error("Error loading LightHelper shader program");
 				return false;
 			}
 			
@@ -63,8 +63,8 @@ namespace StudioCCS
 
 			if(AttribPosition == -1 || UniformMatrix == -1 || UniformColor == -1 || UniformScale == -1 )
 			{
-				Logger.LogError("Error getting LightHelper Shader Attribute/Uniform Locations:\n");
-				Logger.LogError(string.Format("\tPosition: {0}, Matrix: {1}, Color: {2}, Scale: {3}\n", AttribPosition, UniformMatrix, UniformColor, UniformScale));
+				Log.Error("Error getting LightHelper Shader Attribute/Uniform Locations:\n");
+				Log.Error(string.Format("\tPosition: {0}, Matrix: {1}, Color: {2}, Scale: {3}\n", AttribPosition, UniformMatrix, UniformColor, UniformScale));
 				return false;
 			}
 			

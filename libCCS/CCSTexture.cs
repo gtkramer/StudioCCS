@@ -84,7 +84,7 @@ namespace StudioCCS.libCCS
 			TextureType = bStream.ReadByte();
 			if(TextureType != CCS_TEXTURE_I4 && TextureType != CCS_TEXTURE_I8 && TextureType != CCS_TEXTURE_RGBA32 && TextureType != CCS_TEXTURE_DXT1 && TextureType != CCS_TEXTURE_DXT5)
 			{
-				Logger.LogError(string.Format("CCSTexture::Read(): Unknown texture type {0:X} at 0x{1:X}\n", TextureType, textureOffset));
+				Log.Error(string.Format("CCSTexture::Read(): Unknown texture type {0:X} at 0x{1:X}\n", TextureType, textureOffset));
 				return false;
 			}
 			MipCount = bStream.ReadByte();
@@ -107,7 +107,7 @@ namespace StudioCCS.libCCS
 					NonP2 = true;
 					if(TextureType == CCS_TEXTURE_DXT1 || TextureType == CCS_TEXTURE_DXT5)
 					{
-						Logger.LogError(string.Format("Error, CCSTexture 0x{0:X}: {1} has non-power of two width or height", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
+						Log.Error(string.Format("Error, CCSTexture 0x{0:X}: {1} has non-power of two width or height", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
 						return false;
 					}
 					else
@@ -127,7 +127,7 @@ namespace StudioCCS.libCCS
 						int texHeight = bStream.ReadInt16();
 						if(texWidth != Width || texHeight != Height)
 						{
-							Logger.LogWarning(string.Format("Warning, CCSTexture 0x{0:X}: {1} has mismatched Width/Height values..", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
+							Log.Warning(string.Format("Warning, CCSTexture 0x{0:X}: {1} has mismatched Width/Height values..", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
 							//return false;
 						}
 						bStream.BaseStream.Seek(0x14, SeekOrigin.Current);
@@ -180,7 +180,7 @@ namespace StudioCCS.libCCS
 			{
 				if(MipCount > 0)
 				{
-					Logger.LogError(string.Format("Error, Texture {0:X} at 0x{1:X} has MipLevels. Please investigate.", ObjectID, textureOffset));
+					Log.Error(string.Format("Error, Texture {0:X} at 0x{1:X} has MipLevels. Please investigate.", ObjectID, textureOffset));
 					return false;
 				}
 			}
@@ -209,13 +209,13 @@ namespace StudioCCS.libCCS
 
 			if(TextureType != CCS_TEXTURE_DXT1 && TextureType != CCS_TEXTURE_DXT5)
 			{
-				Logger.LogError(string.Format("Error, Texture {0:X} at 0x{1:X}, unknown texture type {2:X}.\n", ObjectID, textureOffset, TextureType));
+				Log.Error(string.Format("Error, Texture {0:X} at 0x{1:X}, unknown texture type {2:X}.\n", ObjectID, textureOffset, TextureType));
 				return false;
 			}
 			MipCount = bStream.ReadByte();
 			if(MipCount > 0)
 			{
-				Logger.LogError(string.Format("Error, Texture {0:X} at 0x{1:X}, has mip levels. these need to be investigated.\n", ObjectID, textureOffset));
+				Log.Error(string.Format("Error, Texture {0:X} at 0x{1:X}, has mip levels. these need to be investigated.\n", ObjectID, textureOffset));
 				return false;
 			}
 			bStream.ReadByte();
@@ -229,7 +229,7 @@ namespace StudioCCS.libCCS
 			Height = bStream.ReadInt16();
 			if(texWidth != Width || texHeight != Height)
 			{
-				Logger.LogError(string.Format("Error, Texture {0:X} at 0x{1:X}, Texture Width/Height mismatch...I don't know who to belive.\n", ObjectID, textureOffset));
+				Log.Error(string.Format("Error, Texture {0:X} at 0x{1:X}, Texture Width/Height mismatch...I don't know who to belive.\n", ObjectID, textureOffset));
 				return false;
 			}
 			
@@ -248,7 +248,7 @@ namespace StudioCCS.libCCS
 		{
 			if(NonP2)
 			{
-				Logger.LogError("CCSTexture::InitTexture(): Non-Power of Two textures are currently unsupported\n");
+				Log.Error("CCSTexture::InitTexture(): Non-Power of Two textures are currently unsupported\n");
 				return false;
 			}
 			/*
@@ -482,7 +482,7 @@ namespace StudioCCS.libCCS
 			
 				//Now, dump texture to file
 				string outputTextureFileName = string.Format("{0}.png", System.IO.Path.Combine(outputPath, textureName));
-				Logger.LogInfo(string.Format("\tDumping {0}...\n", outputTextureFileName));
+				Log.Info(string.Format("\tDumping {0}...\n", outputTextureFileName));
 				using(SKBitmap texture = ToBitmap(CurrentCLUTID))
 				using(SKImage image = SKImage.FromBitmap(texture))
 				using(SKData data = image.Encode(SKEncodedImageFormat.Png, 100))

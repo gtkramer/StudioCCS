@@ -188,7 +188,7 @@ namespace StudioCCS.Views
             if (file == null) return;
 
             OperatingClump.SavePose(file.Path.LocalPath);
-            Logger.LogInfo(string.Format("Saved pose for {0} to {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+            Log.Info(string.Format("Saved pose for {0} to {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
         }
 
         private async void OnLoadPose(object sender, RoutedEventArgs e)
@@ -203,7 +203,7 @@ namespace StudioCCS.Views
             if (file == null) return;
 
             OperatingClump.LoadPose(file.Path.LocalPath);
-            Logger.LogInfo(string.Format("Loaded pose for {0} from {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+            Log.Info(string.Format("Loaded pose for {0} from {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
         }
 
         private static IReadOnlyList<FilePickerFileType> PoseFileTypes()

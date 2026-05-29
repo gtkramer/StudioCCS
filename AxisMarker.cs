@@ -50,7 +50,7 @@ namespace StudioCCS
 			ProgramID = Scene.LoadProgram("AxisMarker");
 			if(ProgramID == -1)
 			{
-				Logger.LogError("Error loading AxisMarker shader program");
+				Log.Error("Error loading AxisMarker shader program");
 				return false;
 			}
 			
@@ -61,8 +61,8 @@ namespace StudioCCS
 			
 			if(AttribPosition == -1 || AttribColor == -1 || UniMatrix == -1 || UniScale == -1)
 			{
-				Logger.LogError("Error getting AxisVertex Shader Attribute/Uniform Locations:\n");
-				Logger.LogError(string.Format("\tPosition: {0}, Color: {1}, Matrix: {2}, Scale: {3}\n", AttribPosition, AttribColor, UniMatrix, UniScale));
+				Log.Error("Error getting AxisVertex Shader Attribute/Uniform Locations:\n");
+				Log.Error(string.Format("\tPosition: {0}, Color: {1}, Matrix: {2}, Scale: {3}\n", AttribPosition, AttribColor, UniMatrix, UniScale));
 				return false;
 			}
 			//Deb

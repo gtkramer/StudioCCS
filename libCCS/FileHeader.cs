@@ -41,14 +41,14 @@ namespace StudioCCS.libCCS
 			var isHeader = bStream.ReadInt32() & 0xFFFF;
 			if(isHeader != CCSFile.SECTION_HEADER)
 			{
-				Logger.LogError("Header Section Mismatch!\n");
+				Log.Error("Header Section Mismatch!\n");
 				return false;
 			}
 			int sectionSize = bStream.ReadInt32();
 			int magic = bStream.ReadInt32();
 			if(magic != CCS_MAGIC)
 			{
-				Logger.LogError("Invalid CCS Magic.\n");
+				Log.Error("Invalid CCS Magic.\n");
 				return false;
 			}
 			
@@ -61,11 +61,11 @@ namespace StudioCCS.libCCS
 			
 			if(CCSFVersion >= CCS_VERSION_THREE)
 			{
-				Logger.LogError("Support for Generation 3 (Last Recode) CCS Files is currently experimental...\n");
+				Log.Error("Support for Generation 3 (Last Recode) CCS Files is currently experimental...\n");
 			}
 			else if(CCSFVersion >= CCS_VERSION_TWO)
 			{
-				Logger.LogError("Support for Generation 2(GU/Link) CCS Files is currently experimental...\n");
+				Log.Error("Support for Generation 2(GU/Link) CCS Files is currently experimental...\n");
 				//return false;
 			}
 			

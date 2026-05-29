@@ -159,9 +159,9 @@ namespace StudioCCS.libCCS
 			FileName = _fileName;
 			var fStream = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
 			var bStream = new BinaryReader(fStream);
-			Logger.LogInfo(string.Format("Loading {0}...\n", _fileName));
+			Log.Info(string.Format("Loading {0}...\n", _fileName));
 			bool result = Read(bStream);
-			Logger.LogInfo("Done.\n");
+			Log.Info("Done.\n");
 			return result;
 		}
 		
@@ -170,25 +170,25 @@ namespace StudioCCS.libCCS
 			var ErrorString = string.Format("Error reading CCS File {0}, ", FileName);
 			if(!Header.Read(bStream))
 			{
-				Logger.LogError(ErrorString + "Header section could not be read\n");
+				Log.Error(ErrorString + "Header section could not be read\n");
 				return false;
 			}
 			
 			if(!ReadIndexSection(bStream))
 			{
-				Logger.LogError(ErrorString + "Index section could not be read\n");
+				Log.Error(ErrorString + "Index section could not be read\n");
 				return false;
 			}
 			
 			if(!ReadSetupSection(bStream))
 			{
-				Logger.LogError(ErrorString + "Setup section could not be read\n");
+				Log.Error(ErrorString + "Setup section could not be read\n");
 				return false;
 			}
 			
 			if(!ReadStreamSection(bStream))
 			{
-				Logger.LogError(ErrorString + "Stream section could not be read\n");
+				Log.Error(ErrorString + "Stream section could not be read\n");
 				return false;
 			}
 			
@@ -271,7 +271,7 @@ namespace StudioCCS.libCCS
 			var isIndexSection = bStream.ReadInt32() & 0xFFFF;
 			if(isIndexSection != SECTION_INDEX)
 			{
-				Logger.LogError("Index section mismatch\n");
+				Log.Error("Index section mismatch\n");
 				return false;
 			}
 			
@@ -303,7 +303,7 @@ namespace StudioCCS.libCCS
 			var isSetupSection = bStream.ReadInt32() & 0xffff;
 			if(isSetupSection != SECTION_SETUP)
 			{
-				Logger.LogError("Setup section mismatch\n");
+				Log.Error("Setup section mismatch\n");
 				return false;
 			}
 			
@@ -327,7 +327,7 @@ namespace StudioCCS.libCCS
 				var tmpSectionID = bStream.ReadInt32();
 				if(tmpSectionID > ObjectIndexCount)
 				{
-					Logger.LogError(string.Format("Error reading sub object, ID out of bounds ({0} > {1}) at 0x{2:X}\n", tmpSectionID, ObjectIndexCount, tmpSectionOffset));
+					Log.Error(string.Format("Error reading sub object, ID out of bounds ({0} > {1}) at 0x{2:X}\n", tmpSectionID, ObjectIndexCount, tmpSectionOffset));
 					return false;
 				}
 				bool sectionRead = true;
@@ -508,7 +508,7 @@ namespace StudioCCS.libCCS
 					case SECTION_BINARYBLOB:
 						{
 							//Warn about section type not introduced until next generation...
-							if(GetVersion() == CCSFileHeader.CCSVersion.Gen1) Logger.LogWarning(string.Format("Binary Blob (Type 0x2400) with ID of {0} found in Generation 1 CCS File at 0x{1:X}, File may fail in game!\n", tmpSectionID, tmpSectionOffset));
+							if(GetVersion() == CCSFileHeader.CCSVersion.Gen1) Log.Warning(string.Format("Binary Blob (Type 0x2400) with ID of {0} found in Generation 1 CCS File at 0x{1:X}, File may fail in game!\n", tmpSectionID, tmpSectionOffset));
 							//But read it anyways.
 							var tmpBinary = new CCSBinaryBlob(tmpSectionID, this);
 							sectionRead = tmpBinary.Read(bStream, tmpSectionSize);
@@ -517,7 +517,7 @@ namespace StudioCCS.libCCS
 						}
 					default:
 						{
-							Logger.LogError(string.Format("Unknown section of type {0:X} found at 0x{2:X}, skipping...\n", tmpSectionType, tmpSectionID, tmpSectionOffset));
+							Log.Error(string.Format("Unknown section of type {0:X} found at 0x{2:X}, skipping...\n", tmpSectionType, tmpSectionID, tmpSectionOffset));
 							sectionRead = true;
 							Util.SkipSection(bStream, tmpSectionSize);
 							break;
@@ -526,7 +526,7 @@ namespace StudioCCS.libCCS
 				
 				if(!sectionRead)
 				{
-					Logger.LogError(string.Format("Error reading section {0} of type {1}({2}) at 0x{3:X}, size: 0x{4:X}\n", tmpSectionID, tmpSectionType, GetObjectTypeString(tmpSectionType), tmpSectionOffset, tmpSectionSize));
+					Log.Error(string.Format("Error reading section {0} of type {1}({2}) at 0x{3:X}, size: 0x{4:X}\n", tmpSectionID, tmpSectionType, GetObjectTypeString(tmpSectionType), tmpSectionOffset, tmpSectionSize));
 					return false;
 				}
 			}
@@ -555,9 +555,9 @@ namespace StudioCCS.libCCS
 			if(tmpObj.ObjectRef != null)
 			{
 				
-				Logger.LogWarning(string.Format("Duplicate sub object definition for object {0}:\n", _objectID));
-				Logger.LogWarning(string.Format("\tType: {0}({1}) at 0x{2:X}\n", _objectType, GetObjectTypeString(_objectType), _objectOffset));
-				Logger.LogWarning(string.Format("\tOriginally defined as Type: {0}({1}) at 0x{2:X}\n", tmpObj.ObjectType, GetObjectTypeString(tmpObj.ObjectType), tmpObj.ObjectOffset));
+				Log.Warning(string.Format("Duplicate sub object definition for object {0}:\n", _objectID));
+				Log.Warning(string.Format("\tType: {0}({1}) at 0x{2:X}\n", _objectType, GetObjectTypeString(_objectType), _objectOffset));
+				Log.Warning(string.Format("\tOriginally defined as Type: {0}({1}) at 0x{2:X}\n", tmpObj.ObjectType, GetObjectTypeString(tmpObj.ObjectType), tmpObj.ObjectOffset));
 			}
 			tmpObj.ObjectOffset = _objectOffset;
 			tmpObj.ObjectType = _objectType;
@@ -581,7 +581,7 @@ namespace StudioCCS.libCCS
 			var isStreamSection = bStream.ReadInt32() & 0xFFFF;
 			if(isStreamSection != SECTION_STREAM)
 			{
-				Logger.LogError("Stream section mismatch!\n");
+				Log.Error("Stream section mismatch!\n");
 				return false;
 			}
 			var streamHeaderSize = bStream.ReadInt32();
@@ -737,7 +737,7 @@ namespace StudioCCS.libCCS
 			{
 				if(File.Exists(fullPath))
 				{
-					Logger.LogError(string.Format("Error, Cannot dump CCS File, {0} exists as file", Header.CCSFName));
+					Log.Error(string.Format("Error, Cannot dump CCS File, {0} exists as file", Header.CCSFName));
 					return;
 				}
 				else
@@ -749,7 +749,7 @@ namespace StudioCCS.libCCS
 			//Output OBJ
 			
 			string outputFileName = Path.Combine(fullPath, Header.CCSFName);
-			Logger.LogInfo(string.Format("Dumping {0} to {0}.obj...\n", Header.CCSFName, outputFileName));
+			Log.Info(string.Format("Dumping {0} to {0}.obj...\n", Header.CCSFName, outputFileName));
 			using(System.IO.StreamWriter fStream = new StreamWriter(outputFileName + ".obj", false))
 			{
 				fStream.WriteLine(string.Format("mtllib {0}.mtl", Header.CCSFName));
@@ -762,7 +762,7 @@ namespace StudioCCS.libCCS
 			}
 			
 			//Output Mtl
-			Logger.LogInfo("Creating MTL file and dumping textures...\n");
+			Log.Info("Creating MTL file and dumping textures...\n");
 			using(System.IO.StreamWriter fStream = new StreamWriter(outputFileName + ".mtl", false))
 			{
 				foreach(var tmpTexture in TextureList)
@@ -773,7 +773,7 @@ namespace StudioCCS.libCCS
 			
 			if(collision)
 			{
-				Logger.LogInfo(string.Format("Dumping Collision Meshes to {0}_collision.obj...\n", outputFileName));
+				Log.Info(string.Format("Dumping Collision Meshes to {0}_collision.obj...\n", outputFileName));
 				using(System.IO.StreamWriter fStream = new StreamWriter(outputFileName + "_collison.obj", false))
 				{
 					int totalVertCount = 1;
@@ -786,7 +786,7 @@ namespace StudioCCS.libCCS
 			
 			if(dummies)
 			{
-				Logger.LogInfo(string.Format("Dumping Dummies to {0}_dummies.txt...\n", outputFileName));
+				Log.Info(string.Format("Dumping Dummies to {0}_dummies.txt...\n", outputFileName));
 				using(System.IO.StreamWriter fStream = new StreamWriter(outputFileName + "_dummies.txt", false))
 				{
 					fStream.WriteLine(string.Format("{0}", DummyList.Count));
@@ -798,7 +798,7 @@ namespace StudioCCS.libCCS
 			}
 			
 			
-			Logger.LogInfo("Done.");
+			Log.Info("Done.");
 		}
 		
 		public void DumpToSMD(string outputPath, bool withNormals)
@@ -808,7 +808,7 @@ namespace StudioCCS.libCCS
 			{
 				if(File.Exists(fullPath))
 				{
-					Logger.LogError(string.Format("Error, Cannot dump CCS File, {0} exists as file", Header.CCSFName));
+					Log.Error(string.Format("Error, Cannot dump CCS File, {0} exists as file", Header.CCSFName));
 					return;
 				}
 				else
@@ -822,7 +822,7 @@ namespace StudioCCS.libCCS
 					tmpClump.DumpToSMD(fullPath, withNormals);
 				}
 				
-				Logger.LogInfo("Done.");
+				Log.Info("Done.");
 			
 		}
 		
@@ -834,7 +834,7 @@ namespace StudioCCS.libCCS
 			{
 				if(File.Exists(fullPath))
 			   	{
-					Logger.LogError(string.Format("Error, Cannot dump Animations to file, '{0}' exists as file", outPath));
+					Log.Error(string.Format("Error, Cannot dump Animations to file, '{0}' exists as file", outPath));
 					return;
 			   	}
 				else

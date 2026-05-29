@@ -217,7 +217,7 @@ namespace StudioCCS
 				GL.GetProgram(programID, GetProgramParameterName.LinkStatus, out programLinkResult);
 				if(programLinkResult == 0)
 				{
-					Logger.LogError(string.Format("Error linking program {0}:\n{1}\n", programName, GL.GetProgramInfoLog(programID)));
+					Log.Error(string.Format("Error linking program {0}:\n{1}\n", programName, GL.GetProgramInfoLog(programID)));
 					result = false;
 				}
 				
@@ -246,7 +246,7 @@ namespace StudioCCS
 				GL.GetShader(shaderID, ShaderParameter.CompileStatus, out compileResult);
 				if(compileResult == 0)
 				{
-					Logger.LogError(string.Format("Error compiling shader {0}:\n{1}\n", fileName, GL.GetShaderInfoLog(shaderID)));
+					Log.Error(string.Format("Error compiling shader {0}:\n{1}\n", fileName, GL.GetShaderInfoLog(shaderID)));
 					return false;
 				}
 				return true;

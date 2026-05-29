@@ -73,8 +73,8 @@ namespace StudioCCS.libCCS
 				
 				if(AttribPosition == -1 || UniformMatrix == -1 || UniformColor == -1)
 				{
-					Logger.LogError("CCSHitMesh: Error Getting Shader Attributes/Uniforms:\n");
-					Logger.LogError(string.Format("\tPosition: {0}, Matrix: {1}, Color: {2}\n", AttribPosition, UniformMatrix, UniformColor));
+					Log.Error("CCSHitMesh: Error Getting Shader Attributes/Uniforms:\n");
+					Log.Error(string.Format("\tPosition: {0}, Matrix: {1}, Color: {2}\n", AttribPosition, UniformMatrix, UniformColor));
 					return false;
 				}
 			}
@@ -106,7 +106,7 @@ namespace StudioCCS.libCCS
 				}
 				else
 				{
-					Logger.LogWarning(string.Format("HitMesh {0}: HitGroup{1} has zero vertices.\n", ParentFile.GetSubObjectName(ObjectID), i));
+					Log.Warning(string.Format("HitMesh {0}: HitGroup{1} has zero vertices.\n", ParentFile.GetSubObjectName(ObjectID), i));
 				}
 			}
 			
@@ -123,7 +123,7 @@ namespace StudioCCS.libCCS
 			{
 				try
 				{
-					//Logger.LogInfo(string.Format("Has {0} of {1} hit groups...\n", i, HitGroupCount));
+					//Log.Info(string.Format("Has {0} of {1} hit groups...\n", i, HitGroupCount));
 					var tmpGroup = HitGroups[i];
 					Console.WriteLine("Wtf 1");
 					if(tmpGroup == null) return;
@@ -152,7 +152,7 @@ namespace StudioCCS.libCCS
 				}
 				catch (NullReferenceException)
 				{
-					Logger.LogError(string.Format("Null Reference expetion caught when attempting render of Hitmesh {0} Submesh {1}...\n", ParentFile.GetSubObjectName(ObjectID), i), Logger.LogType.LogOnceValue);
+					Log.Error(string.Format("Null Reference expetion caught when attempting render of Hitmesh {0} Submesh {1}...\n", ParentFile.GetSubObjectName(ObjectID), i), once: true);
 				}
 			}
 			GL.UseProgram(0);

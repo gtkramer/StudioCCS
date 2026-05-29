@@ -196,7 +196,7 @@ namespace StudioCCS.libCCS
 					default:
 					{
 						//Warn about unkown block type
-						Logger.LogWarning(string.Format("CCSAnime::Read(): Skipped unknown animation controller or keyframe type {0:X} at 0x{1:X}\n", blockType, blockOffset));
+						Log.Warning(string.Format("CCSAnime::Read(): Skipped unknown animation controller or keyframe type {0:X} at 0x{1:X}\n", blockType, blockOffset));
 						Util.SkipSection(bStream, blockSize);
 						break;
 					}
@@ -303,7 +303,7 @@ namespace StudioCCS.libCCS
 						}
 						else
 						{
-							Logger.LogError(string.Format("Error finding Object 0x{0:X} for animation...", tmpExt.ReferencedObjectID), Logger.LogType.LogOnceValue);
+							Log.Error(string.Format("Error finding Object 0x{0:X} for animation...", tmpExt.ReferencedObjectID), once: true);
 						}
 					}
 				}

@@ -79,7 +79,7 @@ namespace StudioCCS
 			ProgramID = Scene.LoadProgram("TexturePreview");
 			if(ProgramID == -1) 
 			{
-				Logger.LogError("Error loading Texture Preview Shader Program");
+				Log.Error("Error loading Texture Preview Shader Program");
 				return false;
 			}
 			
@@ -91,15 +91,15 @@ namespace StudioCCS
 			
 			if(AttribPosition == -1 || AttribTexCoord == -1)
 			{
-				Logger.LogError("Error getting Texture Preview Shader Attributes:");
-				Logger.LogError(string.Format("\tPosition: {0}, TexCoord: {1}", AttribPosition, AttribTexCoord));
+				Log.Error("Error getting Texture Preview Shader Attributes:");
+				Log.Error(string.Format("\tPosition: {0}, TexCoord: {1}", AttribPosition, AttribTexCoord));
 				return false;
 			}
 			
 			if(UniformMatrix == -1 || UniformTexture == -1 || UniformTextureSize == -1)
 			{
-				Logger.LogError("Error getting Texture Preview Shader Uniform Locations:");
-				Logger.LogError(string.Format("\tMatrix: {0}, Texture: {1}, Size: {2}", UniformMatrix, UniformTexture, UniformTextureSize));
+				Log.Error("Error getting Texture Preview Shader Uniform Locations:");
+				Log.Error(string.Format("\tMatrix: {0}, Texture: {1}, Size: {2}", UniformMatrix, UniformTexture, UniformTextureSize));
 				return false;
 			}
 			

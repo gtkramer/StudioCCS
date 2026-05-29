@@ -67,8 +67,8 @@ namespace StudioCCS.libCCS
 				
 				if(AttribVMin == -1 || AttribVMax == -1 || AttribVColor == -1 || UniMatrix == -1)
 				{
-					Logger.LogError("CCSBBox: Error Getting Shader Attributes/Uniforms:\n");
-					Logger.LogError(string.Format("\tVMin: {0}, VMax: {1}, VColor: {2}, UMatrix: {3}", AttribVMin, AttribVMax, AttribVColor, UniMatrix));
+					Log.Error("CCSBBox: Error Getting Shader Attributes/Uniforms:\n");
+					Log.Error(string.Format("\tVMin: {0}, VMax: {1}, VColor: {2}, UMatrix: {3}", AttribVMin, AttribVMax, AttribVColor, UniMatrix));
 					return false;
 				}
 			}

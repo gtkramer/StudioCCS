@@ -111,7 +111,7 @@ namespace StudioCCS.libCCS
 				}
 				else
 				{
-					Logger.LogError(string.Format("Clump {0} Init: could not get child Obj {1}({2}: {3})", ObjectID, i, NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
+					Log.Error(string.Format("Clump {0} Init: could not get child Obj {1}({2}: {3})", ObjectID, i, NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
 					return false;
 				}
 			}
@@ -130,7 +130,7 @@ namespace StudioCCS.libCCS
 					}
 					else
 					{
-						Logger.LogError(string.Format("Clump {0:X}: {1} Init: could not get child Object {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
+						Log.Error(string.Format("Clump {0:X}: {1} Init: could not get child Object {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
 						return false;
 					}
 				}
@@ -145,7 +145,7 @@ namespace StudioCCS.libCCS
 					}
 					else
 					{
-						Logger.LogError(string.Format("Clump {0:X}: {1} Init: could not get child Effect {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
+						Log.Error(string.Format("Clump {0:X}: {1} Init: could not get child Effect {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
 						return false;
 					}
 				}
@@ -159,7 +159,7 @@ namespace StudioCCS.libCCS
 				ProgramID = Scene.LoadProgram("CCSClump", true);
 				if(ProgramID == -1)
 				{
-					Logger.LogError("Error loading Shader program for CCSClump\n");
+					Log.Error("Error loading Shader program for CCSClump\n");
 					return false;
 				}
 				
@@ -167,8 +167,8 @@ namespace StudioCCS.libCCS
 				
 				if(AttribEndpoints == -1)
 				{
-					Logger.LogError("Error getting CCSClump Shader Attributes:\n");
-					Logger.LogError(string.Format("\tEndpoints: {0}", AttribEndpoints));
+					Log.Error("Error getting CCSClump Shader Attributes:\n");
+					Log.Error(string.Format("\tEndpoints: {0}", AttribEndpoints));
 					return false;
 				}
 				
@@ -178,8 +178,8 @@ namespace StudioCCS.libCCS
 				
 				if(UniformMatrix == -1 || UniformSelectionID == -1 || UniformMatrix == -1)
 				{
-					Logger.LogError("Error getting CCSClump Shader Uniforms:\n");
-					Logger.LogError(string.Format("\tMatrix: {0}, SelectionID: {1}, UniformMatrix: {2}", UniformMatrix, UniformSelectionID, UniformMatrixList));
+					Log.Error("Error getting CCSClump Shader Uniforms:\n");
+					Log.Error(string.Format("\tMatrix: {0}, SelectionID: {1}, UniformMatrix: {2}", UniformMatrix, UniformSelectionID, UniformMatrixList));
 					return false;
 				}
 			}
@@ -246,7 +246,7 @@ namespace StudioCCS.libCCS
 					if(childEffect != null) childEffect.Init();
 					else
 					{
-						Logger.LogError(string.Format("Clump {0:X}: {1} Init: could not get child Effect {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
+						Log.Error(string.Format("Clump {0:X}: {1} Init: could not get child Effect {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
 						return false;
 					}
 				}
@@ -354,7 +354,7 @@ namespace StudioCCS.libCCS
 		{
 			if(_nodeID < NodeCount) return PoseMatrixList[_nodeID];
 			
-			Logger.LogWarning(string.Format("Clump {0}: GetPoseMatrix({1}), Invalid NodeID", ParentFile.GetSubObjectName(ObjectID), _nodeID), Logger.LogType.LogOnceValue);
+			Log.Warning(string.Format("Clump {0}: GetPoseMatrix({1}), Invalid NodeID", ParentFile.GetSubObjectName(ObjectID), _nodeID), once: true);
 			return Matrix4.Identity;
 		}
 		*/
@@ -432,7 +432,7 @@ namespace StudioCCS.libCCS
 		{
 			if(_nodeID < NodeCount) return FinalMatrixList[_nodeID];
 			
-			Logger.LogWarning(string.Format("Clump {0}: GetFinalMatrix({1}), Invalid NodeID", ParentFile.GetSubObjectName(ObjectID), _nodeID), Logger.LogType.LogOnceValue);
+			Log.Warning(string.Format("Clump {0}: GetFinalMatrix({1}), Invalid NodeID", ParentFile.GetSubObjectName(ObjectID), _nodeID), once: true);
 			return Matrix4.Identity;
 		}
 		
@@ -626,7 +626,7 @@ namespace StudioCCS.libCCS
 			{
 				using(var outf = new StreamWriter(fs))
 				{
-					Logger.LogInfo(string.Format("Dumping {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
+					Log.Info(string.Format("Dumping {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
 					outf.WriteLine("version 1");
 					
 					outf.WriteLine("nodes");
@@ -677,7 +677,7 @@ namespace StudioCCS.libCCS
 			}
 			/*
 			outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + "_bind.smd";
-			Logger.LogInfo(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
+			Log.Info(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
 			using(var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
 			{
 				using(var outf = new StreamWriter(fs))

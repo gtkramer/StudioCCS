@@ -18,6 +18,8 @@
     <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.8" />
     <!-- Only the GL bindings and math types are used; Avalonia provides the
          window and GL context, so we skip the OpenTK metapackage (which also
          pulls in GLFW windowing, audio, compute, and input). OpenTK.Graphics

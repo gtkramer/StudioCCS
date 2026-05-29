@@ -61,7 +61,7 @@ namespace StudioCCS.Controls
             {
                 GL.LoadBindings(new AvaloniaBindingsContext(gl));
                 _bindingsLoaded = true;
-                Logger.LogInfo(string.Format("OpenGL {0} | GLSL {1} | {2}\n",
+                Log.Info(string.Format("OpenGL {0} | GLSL {1} | {2}\n",
                     GL.GetString(StringName.Version),
                     GL.GetString(StringName.ShadingLanguageVersion),
                     GL.GetString(StringName.Renderer)));
@@ -95,7 +95,7 @@ namespace StudioCCS.Controls
             while (_glJobs.TryDequeue(out var job))
             {
                 try { job(); }
-                catch (Exception ex) { Logger.LogError(string.Format("GL job failed: {0}\n", ex)); }
+                catch (Exception ex) { Log.Error(string.Format("GL job failed: {0}\n", ex)); }
             }
 
             Scene.Render();

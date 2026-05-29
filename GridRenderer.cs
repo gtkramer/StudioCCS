@@ -44,7 +44,7 @@ namespace StudioCCS
 			ProgramID = Scene.LoadProgram("Grid");
 			if(ProgramID == -1)
 			{
-				Logger.LogError("Error loading Grid shader program");
+				Log.Error("Error loading Grid shader program");
 				return false;
 			}
 			
@@ -55,8 +55,8 @@ namespace StudioCCS
 			
 			if(AttribPosition == -1 || UniformMatrix == -1 || UniformColor == -1 || UniformScale == -1)
 			{
-				Logger.LogError("Error getting Grid Shader Attribute/Uniform Locations:\n");
-				Logger.LogError(string.Format("\tPosition: {0}, Matrix: {1}, Color: {2}, Scale: {3}", AttribPosition, UniformMatrix, UniformColor, UniformScale));
+				Log.Error("Error getting Grid Shader Attribute/Uniform Locations:\n");
+				Log.Error(string.Format("\tPosition: {0}, Matrix: {1}, Color: {2}, Scale: {3}", AttribPosition, UniformMatrix, UniformColor, UniformScale));
 				return false;
 			}
 			
