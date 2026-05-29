@@ -130,6 +130,12 @@ namespace StudioCCS
 		public static Matrix4 ProjectionMtx = Matrix4.Identity;
 		public static Matrix4 AxisProjectionMtx = Matrix4.Identity;
 		
+		//Viewport clear + grid colours. Driven by the UI's active theme variant
+		//(MainWindow.ApplyViewportTheme) and re-applied each frame so an OS
+		//light/dark switch is reflected live. Defaults match the dark theme.
+		public static Vector4 BackgroundColor = new Vector4(64 / 255.0f, 64 / 255.0f, 64 / 255.0f, 1.0f);
+		public static Vector4 GridColor = new Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+
 		//Draw options
 		public static bool DrawViewAxis = true;
 		public static bool DrawViewGrid = true;
@@ -313,7 +319,7 @@ namespace StudioCCS
 			//OpenGlControlBase render/init callback), and bindings are loaded.
 			WasInit = true;
 
-			GL.ClearColor(64 / 255.0f, 64 / 255.0f, 64 / 255.0f, 1.0f);
+			GL.ClearColor(BackgroundColor.X, BackgroundColor.Y, BackgroundColor.Z, BackgroundColor.W);
 			GL.Enable(EnableCap.Blend);
 			GL.Enable(EnableCap.DepthTest);
 			GL.DepthFunc(DepthFunction.Lequal);
@@ -483,7 +489,9 @@ namespace StudioCCS
 			HandleInput();
 			ArcBallCamera curCamera = CurrentCamera();
 			
-			//Clear
+			//Clear. The clear colour is re-set every frame so a live theme switch
+			//(BackgroundColor updated off the UI thread) takes effect immediately.
+			GL.ClearColor(BackgroundColor.X, BackgroundColor.Y, BackgroundColor.Z, BackgroundColor.W);
 			GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 			
 			SetMainViewport();

@@ -5,11 +5,34 @@
              RequestedThemeVariant="Default">
 
     <Application.Resources>
-        <!-- Shared template for every CcsTreeNode tree (CCS objects, scene
-             animations, clump bones). Recurses children via Nodes. -->
-        <TreeDataTemplate x:Key="CcsNodeTemplate" x:DataType="ccs:CcsTreeNode" ItemsSource="{Binding Nodes}">
-            <TextBlock Text="{Binding Text}" />
-        </TreeDataTemplate>
+        <ResourceDictionary>
+            <!-- Status-bar palette, keyed by theme variant so the Mode/Camera bars
+                 track the OS light/dark setting (DynamicResource re-resolves these
+                 live on a theme switch). The Dark values preserve the original look;
+                 the Light values are tuned to sit against a light UI. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="StatusBarBackground" Color="#202020" />
+                    <SolidColorBrush x:Key="StatusBarBorder" Color="#40808080" />
+                    <SolidColorBrush x:Key="StatusBarLabel" Color="#808890" />
+                    <SolidColorBrush x:Key="StatusBarValue" Color="#E0E0E0" />
+                    <SolidColorBrush x:Key="StatusBarMono" Color="#B0B8C0" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="StatusBarBackground" Color="#ECECEC" />
+                    <SolidColorBrush x:Key="StatusBarBorder" Color="#40606060" />
+                    <SolidColorBrush x:Key="StatusBarLabel" Color="#5A6168" />
+                    <SolidColorBrush x:Key="StatusBarValue" Color="#202428" />
+                    <SolidColorBrush x:Key="StatusBarMono" Color="#384048" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <!-- Shared template for every CcsTreeNode tree (CCS objects, scene
+                 animations, clump bones). Recurses children via Nodes. -->
+            <TreeDataTemplate x:Key="CcsNodeTemplate" x:DataType="ccs:CcsTreeNode" ItemsSource="{Binding Nodes}">
+                <TextBlock Text="{Binding Text}" />
+            </TreeDataTemplate>
+        </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>

@@ -142,7 +142,7 @@ namespace StudioCCS
 			GL.BindVertexArray(ArrayID);
 			
 			GL.Uniform1(UniformScale, scale);
-			GL.Uniform4(UniformColor, 0.5f, 0.5f, 0.5f, 1.0f);
+			GL.Uniform4(UniformColor, Scene.GridColor.X, Scene.GridColor.Y, Scene.GridColor.Z, Scene.GridColor.W);
 			GL.UniformMatrix4(UniformMatrix, false, ref matrix);
 			
 			GL.DrawArrays(PrimitiveType.Lines, 0, VertexCount);

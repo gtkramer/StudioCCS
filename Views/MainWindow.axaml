@@ -77,24 +77,24 @@
                     <!-- Top bar: render mode. Kept above the viewport because the mode
                          list grows as more views are toggled on, so it needs the full
                          viewport width rather than sharing a line with the camera. -->
-                    <Border DockPanel.Dock="Top" Background="#202020"
-                            BorderBrush="#40808080" BorderThickness="0,0,0,1" Padding="10,4">
+                    <Border DockPanel.Dock="Top" Background="{DynamicResource StatusBarBackground}"
+                            BorderBrush="{DynamicResource StatusBarBorder}" BorderThickness="0,0,0,1" Padding="10,4">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="Mode" Foreground="#808890" VerticalAlignment="Center" />
+                            <TextBlock Text="Mode" Foreground="{DynamicResource StatusBarLabel}" VerticalAlignment="Center" />
                             <TextBlock Text="{Binding RenderModeStatus}"
-                                       FontWeight="SemiBold" Foreground="#E0E0E0"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource StatusBarValue}"
                                        TextWrapping="NoWrap" VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>
 
                     <!-- Bottom bar: live camera readout. -->
-                    <Border DockPanel.Dock="Bottom" Background="#202020"
-                            BorderBrush="#40808080" BorderThickness="0,1,0,0" Padding="10,4">
+                    <Border DockPanel.Dock="Bottom" Background="{DynamicResource StatusBarBackground}"
+                            BorderBrush="{DynamicResource StatusBarBorder}" BorderThickness="0,1,0,0" Padding="10,4">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="Camera" Foreground="#808890" VerticalAlignment="Center" />
+                            <TextBlock Text="Camera" Foreground="{DynamicResource StatusBarLabel}" VerticalAlignment="Center" />
                             <TextBlock Text="{Binding CameraStatus}"
                                        FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,monospace"
-                                       Foreground="#B0B8C0"
+                                       Foreground="{DynamicResource StatusBarMono}"
                                        VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>

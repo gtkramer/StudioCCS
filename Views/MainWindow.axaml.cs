@@ -10,7 +10,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Avalonia.Threading;
+using OpenTK.Mathematics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using StudioCCS.libCCS;
@@ -54,6 +56,13 @@ namespace StudioCCS.Views
             ccsTree.Tapped += TreeViewExpand.ToggleOnTap;
             sceneTree.Tapped += TreeViewExpand.ToggleOnTap;
 
+            // The GL viewport's clear/grid colours aren't styled by the theme engine
+            // (they're set in raw GL), so push theme-appropriate values into Scene
+            // now and again whenever the OS light/dark setting changes. Scene re-reads
+            // these every frame, so the switch is reflected immediately.
+            ActualThemeVariantChanged += (_, _) => ApplyViewportTheme();
+            ApplyViewportTheme();
+
             // Drag & drop CCS files onto the window.
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragOverEvent, OnDragOver);
@@ -81,6 +90,23 @@ namespace StudioCCS.Views
             if (startupFiles != null)
             {
                 LoadFiles(startupFiles.Where(File.Exists));
+            }
+        }
+
+        // Maps the active theme variant onto the viewport's GL clear and grid colours.
+        // Dark keeps the original neutral-grey look; Light uses a brighter ground with
+        // slightly darker grid lines so they stay visible against it.
+        private void ApplyViewportTheme()
+        {
+            if (ActualThemeVariant == ThemeVariant.Dark)
+            {
+                Scene.BackgroundColor = new Vector4(64 / 255.0f, 64 / 255.0f, 64 / 255.0f, 1.0f);
+                Scene.GridColor = new Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+            }
+            else
+            {
+                Scene.BackgroundColor = new Vector4(0.86f, 0.86f, 0.86f, 1.0f);
+                Scene.GridColor = new Vector4(0.62f, 0.62f, 0.62f, 1.0f);
             }
         }
 
