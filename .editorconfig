@@ -6,13 +6,17 @@ root = true
 # Store every text file as UTF-8 *without* a BOM. "utf-8" here means no BOM;
 # "utf-8-bom" would be the opt-in variant. This stops Windows editors (Visual
 # Studio, older Notepad/PowerShell) from silently re-adding the EF BB BF marker
-# that was stripped from the tree. Line endings are normalized to LF by
-# .gitattributes (LF in the repo, native on checkout); end_of_line below keeps
-# editors writing LF so working trees match what Git stores.
+# that was stripped from the tree.
+#
+# Line endings are intentionally NOT pinned here. EditorConfig's end_of_line
+# only accepts a fixed value (lf/crlf) with no "native" option, so setting it
+# would override the per-OS checkout that .gitattributes (* text=auto) provides
+# -- LF in the repo, each platform's native ending in the working tree (CRLF on
+# Windows when core.autocrlf is enabled, LF elsewhere). Leaving it unset lets
+# editors preserve whatever Git checked out, keeping working trees OS-native.
 # ---------------------------------------------------------------------------
 [*]
 charset = utf-8
-end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space

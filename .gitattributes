@@ -1,6 +1,9 @@
 # Normalize line endings. Store text with LF in the repo, but check it out with
-# each platform's native ending (CRLF on Windows, LF elsewhere) so working trees
-# stay friendly to local tooling while the repo stays consistent.
+# each platform's native ending so working trees stay friendly to local tooling
+# while the repo stays consistent. The working-tree ending is decided by each
+# developer's core.autocrlf: "true" (the Git-for-Windows default) yields CRLF on
+# Windows; "input"/"false" yields LF. .editorconfig deliberately leaves
+# end_of_line unset so editors don't override this per-OS behavior.
 * text=auto
 
 # Binary assets: never normalized or diffed as text.
