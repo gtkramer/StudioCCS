@@ -26,7 +26,7 @@ void main()
 	}
 	
 	vec2 finalTexCoord = texCoords + fTextureOffset;
-	vec4 textureColor = texture2D(uTexture, finalTexCoord);
+	vec4 textureColor = texture(uTexture, finalTexCoord);
 	color = vec4(fSelectionColor.xyz, 1.0);
 	
 	if(fDrawOptions != 0)

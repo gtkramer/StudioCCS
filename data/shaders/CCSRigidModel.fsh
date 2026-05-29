@@ -44,7 +44,7 @@ void main()
 	
 	
 	vec2 finalTexCoord = fTextureCoords + fTextureOffset;
-	vec4 textureColor = texture2D(fTexture, finalTexCoord);
+	vec4 textureColor = texture(fTexture, finalTexCoord);
 	color = vec4(fSelectionColor.xyz, 1.0);
 	
 	
