@@ -160,9 +160,9 @@ namespace StudioCCS
 			GL.UseProgram(0);
 		}
 		
-		public static void ReadBin()
+		private static void ReadBin()
 		{
-			using(var fs = new FileStream("data/bin/WireHelpers.bin", FileMode.Open))
+			using(var fs = EmbeddedData.Open("data/bin/WireHelpers.bin"))
 			{
 				using(var bs = new BinaryReader(fs))
 				{

@@ -93,7 +93,7 @@ namespace StudioCCS
 		
 		private static void ReadBin()
 		{
-			using(var fs = new FileStream("data/bin/AxisMarker.bin", FileMode.Open))
+			using(var fs = EmbeddedData.Open("data/bin/AxisMarker.bin"))
 			{
 				using(var bs = new BinaryReader(fs))
 				{
@@ -124,16 +124,6 @@ namespace StudioCCS
 					}
 				}
 			}
-		}
-		
-		public static void Reload()
-		{
-			ReadBin();
-			GL.BindBuffer(BufferTarget.ArrayBuffer, BufferID);
-			Type vertexType = Vertices[0].GetType();
-			int vertexSize = Marshal.SizeOf(vertexType);
-			
-			GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexCount * vertexSize), Vertices, BufferUsageHint.StaticDraw); 
 		}
 		
 		public static void DeInit()

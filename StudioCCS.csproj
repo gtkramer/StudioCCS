@@ -27,7 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="data/**/*" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Shaders and vertex blobs are embedded into the assembly and read at
+         runtime via avares:// URIs (see EmbeddedData.cs), so they don't need to
+         be copied to the output directory. -->
+    <AvaloniaResource Include="data/bin/**/*" />
+    <AvaloniaResource Include="data/shaders/**/*" />
     <None Update="blenderDummyImport.py" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

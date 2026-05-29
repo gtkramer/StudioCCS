@@ -237,7 +237,7 @@ namespace StudioCCS
 		
 		private static bool LoadShader(string fileName, int shaderID)
 		{
-			using(var sr = new StreamReader(fileName))
+			using(var sr = new StreamReader(EmbeddedData.Open(fileName)))
 			{
 				string shaderCode = sr.ReadToEnd();
 				GL.ShaderSource(shaderID, shaderCode);
