@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace StudioCCS
+namespace StudioCCS.Logging
 {
     /// <summary>
     /// Single source of truth for severity colours, shared by the console

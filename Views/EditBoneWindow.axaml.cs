@@ -6,7 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using OpenTK.Mathematics;
-using StudioCCS.libCCS;
 
 namespace StudioCCS.Views
 {

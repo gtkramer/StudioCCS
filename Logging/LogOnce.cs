@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace StudioCCS
+namespace StudioCCS.Logging
 {
     /// <summary>
     /// Flood protection for messages emitted from per-frame / per-bone code paths

@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace StudioCCS
+namespace StudioCCS.Logging
 {
     /// <summary>
     /// Thin static facade over Microsoft.Extensions.Logging. The framework owns

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace StudioCCS
+namespace StudioCCS.Logging
 {
     /// <summary>
     /// The short severity tag used as a line's "&lt;level&gt;: " prefix. Shared by

@@ -15,7 +15,6 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using OpenTK.Mathematics;
-using StudioCCS.libCCS;
 using StudioCCS.ViewModels;
 
 namespace StudioCCS.Views

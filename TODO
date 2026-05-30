@@ -1,4 +1,2 @@
-Source file organization in general
 Import functionality to unpack data.bin
 Add CLI only versions that don't run GUI stack at all, and make it easier to process large amounts of files in batches
-Identify dead code or test code that's not meaningful to the project

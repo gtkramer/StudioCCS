@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 
-namespace StudioCCS
+namespace StudioCCS.Logging
 {
     /// <summary>
     /// A console formatter that prints "&lt;level&gt;: &lt;message&gt;" — dropping the

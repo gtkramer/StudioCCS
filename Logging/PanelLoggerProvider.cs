@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using Microsoft.Extensions.Logging;
 
-namespace StudioCCS
+namespace StudioCCS.Logging
 {
     /// <summary>
     /// A logging provider that routes log lines to the in-app log panel. Each line
