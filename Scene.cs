@@ -59,6 +59,7 @@ namespace StudioCCS
         public static bool DrawViewAxis = true;
         public static bool DrawViewGrid = true;
         public static bool DrawCollisionMeshes = true;
+        public static bool DrawBoundingBoxes = true;
         public static bool DrawWorldCenter = true;
         public static bool DrawDummyHelpers = true;
         public static bool DrawLightHelpers = true;
@@ -169,20 +170,34 @@ namespace StudioCCS
 
         private static bool LoadShader(string fileName, int shaderID)
         {
-            using (var sr = new StreamReader(EmbeddedData.Open(fileName)))
+            string shaderCode;
+            try
             {
-                string shaderCode = sr.ReadToEnd();
-                GL.ShaderSource(shaderID, shaderCode);
-                GL.CompileShader(shaderID);
-                int compileResult = 0;
-                GL.GetShader(shaderID, ShaderParameter.CompileStatus, out compileResult);
-                if (compileResult == 0)
+                // AssetLoader.Open throws if the embedded resource is missing
+                // (it never returns null), so a misnamed/absent shader would
+                // otherwise propagate an uncaught exception instead of letting
+                // LoadProgram fall through to its -1 result.
+                using (var sr = new StreamReader(EmbeddedData.Open(fileName)))
                 {
-                    Log.Error(string.Format("Error compiling shader {0}:\n{1}\n", fileName, GL.GetShaderInfoLog(shaderID)));
-                    return false;
+                    shaderCode = sr.ReadToEnd();
                 }
-                return true;
             }
+            catch (Exception ex)
+            {
+                Log.Error(string.Format("Error opening shader {0}:\n{1}\n", fileName, ex.Message));
+                return false;
+            }
+
+            GL.ShaderSource(shaderID, shaderCode);
+            GL.CompileShader(shaderID);
+            int compileResult = 0;
+            GL.GetShader(shaderID, ShaderParameter.CompileStatus, out compileResult);
+            if (compileResult == 0)
+            {
+                Log.Error(string.Format("Error compiling shader {0}:\n{1}\n", fileName, GL.GetShaderInfoLog(shaderID)));
+                return false;
+            }
+            return true;
         }
 
         // Loading is split into two phases so the heavy CPU parse can run off the UI
@@ -636,6 +651,15 @@ namespace StudioCCS
                     {
                         tmpHit.RenderAll(ProjViewMtx);
                         //tmpHit.RenderOne(ProjViewMtx, 0);
+                    }
+                }
+
+                if (DrawBoundingBoxes)
+                {
+                    List<CCSBoundingBox> bboxList = tmpCCS.BBoxList;
+                    foreach (var tmpBBox in bboxList)
+                    {
+                        tmpBBox.Render(ProjViewMtx);
                     }
                 }
 

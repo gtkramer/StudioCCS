@@ -25,6 +25,7 @@ namespace StudioCCS.ViewModels
             Textured = true;
             DrawGrid = true;
             DrawCollisionMeshes = true;
+            DrawBoundingBoxes = true;
             DrawDummies = true;
             DrawLightHelpers = true;
             DrawAxisViewport = true;
@@ -214,6 +215,19 @@ namespace StudioCCS.ViewModels
                 if (SetField(ref _drawCollisionMeshes, value))
                 {
                     Scene.DrawCollisionMeshes = value;
+                }
+            }
+        }
+
+        private bool _drawBoundingBoxes;
+        public bool DrawBoundingBoxes
+        {
+            get => _drawBoundingBoxes;
+            set
+            {
+                if (SetField(ref _drawBoundingBoxes, value))
+                {
+                    Scene.DrawBoundingBoxes = value;
                 }
             }
         }

@@ -49,7 +49,7 @@ namespace StudioCCS.libCCS
         {
             if (ProgramID == -1)
             {
-                ProgramID = Scene.LoadProgram("BBox", true);
+                ProgramID = Scene.LoadProgram("BoundingBox", true);
                 if (ProgramID == -1)
                 {
                     return false;
@@ -69,7 +69,9 @@ namespace StudioCCS.libCCS
             }
 
             ProgramRefs += 1;
-            Box[0] = new BBox();
+            // Read() already populated Box[0].Minimum/Maximum; only the wireframe
+            // colour is left to set here (a fresh BBox would wipe the extents).
+            Box[0].Color = new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
             VertexArrayID = GL.GenVertexArray();
             GL.BindVertexArray(VertexArrayID);
 
@@ -82,10 +84,10 @@ namespace StudioCCS.libCCS
             GL.BufferData(BufferTarget.ArrayBuffer, VertexSize, Box, BufferUsageHint.DynamicDraw);
 
             GL.EnableVertexAttribArray(AttribVMin);
-            GL.VertexAttribPointer(AttribVMin, 3, VertexAttribPointerType.Float, false, VertexSize, Marshal.OffsetOf(VertexType, "Min"));
+            GL.VertexAttribPointer(AttribVMin, 3, VertexAttribPointerType.Float, false, VertexSize, Marshal.OffsetOf(VertexType, "Minimum"));
 
             GL.EnableVertexAttribArray(AttribVMax);
-            GL.VertexAttribPointer(AttribVMax, 3, VertexAttribPointerType.Float, false, VertexSize, Marshal.OffsetOf(VertexType, "Max"));
+            GL.VertexAttribPointer(AttribVMax, 3, VertexAttribPointerType.Float, false, VertexSize, Marshal.OffsetOf(VertexType, "Maximum"));
 
             GL.EnableVertexAttribArray(AttribVColor);
             GL.VertexAttribPointer(AttribVColor, 4, VertexAttribPointerType.Float, false, VertexSize, Marshal.OffsetOf(VertexType, "Color"));
@@ -94,6 +96,25 @@ namespace StudioCCS.libCCS
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             return true;
+        }
+
+        public void Render(Matrix4 ProjViewMtx)
+        {
+            if (ProgramID == -1 || VertexArrayID == -1)
+            {
+                return;
+            }
+
+            GL.UseProgram(ProgramID);
+            GL.BindVertexArray(VertexArrayID);
+
+            GL.UniformMatrix4(UniMatrix, false, ref ProjViewMtx);
+
+            // One point per box; the geometry shader expands it into the 12 edges.
+            GL.DrawArrays(PrimitiveType.Points, 0, 1);
+
+            GL.BindVertexArray(0);
+            GL.UseProgram(0);
         }
 
         public override bool DeInit()

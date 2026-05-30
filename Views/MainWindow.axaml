@@ -34,6 +34,7 @@
                 <Separator />
                 <MenuItem Header="Draw Grid" ToggleType="CheckBox" IsChecked="{Binding DrawGrid, Mode=TwoWay}" />
                 <MenuItem Header="Draw Collision Meshes" ToggleType="CheckBox" IsChecked="{Binding DrawCollisionMeshes, Mode=TwoWay}" />
+                <MenuItem Header="Draw Bounding Boxes" ToggleType="CheckBox" IsChecked="{Binding DrawBoundingBoxes, Mode=TwoWay}" />
                 <MenuItem Header="Draw Dummies" ToggleType="CheckBox" IsChecked="{Binding DrawDummies, Mode=TwoWay}" />
                 <MenuItem Header="Draw Light Helpers" ToggleType="CheckBox" IsChecked="{Binding DrawLightHelpers, Mode=TwoWay}" />
                 <MenuItem Header="Draw Axis Marker (Viewport)" ToggleType="CheckBox" IsChecked="{Binding DrawAxisViewport, Mode=TwoWay}" />

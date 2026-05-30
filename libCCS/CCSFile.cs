@@ -141,6 +141,14 @@ namespace StudioCCS.libCCS
                 }
             }
 
+            foreach (var tmpBBox in BBoxList)
+            {
+                if (!tmpBBox.Init())
+                {
+                    return false;
+                }
+            }
+
             NeedsInit = false;
             return true;
         }
@@ -150,6 +158,11 @@ namespace StudioCCS.libCCS
             foreach (var tmpHit in HitList)
             {
                 tmpHit.DeInit();
+            }
+
+            foreach (var tmpBBox in BBoxList)
+            {
+                tmpBBox.DeInit();
             }
 
             return true;
