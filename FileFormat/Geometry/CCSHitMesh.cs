@@ -284,12 +284,12 @@ namespace StudioCCS.FileFormat.Geometry
             return true;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             var retNode = base.ToNode();
             for (int i = 0; i < HitGroupCount; i++)
             {
-                CcsTreeNode tmpGroupNode = new CcsTreeNode(string.Format("HitGroup {0}", i))
+                CCSTreeNode tmpGroupNode = new CCSTreeNode(string.Format("HitGroup {0}", i))
                 {
                     Tag = new TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
                 };

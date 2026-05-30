@@ -16,7 +16,7 @@
 
         <Grid ColumnDefinitions="*,Auto" Margin="6">
             <TreeView Grid.Column="0" Name="treeBones"
-                      ItemTemplate="{StaticResource CcsNodeTemplate}"
+                      ItemTemplate="{StaticResource CCSNodeTemplate}"
                       SelectionChanged="OnBoneSelected" />
 
             <StackPanel Grid.Column="1" Width="240" Margin="8,0,0,0" Spacing="6">

@@ -27,9 +27,9 @@
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
-            <!-- Shared template for every CcsTreeNode tree (CCS objects, scene
+            <!-- Shared template for every CCSTreeNode tree (CCS objects, scene
                  animations, clump bones). Recurses children via Nodes. -->
-            <TreeDataTemplate x:Key="CcsNodeTemplate" x:DataType="ccs:CcsTreeNode" ItemsSource="{Binding Nodes}">
+            <TreeDataTemplate x:Key="CCSNodeTemplate" x:DataType="ccs:CCSTreeNode" ItemsSource="{Binding Nodes}">
                 <TextBlock Text="{Binding Text}" />
             </TreeDataTemplate>
         </ResourceDictionary>

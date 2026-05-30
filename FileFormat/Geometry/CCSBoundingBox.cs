@@ -152,7 +152,7 @@ namespace StudioCCS.FileFormat.Geometry
             return true;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             return base.ToNode();
         }

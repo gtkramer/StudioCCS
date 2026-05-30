@@ -54,14 +54,14 @@
             <Grid Grid.Row="0" Name="splitGrid" ColumnDefinitions="240,Auto,*">
                 <Panel Grid.Column="0" Name="leftPanel">
                     <TreeView Name="ccsTree"
-                              ItemsSource="{Binding CcsRoots}"
-                              ItemTemplate="{StaticResource CcsNodeTemplate}"
-                              SelectionChanged="OnCcsTreeSelectionChanged"
-                              ContextRequested="OnCcsTreeContextRequested" />
+                              ItemsSource="{Binding CCSRoots}"
+                              ItemTemplate="{StaticResource CCSNodeTemplate}"
+                              SelectionChanged="OnCCSTreeSelectionChanged"
+                              ContextRequested="OnCCSTreeContextRequested" />
                     <Grid Name="scenePanel" IsVisible="False" RowDefinitions="*,Auto,*">
                         <TreeView Grid.Row="0" Name="sceneTree"
                                   ItemsSource="{Binding SceneRoots}"
-                                  ItemTemplate="{StaticResource CcsNodeTemplate}"
+                                  ItemTemplate="{StaticResource CCSNodeTemplate}"
                                   ContextRequested="OnSceneTreeContextRequested" />
                         <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" />
                         <Border Grid.Row="2" Background="#10808080">

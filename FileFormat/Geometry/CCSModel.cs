@@ -728,7 +728,7 @@ namespace StudioCCS.FileFormat.Geometry
             return modelTypeStr;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             var retNode = base.ToNode();
             string modelTypeStr = string.Format(" Type: {0}", GetModelTypeStr());
@@ -738,7 +738,7 @@ namespace StudioCCS.FileFormat.Geometry
             {
                 if ((ModelType & CCS_MODEL_SHADOW) == CCS_MODEL_SHADOW)
                 {
-                    CcsTreeNode tmpSubNode = new CcsTreeNode(string.Format("Sub Model {0}", i))
+                    CCSTreeNode tmpSubNode = new CCSTreeNode(string.Format("Sub Model {0}", i))
                     {
                         Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
                     };
@@ -752,7 +752,7 @@ namespace StudioCCS.FileFormat.Geometry
                     //string subModelName = ParentFile.GetSubObjectName(tmpSubModel.ParentObjectRef.ModelID);
                     CCSObject tmpObject = ClumpRef.GetObject(tmpSubModel.ParentID);
                     string subModelName = ParentFile.GetSubObjectName(ClumpRef.GetObject(tmpSubModel.ParentID).ObjectID);
-                    CcsTreeNode tmpSubNode = new CcsTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
+                    CCSTreeNode tmpSubNode = new CCSTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
                     {
                         Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
                     };
@@ -763,7 +763,7 @@ namespace StudioCCS.FileFormat.Geometry
                 {
                     var tmpSubModel = SubModels[i];
                     string subModelName = ParentFile.GetSubObjectName(tmpSubModel.ParentID);
-                    var tmpSubNode = new CcsTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
+                    var tmpSubNode = new CCSTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
                     {
                         Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
                     };

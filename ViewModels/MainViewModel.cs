@@ -13,13 +13,13 @@ namespace StudioCCS.ViewModels
     public class MainViewModel : ViewModelBase
     {
         // Tree data sources bound to the TreeViews (the templates recurse Nodes).
-        public ObservableCollection<CcsTreeNode> CcsRoots { get; } = new ObservableCollection<CcsTreeNode>();
-        public CcsTreeNode AnimationsRoot { get; } = new CcsTreeNode("Animations");
-        public ObservableCollection<CcsTreeNode> SceneRoots { get; }
+        public ObservableCollection<CCSTreeNode> CCSRoots { get; } = new ObservableCollection<CCSTreeNode>();
+        public CCSTreeNode AnimationsRoot { get; } = new CCSTreeNode("Animations");
+        public ObservableCollection<CCSTreeNode> SceneRoots { get; }
 
         public MainViewModel()
         {
-            SceneRoots = new ObservableCollection<CcsTreeNode> { AnimationsRoot };
+            SceneRoots = new ObservableCollection<CCSTreeNode> { AnimationsRoot };
 
             // Initial render-option state (matches the original defaults).
             Textured = true;

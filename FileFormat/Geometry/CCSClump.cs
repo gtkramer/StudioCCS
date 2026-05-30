@@ -523,15 +523,15 @@ namespace StudioCCS.FileFormat.Geometry
 
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             var retNode = base.ToNode();
-            List<CcsTreeNode> tNodes = new List<CcsTreeNode>();
+            List<CCSTreeNode> tNodes = new List<CCSTreeNode>();
             //Add child nodes.
             for (int i = 0; i < NodeCount; i++)
             {
                 CCSObject childObject = ParentFile.GetObject<CCSObject>(NodeIDs[i]);
-                CcsTreeNode tmpNode = null;
+                CCSTreeNode tmpNode = null;
                 if (childObject != null)
                 {
                     tmpNode = childObject.ToNode();

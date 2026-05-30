@@ -74,7 +74,7 @@ namespace StudioCCS.FileFormat.Geometry
             return true;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             //TODO: CCSObject::ToNode(): Make it Heirarchal or Heirarchical or an actual tree.
             var retNode = base.ToNode();

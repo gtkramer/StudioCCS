@@ -201,7 +201,7 @@ namespace StudioCCS.FileFormat.Animation
             return true;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             //TODO: CCSAnime::ToNode()
             return base.ToNode();

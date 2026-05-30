@@ -3,7 +3,7 @@
 // reorganization, so consumer files don't each need a `using` for every area.
 // See the namespace tree: StudioCCS.FileFormat[.Geometry|.Materials|.Animation|
 // .SceneObjects|.Raw], StudioCCS.Rendering[.Gizmos], StudioCCS.Logging,
-// StudioCCS.Resources. The two shared tree-model types (CcsTreeNode,
+// StudioCCS.Resources. The two shared tree-model types (CCSTreeNode,
 // TreeNodeTag) remain in the root StudioCCS namespace.
 global using StudioCCS;
 global using StudioCCS.Resources;

@@ -159,7 +159,7 @@ namespace StudioCCS.Views
             {
                 Title = "Select CCS Files to load",
                 AllowMultiple = true,
-                FileTypeFilter = new[] { FileFilters.Ccs, FileFilters.All },
+                FileTypeFilter = new[] { FileFilters.CCS, FileFilters.All },
             });
 
             LoadFiles(files.Select(f => f.Path.LocalPath));
@@ -198,10 +198,10 @@ namespace StudioCCS.Views
 
                     glViewport.EnqueueGlJob(() =>
                     {
-                        CcsTreeNode node = Scene.InitCCSFile(file);
+                        CCSTreeNode node = Scene.InitCCSFile(file);
                         if (node != null)
                         {
-                            Dispatcher.UIThread.Post(() => _vm.CcsRoots.Add(node));
+                            Dispatcher.UIThread.Post(() => _vm.CCSRoots.Add(node));
                         }
                     });
                 }
@@ -237,9 +237,9 @@ namespace StudioCCS.Views
 
         #region Tree selection & context menus
 
-        private void OnCcsTreeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnCCSTreeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var node = ccsTree.SelectedItem as CcsTreeNode;
+            var node = ccsTree.SelectedItem as CCSTreeNode;
             var tag = node?.Tag as TreeNodeTag;
             Scene.SelectedPreviewItemTag = tag;
             if (tag != null && tag.ObjectType == CCSFile.SECTION_ANIME)
@@ -253,7 +253,7 @@ namespace StudioCCS.Views
             }
         }
 
-        private void OnCcsTreeContextRequested(object sender, ContextRequestedEventArgs e)
+        private void OnCCSTreeContextRequested(object sender, ContextRequestedEventArgs e)
         {
             var node = ContextNode(e);
             if (node == null)
@@ -262,7 +262,7 @@ namespace StudioCCS.Views
             }
 
             ccsTree.SelectedItem = node;
-            OpenNodeMenu(e, ccsTree, BuildCcsNodeMenu(node));
+            OpenNodeMenu(e, ccsTree, BuildCCSNodeMenu(node));
         }
 
         private void OnSceneTreeContextRequested(object sender, ContextRequestedEventArgs e)
@@ -289,7 +289,7 @@ namespace StudioCCS.Views
             })));
         }
 
-        private ContextMenu BuildCcsNodeMenu(CcsTreeNode node)
+        private ContextMenu BuildCCSNodeMenu(CCSTreeNode node)
         {
             if (node.Tag is not TreeNodeTag tag)
             {
@@ -303,7 +303,7 @@ namespace StudioCCS.Views
                     {
                         // DeInit() deletes GL resources, so run it on the render thread.
                         glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
-                        _vm.CcsRoots.Remove(node);
+                        _vm.CCSRoots.Remove(node);
                     }),
                     MakeMenuItem("View Info Report", () =>
                     {
@@ -334,7 +334,7 @@ namespace StudioCCS.Views
                         if (tmpAnime != null)
                         {
                             Scene.AddAnime(tmpAnime);
-                            _vm.AnimationsRoot.Nodes.Add(new CcsTreeNode(tmpAnime.ToNode().Text) { Tag = tag });
+                            _vm.AnimationsRoot.Nodes.Add(new CCSTreeNode(tmpAnime.ToNode().Text) { Tag = tag });
                         }
                     }),
                     MakeMenuItem("Set Pose", () =>
@@ -349,9 +349,9 @@ namespace StudioCCS.Views
 
         // ----- Context-menu helpers (shared by both trees) -----
 
-        private static CcsTreeNode ContextNode(ContextRequestedEventArgs e)
+        private static CCSTreeNode ContextNode(ContextRequestedEventArgs e)
         {
-            return (e.Source as Control)?.DataContext as CcsTreeNode;
+            return (e.Source as Control)?.DataContext as CCSTreeNode;
         }
 
         private static void OpenNodeMenu(ContextRequestedEventArgs e, Control owner, ContextMenu menu)

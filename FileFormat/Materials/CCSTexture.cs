@@ -434,7 +434,7 @@ namespace StudioCCS.FileFormat.Materials
             return "Unknown";
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             var retNode = base.ToNode();
             string textureTypeStr = string.Format("  Type: {0}", GetTextureTypeStr());
@@ -452,7 +452,7 @@ namespace StudioCCS.FileFormat.Materials
                     if (tmpType == CCSFile.SECTION_CLUT)
                     {
                         CCSClut tmpClut = ParentFile.GetObject<CCSClut>(tmpID);
-                        CcsTreeNode tmpSubNode = null;
+                        CCSTreeNode tmpSubNode = null;
                         if (tmpClut == null)
                         {
                             tmpSubNode = Util.NonExistantNode(ParentFile, tmpID);

@@ -56,7 +56,7 @@ namespace StudioCCS.FileFormat.SceneObjects
             return true;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             var retNode = base.ToNode();
             string lightTypeStr = "";

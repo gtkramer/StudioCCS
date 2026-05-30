@@ -216,7 +216,7 @@ namespace StudioCCS.Rendering
             return null;
         }
 
-        public static CcsTreeNode InitCCSFile(CCSFile file)
+        public static CCSTreeNode InitCCSFile(CCSFile file)
         {
             if (file != null && file.Init())
             {
@@ -233,9 +233,9 @@ namespace StudioCCS.Rendering
             return true;
         }
 
-        public static CcsTreeNode ToNode()
+        public static CCSTreeNode ToNode()
         {
-            var retNode = new CcsTreeNode();
+            var retNode = new CCSTreeNode();
             foreach (var tmpCCS in CCSFileList)
             {
                 retNode.Nodes.Add(tmpCCS.ToNode());
@@ -244,10 +244,10 @@ namespace StudioCCS.Rendering
             return retNode;
         }
 
-        public static CcsTreeNode ToSceneNode()
+        public static CCSTreeNode ToSceneNode()
         {
 
-            var tmpMainAnmNode = new CcsTreeNode("Animations");
+            var tmpMainAnmNode = new CCSTreeNode("Animations");
             foreach (var tmpAnmNode in ActiveAnimes)
             {
                 tmpMainAnmNode.Nodes.Add(tmpAnmNode.ToNode());

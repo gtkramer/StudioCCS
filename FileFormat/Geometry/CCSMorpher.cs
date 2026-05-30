@@ -42,7 +42,7 @@ namespace StudioCCS.FileFormat.Geometry
             return true;
         }
 
-        public override CcsTreeNode ToNode()
+        public override CCSTreeNode ToNode()
         {
             var retNode = base.ToNode();
             retNode.Text += string.Format(" Base: {0}", ParentFile.GetSubObjectName(BaseModelID));

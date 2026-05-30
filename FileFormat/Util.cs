@@ -201,9 +201,9 @@ namespace StudioCCS.FileFormat
 
         }
 
-        public static CcsTreeNode NonExistantNode(CCSFile _file, int _objectID)
+        public static CCSTreeNode NonExistantNode(CCSFile _file, int _objectID)
         {
-            CcsTreeNode retNode = new CcsTreeNode(string.Format("{0}: {1}", _objectID, _file.GetSubObjectName(_objectID)))
+            CCSTreeNode retNode = new CCSTreeNode(string.Format("{0}: {1}", _objectID, _file.GetSubObjectName(_objectID)))
             {
                 Tag = new TreeNodeTag(_file, _objectID, 0),
                 ForeColor = Color.Red

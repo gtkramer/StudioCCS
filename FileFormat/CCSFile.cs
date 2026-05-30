@@ -209,58 +209,58 @@ namespace StudioCCS.FileFormat
             return true;
         }
 
-        public CcsTreeNode ToNode()
+        public CCSTreeNode ToNode()
         {
             //In my preferred order
-            var retNode = new CcsTreeNode(Header.CCSFName)
+            var retNode = new CCSTreeNode(Header.CCSFName)
             {
                 Tag = new TreeNodeTag(this, 0, 0, TreeNodeTag.NodeType.File, 0)
             };
 
             //In this order, because that's how I feel like ordering them.
-            var ClumpNode = new CcsTreeNode("Clumps");
+            var ClumpNode = new CCSTreeNode("Clumps");
             foreach (var tmpClump in ClumpList)
             {
                 ClumpNode.Nodes.Add(tmpClump.ToNode());
             }
             retNode.Nodes.Add(ClumpNode);
 
-            var MaterialNode = new CcsTreeNode("Materials");
+            var MaterialNode = new CCSTreeNode("Materials");
             foreach (var tmpMat in MaterialList)
             {
                 MaterialNode.Nodes.Add(tmpMat.ToNode());
             }
             retNode.Nodes.Add(MaterialNode);
 
-            var TextureNode = new CcsTreeNode("Textures");
+            var TextureNode = new CCSTreeNode("Textures");
             foreach (var tmpTex in TextureList)
             {
                 TextureNode.Nodes.Add(tmpTex.ToNode());
             }
             retNode.Nodes.Add(TextureNode);
 
-            var HitNode = new CcsTreeNode("HitMeshes");
+            var HitNode = new CCSTreeNode("HitMeshes");
             foreach (var tmpHit in HitList)
             {
                 HitNode.Nodes.Add(tmpHit.ToNode());
             }
             retNode.Nodes.Add(HitNode);
 
-            var BBoxNode = new CcsTreeNode("Bounding Boxes");
+            var BBoxNode = new CCSTreeNode("Bounding Boxes");
             foreach (var tmpBBox in BBoxList)
             {
                 BBoxNode.Nodes.Add(tmpBBox.ToNode());
             }
             retNode.Nodes.Add(BBoxNode);
 
-            var DummyNode = new CcsTreeNode("Dummies");
+            var DummyNode = new CCSTreeNode("Dummies");
             foreach (var tmpDummy in DummyList)
             {
                 DummyNode.Nodes.Add(tmpDummy.ToNode());
             }
             retNode.Nodes.Add(DummyNode);
 
-            var AnimeNode = new CcsTreeNode("Animations");
+            var AnimeNode = new CCSTreeNode("Animations");
             foreach (var tmpAnime in AnimeList)
             {
                 AnimeNode.Nodes.Add(tmpAnime.ToNode());

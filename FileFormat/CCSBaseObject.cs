@@ -12,9 +12,9 @@ namespace StudioCCS.FileFormat
         public int ObjectType = 0;
         public CCSFile ParentFile;
 
-        public virtual CcsTreeNode ToNode()
+        public virtual CCSTreeNode ToNode()
         {
-            CcsTreeNode retNode = new CcsTreeNode(string.Format("{0}: {1}", ObjectID, ParentFile.GetSubObjectName(ObjectID)))
+            CCSTreeNode retNode = new CCSTreeNode(string.Format("{0}: {1}", ObjectID, ParentFile.GetSubObjectName(ObjectID)))
             {
                 Tag = new TreeNodeTag(ParentFile, ObjectID, ObjectType)
             };

@@ -10,19 +10,19 @@ namespace StudioCCS
     /// port over with nothing more than a type-name change. The Avalonia UI
     /// consumes these and maps them into TreeView items.
     /// </summary>
-    public class CcsTreeNode
+    public class CCSTreeNode
     {
         public string Text { get; set; }
         public object Tag { get; set; }
         public Color ForeColor { get; set; } = Color.Empty;
-        public CcsTreeNodeCollection Nodes { get; } = new CcsTreeNodeCollection();
+        public CCSTreeNodeCollection Nodes { get; } = new CCSTreeNodeCollection();
 
-        public CcsTreeNode()
+        public CCSTreeNode()
         {
             Text = string.Empty;
         }
 
-        public CcsTreeNode(string text)
+        public CCSTreeNode(string text)
         {
             Text = text;
         }
@@ -39,11 +39,11 @@ namespace StudioCCS
     /// observable so that TreeViews bound to it update when nodes are added/removed
     /// after the initial build (e.g. animations added to the scene tree).
     /// </summary>
-    public class CcsTreeNodeCollection : ObservableCollection<CcsTreeNode>
+    public class CCSTreeNodeCollection : ObservableCollection<CCSTreeNode>
     {
-        public CcsTreeNode Add(string text)
+        public CCSTreeNode Add(string text)
         {
-            var node = new CcsTreeNode(text);
+            var node = new CCSTreeNode(text);
             Add(node);
             return node;
         }
