@@ -18,39 +18,6 @@ namespace StudioCCS
 
         }
 
-        public ArcBallCamera(Vector3 _position, float _distance)
-        {
-            Position = _position;
-            Rotation = new Vector3(0.0f, 0.0f, 0.0f);
-            Distance = _distance;
-        }
-
-        /*
-        public Vector3 Rotation {
-            get {
-                return this.rotation;
-            }
-            set {
-                this.rotation = value;
-                if(this.rotation.Y > 0.0f) this.rotation.Y = 0.0f;
-                if(this.rotation.Y < -90.0f) this.rotation.Y = -90.0f;
-
-                if(this.rotation.X > 360.0f) this.rotation.X = 0;
-                if(this.rotation.X < 0) this.rotation.X = 360.0f;
-            }
-        }
-
-        public float Distance {
-            get {
-                return this.distance;
-            }
-            set {
-                this.distance = value;
-                if(this.distance < 1.0f) this.distance = 1.0f;
-            }
-        }
-        */
-
         private void Clamp()
         {
             // Stop just short of straight up/down. At exactly +/-90 deg the view
