@@ -651,7 +651,7 @@ namespace StudioCCS.FileFormat
             for (int i = 0; i < ObjectIndexCount; i++)
             {
                 var tmpObj = ObjectIndex[i];
-                if (tmpObj.ObjectType == _objectType)
+                if (tmpObj.ObjectType == _objectType && tmpObj.ObjectName == _name)
                 {
                     return i;
                 }
