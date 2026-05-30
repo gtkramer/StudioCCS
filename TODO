@@ -1,2 +1,0 @@
-Import functionality to unpack data.bin
-Add CLI only versions that don't run GUI stack at all, and make it easier to process large amounts of files in batches
