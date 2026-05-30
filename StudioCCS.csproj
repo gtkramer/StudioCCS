@@ -39,7 +39,6 @@
          be copied to the output directory. -->
     <AvaloniaResource Include="Rendering/Gizmos/*.bin" />
     <AvaloniaResource Include="Rendering/Shaders/**/*" />
-    <None Update="blenderDummyImport.py" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
