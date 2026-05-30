@@ -88,7 +88,7 @@ namespace StudioCCS.Rendering.Gizmos
 
         private static void ReadBin()
         {
-            using (var fs = EmbeddedData.Open("data/bin/AxisMarker.bin"))
+            using (var fs = EmbeddedData.Open("Rendering/Gizmos/AxisMarker.bin"))
             {
                 using (var bs = new BinaryReader(fs))
                 {

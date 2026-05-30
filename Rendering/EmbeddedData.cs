@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using Avalonia.Platform;
 
-namespace StudioCCS.Resources
+namespace StudioCCS.Rendering
 {
     /// <summary>
     /// Opens the data files (shaders, vertex blobs) that are embedded in the
     /// assembly as AvaloniaResource items. The relative path passed in matches
-    /// the project-relative path of the file (e.g. "data/shaders/Grid.vsh"),
+    /// the project-relative path of the file (e.g. "Rendering/Shaders/Grid.vsh"),
     /// which AvaloniaResource maps to "avares://StudioCCS/&lt;path&gt;".
     /// </summary>
     public static class EmbeddedData

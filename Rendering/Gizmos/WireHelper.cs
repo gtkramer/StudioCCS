@@ -179,7 +179,7 @@ namespace StudioCCS.Rendering.Gizmos
 
         private static void ReadBin()
         {
-            using (var fs = EmbeddedData.Open("data/bin/WireHelpers.bin"))
+            using (var fs = EmbeddedData.Open("Rendering/Gizmos/WireHelper.bin"))
             {
                 using (var bs = new BinaryReader(fs))
                 {

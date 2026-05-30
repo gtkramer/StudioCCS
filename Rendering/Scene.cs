@@ -111,19 +111,19 @@ namespace StudioCCS.Rendering
                 gShaderID = GL.CreateShader(ShaderType.GeometryShader);
             }
 
-            if (!LoadShader("data/shaders/" + programName + ".vsh", vShaderID))
+            if (!LoadShader("Rendering/Shaders/" + programName + ".vsh", vShaderID))
             {
                 result = false;
             }
 
-            if (!LoadShader("data/shaders/" + programName + ".fsh", fShaderID))
+            if (!LoadShader("Rendering/Shaders/" + programName + ".fsh", fShaderID))
             {
                 result = false;
             }
 
             if (hasGeometryShader)
             {
-                if (!LoadShader("data/shaders/" + programName + ".gsh", gShaderID))
+                if (!LoadShader("Rendering/Shaders/" + programName + ".gsh", gShaderID))
                 {
                     result = false;
                 }
