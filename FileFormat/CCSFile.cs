@@ -171,9 +171,9 @@ namespace StudioCCS.FileFormat
         public bool Read(string _fileName)
         {
             FileName = _fileName;
-            var fStream = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
-            var bStream = new BinaryReader(fStream);
             Log.Info(string.Format("Loading {0}...\n", _fileName));
+            using var fStream = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
+            using var bStream = new BinaryReader(fStream);
             bool result = Read(bStream);
             Log.Info("Done.\n");
             return result;
