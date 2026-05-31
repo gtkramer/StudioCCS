@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Raw
 {
-    /// <summary>
-    /// Description of CCSBinaryBLob.
-    /// </summary>
     public class CCSBinaryBlob : CCSBaseObject
     {
         public byte[] Data;

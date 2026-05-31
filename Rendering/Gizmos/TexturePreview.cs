@@ -5,9 +5,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.Rendering.Gizmos
 {
-    /// <summary>
-    /// Description of TexturePreview.
-    /// </summary>
     public static class TexturePreview
     {
         public static bool WasInit = false;

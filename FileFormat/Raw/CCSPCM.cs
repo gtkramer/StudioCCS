@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Raw
 {
-    /// <summary>
-    /// Description of CCSPCM.
-    /// </summary>
     public class CCSPCM : CCSBaseObject
     {
         public byte[] Data;

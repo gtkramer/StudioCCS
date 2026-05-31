@@ -9,9 +9,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat
 {
-    /// <summary>
-    /// Description of CCSExt.
-    /// </summary>
     public class CCSExt : CCSBaseObject
     {
         public int ReferencedParentID;

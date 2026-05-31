@@ -3,9 +3,6 @@ using System.IO;
 
 namespace StudioCCS.FileFormat
 {
-    /// <summary>
-    /// Description of CCSBaseObject.
-    /// </summary>
     public abstract class CCSBaseObject
     {
         public int ObjectID = 0;

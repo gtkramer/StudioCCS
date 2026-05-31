@@ -7,9 +7,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.Rendering.Gizmos
 {
-    /// <summary>
-    /// Description of LightHelper.
-    /// </summary>
     public static class WireHelper
     {
         public static bool WasInit = false;

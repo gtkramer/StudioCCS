@@ -9,9 +9,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Raw
 {
-    /// <summary>
-    /// Description of CCSEffect.
-    /// </summary>
     public class CCSEffect : CCSBaseObject
     {
         public byte[] Data;

@@ -9,9 +9,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Geometry
 {
-    /// <summary>
-    /// Description of CCSObject.
-    /// </summary>
     public class CCSObject : CCSBaseObject
     {
         public int ParentObjectID = 0;

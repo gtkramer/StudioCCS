@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Geometry
 {
-    /// <summary>
-    /// Description of CCSClump.
-    /// </summary>
     public class CCSClump : CCSBaseObject
     {
         public Matrix4[] PoseMatrixList = null;

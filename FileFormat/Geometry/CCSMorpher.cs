@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Geometry
 {
-    /// <summary>
-    /// Description of CCSMorpher.
-    /// </summary>
     public class CCSMorpher : CCSBaseObject
     {
         public int BaseModelID = 0;

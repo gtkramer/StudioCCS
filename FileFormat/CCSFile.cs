@@ -5,9 +5,6 @@ using System.IO;
 
 namespace StudioCCS.FileFormat
 {
-    /// <summary>
-    /// Description of CCSFile.
-    /// </summary>
     public class CCSFile
     {
         //Useful defines

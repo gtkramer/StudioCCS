@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Raw
 {
-    /// <summary>
-    /// Description of CCSShadow.
-    /// </summary>
     public class CCSShadow : CCSBaseObject
     {
         public byte[] Data;

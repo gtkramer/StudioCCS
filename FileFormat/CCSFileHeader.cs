@@ -3,9 +3,6 @@ using System.IO;
 
 namespace StudioCCS.FileFormat
 {
-    /// <summary>
-    /// Description of CCSFileHeader.
-    /// </summary>
     public class CCSFileHeader
     {
         //Useful defines

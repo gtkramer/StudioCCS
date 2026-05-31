@@ -3,9 +3,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.Rendering
 {
-    /// <summary>
-    /// Description of ArcBallCamera.
-    /// </summary>
     public class ArcBallCamera
     {
         public Vector3 Position = new Vector3(0.0f, 0.0f, 0.0f);

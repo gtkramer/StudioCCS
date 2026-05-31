@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.SceneObjects
 {
-    /// <summary>
-    /// Description of CCSLight.
-    /// </summary>
     public class CCSLight : CCSBaseObject
     {
         //Useful Defines

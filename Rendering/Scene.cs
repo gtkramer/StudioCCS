@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.Rendering
 {
-    /// <summary>
-    /// Description of Scene.
-    /// </summary>
     public static class Scene
     {
 

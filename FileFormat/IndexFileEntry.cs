@@ -4,9 +4,6 @@ using System.IO;
 
 namespace StudioCCS.FileFormat
 {
-    /// <summary>
-    /// Description of IndexFileEntry.
-    /// </summary>
     public class IndexFileEntry
     {
         public string FileName = "";

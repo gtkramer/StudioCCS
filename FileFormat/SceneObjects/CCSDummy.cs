@@ -9,9 +9,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.SceneObjects
 {
-    /// <summary>
-    /// Description of CCSDummy.
-    /// </summary>
     public class CCSDummy : CCSBaseObject
     {
         public Vector3 Position = new Vector3(0.0f, 0.0f, 0.0f);

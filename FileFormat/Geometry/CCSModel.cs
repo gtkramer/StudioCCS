@@ -12,9 +12,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Geometry
 {
-    /// <summary>
-    /// Description of CCSModel.
-    /// </summary>
     public class CCSModel : CCSBaseObject
     {
         //Useful Defines

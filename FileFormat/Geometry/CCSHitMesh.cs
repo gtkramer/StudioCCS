@@ -12,9 +12,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Geometry
 {
-    /// <summary>
-    /// Description of CCSHitMesh.
-    /// </summary>
     public class CCSHitMesh : CCSBaseObject
     {
         public class HitGroup

@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Raw
 {
-    /// <summary>
-    /// Description of CCSBlitGroup.
-    /// </summary>
     public class CCSBlitGroup : CCSBaseObject
     {
         public byte[] Data;

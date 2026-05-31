@@ -5,9 +5,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat
 {
-    /// <summary>
-    /// Description of Util.
-    /// </summary>
     public static class Util
     {
         //Helpful defines

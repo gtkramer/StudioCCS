@@ -11,9 +11,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Geometry
 {
-    /// <summary>
-    /// Description of CCSBoundingBox.
-    /// </summary>
     public class CCSBoundingBox : CCSBaseObject
     {
         [StructLayout(LayoutKind.Sequential)]

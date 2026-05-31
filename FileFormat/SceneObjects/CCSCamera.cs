@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.SceneObjects
 {
-    /// <summary>
-    /// Description of CCSCamera.
-    /// </summary>
     public class CCSCamera : CCSBaseObject
     {
         //Not defined in Setup section, but set by Animation.

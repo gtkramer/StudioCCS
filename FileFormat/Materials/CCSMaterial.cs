@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Materials
 {
-    /// <summary>
-    /// Description of CCSMaterial.
-    /// </summary>
     public class CCSMaterial : CCSBaseObject
     {
         public int TextureID = 0;

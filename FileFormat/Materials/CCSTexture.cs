@@ -13,9 +13,6 @@ using SkiaSharp;
 
 namespace StudioCCS.FileFormat.Materials
 {
-    /// <summary>
-    /// Description of CCSTexture.
-    /// </summary>
     public class CCSTexture : CCSBaseObject
     {
         //Known Texture Types
@@ -568,7 +565,7 @@ namespace StudioCCS.FileFormat.Materials
                     //write flags
                     bs.Write((int)4);
                     //write fourCC
-                    int fourCC = 0x31545844; //44 58 54 35
+                    int fourCC = 0x31545844; //44 58 54 31
                     if (TextureType == CCS_TEXTURE_DXT5)
                     {
                         fourCC = 0x35545844;

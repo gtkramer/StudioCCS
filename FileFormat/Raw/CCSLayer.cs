@@ -10,9 +10,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Raw
 {
-    /// <summary>
-    /// Description of CCSLayer.
-    /// </summary>
     public class CCSLayer : CCSBaseObject
     {
         public byte[] Data;

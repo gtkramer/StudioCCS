@@ -2,9 +2,6 @@ using System;
 
 namespace StudioCCS
 {
-    /// <summary>
-    /// Description of TreeNodeTag.
-    /// </summary>
     public class TreeNodeTag
     {
         public enum NodeType { File, Main, SubNode };

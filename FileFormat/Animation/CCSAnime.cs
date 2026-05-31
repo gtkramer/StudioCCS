@@ -12,9 +12,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Animation
 {
-    /// <summary>
-    /// Description of CCSAnime.
-    /// </summary>
     public partial class CCSAnime : CCSBaseObject
     {
         //Useful defines
@@ -52,9 +49,9 @@ namespace StudioCCS.FileFormat.Animation
         public const int CCS_ANIME_LIGHT_OMNI_CONTROLLER = 0x0609;
 
 
-        //CCSMoprher
+        //CCSMorpher
         /// <summary>
-        /// <c>CCS_ANIME_MOPRH_KEYFRAME = 0x1901</c>
+        /// <c>CCS_ANIME_MORPH_KEYFRAME = 0x1901</c>
         /// </summary>
         public const int CCS_ANIME_MORPH_KEYFRAME = 0x1901;
 

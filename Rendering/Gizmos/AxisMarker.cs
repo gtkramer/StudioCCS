@@ -7,9 +7,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.Rendering.Gizmos
 {
-    /// <summary>
-    /// Description of AxisMarker.
-    /// </summary>
     public static class AxisMarker
     {
         [StructLayout(LayoutKind.Sequential)]
@@ -60,7 +57,6 @@ namespace StudioCCS.Rendering.Gizmos
                 Log.Error(string.Format("\tPosition: {0}, Color: {1}, Matrix: {2}, Scale: {3}\n", AttribPosition, AttribColor, UniMatrix, UniScale));
                 return false;
             }
-            //Deb
 
             ArrayID = GL.GenVertexArray();
             GL.BindVertexArray(ArrayID);

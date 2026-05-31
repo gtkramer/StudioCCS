@@ -9,9 +9,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.FileFormat.Materials
 {
-    /// <summary>
-    /// Description of CCSClut.
-    /// </summary>
     public class CCSClut : CCSBaseObject
     {
         public int ColorCount;

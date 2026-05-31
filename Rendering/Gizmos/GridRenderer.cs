@@ -7,9 +7,6 @@ using OpenTK.Mathematics;
 
 namespace StudioCCS.Rendering.Gizmos
 {
-    /// <summary>
-    /// Description of GridRenderer.
-    /// </summary>
     public static class GridRenderer
     {
         public static bool WasInit = false;
