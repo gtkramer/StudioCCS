@@ -1,5 +1,3 @@
-using System;
-
 namespace StudioCCS
 {
     public class TreeNodeTag

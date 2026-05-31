@@ -11,6 +11,14 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>StudioCCS</RootNamespace>
     <AssemblyName>StudioCCS</AssemblyName>
+    <!-- Surface IDE code-style analyzers (e.g. IDE0005 "unnecessary using") at
+         build time and let `dotnet format` act on them. IDE0005 in particular
+         only reports when a documentation file is generated (a Roslyn quirk),
+         so GenerateDocumentationFile is required; CS1591 (missing XML doc on
+         public members) is the noisy side effect of that and is suppressed. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

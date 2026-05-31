@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
 using SkiaSharp;
 
 namespace StudioCCS.FileFormat.Materials

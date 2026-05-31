@@ -54,9 +54,13 @@ indent_size = 4
 indent_size = 4
 
 # using directives: outside the namespace, System.* sorted first, one group.
+# IDE0005 flags unnecessary usings as a build warning so `dotnet format` strips
+# them in one pass. It only fires with GenerateDocumentationFile +
+# EnforceCodeStyleInBuild, both set in the .csproj (a documented Roslyn quirk).
 csharp_using_directive_placement = outside_namespace:warning
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
+dotnet_diagnostic.IDE0005.severity = warning
 
 # Use language keywords (int, string) instead of BCL type names (Int32, String).
 dotnet_style_predefined_type_for_locals_parameters_members = true:warning

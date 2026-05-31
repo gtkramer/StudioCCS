@@ -5,7 +5,6 @@
 // .SceneObjects|.Raw], StudioCCS.Rendering[.Gizmos], StudioCCS.Logging. The two
 // shared tree-model types (CCSTreeNode, TreeNodeTag) remain in the root
 // StudioCCS namespace.
-global using StudioCCS;
 global using StudioCCS.Logging;
 global using StudioCCS.Rendering;
 global using StudioCCS.Rendering.Gizmos;
