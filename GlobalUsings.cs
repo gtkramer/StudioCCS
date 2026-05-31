@@ -5,12 +5,12 @@
 // .SceneObjects|.Raw], StudioCCS.Rendering[.Gizmos], StudioCCS.Logging. The two
 // shared tree-model types (CCSTreeNode, TreeNodeTag) remain in the root
 // StudioCCS namespace.
+global using StudioCCS.FileFormat;
+global using StudioCCS.FileFormat.Animation;
+global using StudioCCS.FileFormat.Geometry;
+global using StudioCCS.FileFormat.Materials;
+global using StudioCCS.FileFormat.Raw;
+global using StudioCCS.FileFormat.SceneObjects;
 global using StudioCCS.Logging;
 global using StudioCCS.Rendering;
 global using StudioCCS.Rendering.Gizmos;
-global using StudioCCS.FileFormat;
-global using StudioCCS.FileFormat.Geometry;
-global using StudioCCS.FileFormat.Materials;
-global using StudioCCS.FileFormat.Animation;
-global using StudioCCS.FileFormat.SceneObjects;
-global using StudioCCS.FileFormat.Raw;
