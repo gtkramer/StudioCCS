@@ -657,7 +657,7 @@ public class CCSFile
             }
         }
 
-        return 0;
+        return -1;
     }
 
     public T GetObject<T>(int _objectID) where T : CCSBaseObject
