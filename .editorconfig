@@ -112,6 +112,16 @@ csharp_space_before_open_square_brackets = false
 # converts the whole tree and keeps new files single-namespace.
 csharp_style_namespace_declarations = file_scoped:warning
 
+# Modern syntax we deliberately decline, to keep code explicit and never
+# cryptic. With the preference set to the verbose side these rules don't
+# rewrite anything (the codebase uses essentially none of them today); they
+# only stop the IDE from nudging existing code toward the terse form.
+dotnet_style_prefer_collection_expression = false:suggestion                    # no [ ... ] collection expressions
+csharp_style_implicit_object_creation_when_type_is_apparent = false:suggestion  # no target-typed new()
+csharp_style_prefer_primary_constructors = false:silent                         # no primary constructors on class/struct
+csharp_style_prefer_switch_expression = false:suggestion                        # keep classic switch statements
+csharp_style_prefer_top_level_statements = false:warning                        # keep an explicit Program.Main
+
 # Expression-level preferences.
 dotnet_style_object_initializer = true:suggestion
 dotnet_style_collection_initializer = true:suggestion
@@ -121,7 +131,7 @@ dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_return = true:suggestion
-csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_simple_using_statement = false:suggestion   # keep `using (...) { }` with explicit scope braces
 csharp_style_prefer_index_operator = true:suggestion
 csharp_style_prefer_range_operator = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
