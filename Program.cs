@@ -12,15 +12,20 @@ internal sealed class Program
     // (the highest GL version) so capable drivers also light up the KHR_debug
     // output we register in debug builds (core in 4.3); 3.3 is the floor the
     // shaders actually require, used when the driver cannot grant anything newer.
-    private static List<GlVersion> DesktopGlProfiles() => new List<GlVersion>
+    private static List<GlVersion> DesktopGlProfiles()
+    {
+        return new List<GlVersion>
     {
         new GlVersion(GlProfileType.OpenGL, 4, 6),
         new GlVersion(GlProfileType.OpenGL, 3, 3),
     };
+    }
 
     [STAThread]
-    public static void Main(string[] args) =>
+    public static void Main(string[] args)
+    {
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    }
 
     public static AppBuilder BuildAvaloniaApp()
     {

@@ -13,5 +13,8 @@ internal static class LogOnce
     private static readonly ConcurrentDictionary<string, byte> Seen = new();
 
     /// <summary>Returns true the first time a given message is seen, false thereafter.</summary>
-    public static bool FirstTime(string message) => Seen.TryAdd(message ?? string.Empty, 0);
+    public static bool FirstTime(string message)
+    {
+        return Seen.TryAdd(message ?? string.Empty, 0);
+    }
 }

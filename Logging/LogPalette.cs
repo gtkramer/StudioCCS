@@ -12,14 +12,17 @@ namespace StudioCCS.Logging;
 /// </summary>
 internal static class LogPalette
 {
-    public static (byte R, byte G, byte B) Of(LogLevel level) => level switch
+    public static (byte R, byte G, byte B) Of(LogLevel level)
     {
-        LogLevel.Critical => (255, 85, 85),    // red
-        LogLevel.Error => (255, 85, 85),        // red
-        LogLevel.Warning => (255, 165, 0),      // orange
-        LogLevel.Information => (220, 220, 220), // light grey
-        _ => (128, 128, 128),                   // grey (trace/debug)
-    };
+        return level switch
+        {
+            LogLevel.Critical => (255, 85, 85),    // red
+            LogLevel.Error => (255, 85, 85),        // red
+            LogLevel.Warning => (255, 165, 0),      // orange
+            LogLevel.Information => (220, 220, 220), // light grey
+            _ => (128, 128, 128),                   // grey (trace/debug)
+        };
+    }
 
     /// <summary>24-bit (truecolor) ANSI foreground escape for the level.</summary>
     public static string Ansi(LogLevel level)

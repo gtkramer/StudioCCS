@@ -87,6 +87,17 @@ csharp_style_var_elsewhere = true:silent
 # Always use braces, even for single-statement blocks.
 csharp_prefer_braces = true:warning
 
+# Keep method/constructor/operator logic in block bodies -- a `=>` body that
+# later grows is harder to reason about. Trivial one-line property and accessor
+# getters may stay expression-bodied; those are clean, not cryptic.
+csharp_style_expression_bodied_methods = false:warning
+csharp_style_expression_bodied_constructors = false:warning
+csharp_style_expression_bodied_operators = false:warning
+csharp_style_expression_bodied_local_functions = false:warning
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
+csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
+
 # Allman braces — opening brace on its own line.
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true

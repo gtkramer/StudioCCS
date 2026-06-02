@@ -22,8 +22,15 @@ public class GlViewport : OpenGlControlBase
     private sealed class AvaloniaBindingsContext : OpenTK.IBindingsContext
     {
         private readonly GlInterface _gl;
-        public AvaloniaBindingsContext(GlInterface gl) => _gl = gl;
-        public IntPtr GetProcAddress(string procName) => _gl.GetProcAddress(procName);
+        public AvaloniaBindingsContext(GlInterface gl)
+        {
+            _gl = gl;
+        }
+
+        public IntPtr GetProcAddress(string procName)
+        {
+            return _gl.GetProcAddress(procName);
+        }
     }
 
     private bool _bindingsLoaded;

@@ -19,7 +19,10 @@ public sealed class PanelLoggerProvider : ILoggerProvider
         _logger = new PanelLogger(sink);
     }
 
-    public ILogger CreateLogger(string categoryName) => _logger;
+    public ILogger CreateLogger(string categoryName)
+    {
+        return _logger;
+    }
 
     public void Dispose() { }
 
@@ -27,11 +30,20 @@ public sealed class PanelLoggerProvider : ILoggerProvider
     {
         private readonly Action<string, string, Color> _sink;
 
-        public PanelLogger(Action<string, string, Color> sink) => _sink = sink;
+        public PanelLogger(Action<string, string, Color> sink)
+        {
+            _sink = sink;
+        }
 
-        public IDisposable BeginScope<TState>(TState state) where TState : notnull => null;
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        {
+            return null;
+        }
 
-        public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return logLevel != LogLevel.None;
+        }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
             Func<TState, Exception, string> formatter)

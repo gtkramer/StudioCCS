@@ -58,7 +58,13 @@ public static class Log
     // Trailing newlines used to be baked into every call site; strip them here
     // so each sink owns its own line termination (the console provider and the
     // panel provider both append one).
-    private static string Normalize(string message) => message?.TrimEnd('\r', '\n');
+    private static string Normalize(string message)
+    {
+        return message?.TrimEnd('\r', '\n');
+    }
 
-    private static bool ShouldLog(string message, bool once) => !once || LogOnce.FirstTime(message);
+    private static bool ShouldLog(string message, bool once)
+    {
+        return !once || LogOnce.FirstTime(message);
+    }
 }

@@ -10,14 +10,17 @@ namespace StudioCCS.Logging;
 /// </summary>
 internal static class LogLevelTag
 {
-    public static string Of(LogLevel level) => level switch
+    public static string Of(LogLevel level)
     {
-        LogLevel.Trace => "trce",
-        LogLevel.Debug => "dbug",
-        LogLevel.Information => "info",
-        LogLevel.Warning => "warn",
-        LogLevel.Error => "fail",
-        LogLevel.Critical => "crit",
-        _ => "info",
-    };
+        return level switch
+        {
+            LogLevel.Trace => "trce",
+            LogLevel.Debug => "dbug",
+            LogLevel.Information => "info",
+            LogLevel.Warning => "warn",
+            LogLevel.Error => "fail",
+            LogLevel.Critical => "crit",
+            _ => "info",
+        };
+    }
 }
