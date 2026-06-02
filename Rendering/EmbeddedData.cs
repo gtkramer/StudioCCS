@@ -1,27 +1,27 @@
 using Avalonia.Platform;
-namespace StudioCCS.Rendering
+
+namespace StudioCCS.Rendering;
+
+/// <summary>
+/// Opens the data files (shaders, vertex blobs) that are embedded in the
+/// assembly as AvaloniaResource items. The relative path passed in matches
+/// the project-relative path of the file (e.g. "Rendering/Shaders/Grid.vsh"),
+/// which AvaloniaResource maps to "avares://StudioCCS/&lt;path&gt;".
+/// </summary>
+public static class EmbeddedData
 {
-    /// <summary>
-    /// Opens the data files (shaders, vertex blobs) that are embedded in the
-    /// assembly as AvaloniaResource items. The relative path passed in matches
-    /// the project-relative path of the file (e.g. "Rendering/Shaders/Grid.vsh"),
-    /// which AvaloniaResource maps to "avares://StudioCCS/&lt;path&gt;".
-    /// </summary>
-    public static class EmbeddedData
+    private const string BaseUri = "avares://StudioCCS/";
+
+    public static Stream Open(string relativePath)
     {
-        private const string BaseUri = "avares://StudioCCS/";
+        return AssetLoader.Open(new Uri(BaseUri + relativePath));
+    }
 
-        public static Stream Open(string relativePath)
+    public static string ReadAllText(string relativePath)
+    {
+        using (var sr = new StreamReader(Open(relativePath)))
         {
-            return AssetLoader.Open(new Uri(BaseUri + relativePath));
-        }
-
-        public static string ReadAllText(string relativePath)
-        {
-            using (var sr = new StreamReader(Open(relativePath)))
-            {
-                return sr.ReadToEnd();
-            }
+            return sr.ReadToEnd();
         }
     }
 }

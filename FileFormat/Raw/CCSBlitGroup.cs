@@ -1,36 +1,35 @@
-namespace StudioCCS.FileFormat.Raw
+namespace StudioCCS.FileFormat.Raw;
+
+public class CCSBlitGroup : CCSBaseObject
 {
-    public class CCSBlitGroup : CCSBaseObject
+    public byte[] Data;
+    public int DataSize;
+
+    public CCSBlitGroup(int _objectID, CCSFile _parentFile)
     {
-        public byte[] Data;
-        public int DataSize;
-
-        public CCSBlitGroup(int _objectID, CCSFile _parentFile)
-        {
-            ObjectID = _objectID;
-            ParentFile = _parentFile;
-            ObjectType = CCSFile.SECTION_BLTGROUP;
-        }
-
-        public override bool Init()
-        {
-            //Currently nothing to be done for CCSBlitGroup::Init()
-            return true;
-        }
-
-        public override bool DeInit()
-        {
-            //Currently nothing to be done for CCSBlitGroup::DeInit()
-            return true;
-        }
-
-        public override bool Read(BinaryReader bStream, int sectionSize)
-        {
-            DataSize = sectionSize * 4;
-            Data = new byte[DataSize];
-            bStream.Read(Data, 0, DataSize);
-            return true;
-        }
-
+        ObjectID = _objectID;
+        ParentFile = _parentFile;
+        ObjectType = CCSFile.SECTION_BLTGROUP;
     }
+
+    public override bool Init()
+    {
+        //Currently nothing to be done for CCSBlitGroup::Init()
+        return true;
+    }
+
+    public override bool DeInit()
+    {
+        //Currently nothing to be done for CCSBlitGroup::DeInit()
+        return true;
+    }
+
+    public override bool Read(BinaryReader bStream, int sectionSize)
+    {
+        DataSize = sectionSize * 4;
+        Data = new byte[DataSize];
+        bStream.Read(Data, 0, DataSize);
+        return true;
+    }
+
 }

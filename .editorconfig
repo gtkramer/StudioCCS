@@ -105,9 +105,9 @@ csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_method_call_parameter_list_parentheses = false
 csharp_space_before_open_square_brackets = false
 
-# Prefer file-scoped namespaces (C# 10+). Suggestion only, to avoid rewriting
-# every legacy block-scoped file in one pass.
-csharp_style_namespace_declarations = file_scoped:suggestion
+# File-scoped namespaces (C# 10+). Enforced as a warning so `dotnet format`
+# converts the whole tree and keeps new files single-namespace.
+csharp_style_namespace_declarations = file_scoped:warning
 
 # Expression-level preferences.
 dotnet_style_object_initializer = true:suggestion

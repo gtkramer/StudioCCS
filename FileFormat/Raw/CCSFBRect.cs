@@ -1,36 +1,35 @@
-namespace StudioCCS.FileFormat.Raw
+namespace StudioCCS.FileFormat.Raw;
+
+public class CCSFBRect : CCSBaseObject
 {
-    public class CCSFBRect : CCSBaseObject
+    public byte[] Data;
+    public int DataSize;
+
+    public CCSFBRect(int _objectID, CCSFile _parentFile)
     {
-        public byte[] Data;
-        public int DataSize;
+        ObjectID = _objectID;
+        ParentFile = _parentFile;
+        ObjectType = CCSFile.SECTION_FBRECT;
+    }
 
-        public CCSFBRect(int _objectID, CCSFile _parentFile)
-        {
-            ObjectID = _objectID;
-            ParentFile = _parentFile;
-            ObjectType = CCSFile.SECTION_FBRECT;
-        }
+    public override bool Init()
+    {
+        //Currently nothing to do for CCSFBRect::Init()
+        return true;
+    }
 
-        public override bool Init()
-        {
-            //Currently nothing to do for CCSFBRect::Init()
-            return true;
-        }
+    public override bool DeInit()
+    {
+        //Currently nothing to do for CCSFBRect::DeInit()
+        return true;
+    }
 
-        public override bool DeInit()
-        {
-            //Currently nothing to do for CCSFBRect::DeInit()
-            return true;
-        }
+    public override bool Read(BinaryReader bStream, int sectionSize)
+    {
+        DataSize = sectionSize * 4;
+        Data = new byte[DataSize];
+        bStream.Read(Data, 0, DataSize);
 
-        public override bool Read(BinaryReader bStream, int sectionSize)
-        {
-            DataSize = sectionSize * 4;
-            Data = new byte[DataSize];
-            bStream.Read(Data, 0, DataSize);
-
-            return true;
-        }
+        return true;
     }
 }

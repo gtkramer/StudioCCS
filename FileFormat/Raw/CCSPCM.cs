@@ -1,37 +1,36 @@
-namespace StudioCCS.FileFormat.Raw
+namespace StudioCCS.FileFormat.Raw;
+
+public class CCSPCM : CCSBaseObject
 {
-    public class CCSPCM : CCSBaseObject
+    public byte[] Data;
+    public int DataSize;
+
+    public CCSPCM(int _objectID, CCSFile _parentFile)
     {
-        public byte[] Data;
-        public int DataSize;
-
-        public CCSPCM(int _objectID, CCSFile _parentFile)
-        {
-            ObjectID = _objectID;
-            ParentFile = _parentFile;
-            ObjectType = CCSFile.SECTION_PCM;
-        }
-
-        public override bool Init()
-        {
-            //Currently nothing to be done for CCSPCM::Init()
-            return true;
-        }
-
-        public override bool DeInit()
-        {
-            //Currently nothing to be done for CCSPCM::DeInit()
-            return true;
-        }
-
-        public override bool Read(BinaryReader bStream, int sectionSize)
-        {
-            DataSize = sectionSize * 4;
-            Data = new byte[DataSize];
-            bStream.Read(Data, 0, DataSize);
-
-            return true;
-        }
-
+        ObjectID = _objectID;
+        ParentFile = _parentFile;
+        ObjectType = CCSFile.SECTION_PCM;
     }
+
+    public override bool Init()
+    {
+        //Currently nothing to be done for CCSPCM::Init()
+        return true;
+    }
+
+    public override bool DeInit()
+    {
+        //Currently nothing to be done for CCSPCM::DeInit()
+        return true;
+    }
+
+    public override bool Read(BinaryReader bStream, int sectionSize)
+    {
+        DataSize = sectionSize * 4;
+        Data = new byte[DataSize];
+        bStream.Read(Data, 0, DataSize);
+
+        return true;
+    }
+
 }

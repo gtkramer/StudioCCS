@@ -1,36 +1,35 @@
-namespace StudioCCS.FileFormat.Raw
+namespace StudioCCS.FileFormat.Raw;
+
+public class CCSEffect : CCSBaseObject
 {
-    public class CCSEffect : CCSBaseObject
+    public byte[] Data;
+    public int DataSize;
+
+    public CCSEffect(int _objectID, CCSFile _parentFile)
     {
-        public byte[] Data;
-        public int DataSize;
+        ObjectID = _objectID;
+        ParentFile = _parentFile;
+        ObjectType = CCSFile.SECTION_EFFECT;
+    }
 
-        public CCSEffect(int _objectID, CCSFile _parentFile)
-        {
-            ObjectID = _objectID;
-            ParentFile = _parentFile;
-            ObjectType = CCSFile.SECTION_EFFECT;
-        }
+    public override bool Init()
+    {
+        //Currently nothing to be done for CCSEffect::Init()
+        return true;
+    }
 
-        public override bool Init()
-        {
-            //Currently nothing to be done for CCSEffect::Init()
-            return true;
-        }
+    public override bool DeInit()
+    {
+        //Currently nothing to be done for CCSEffect::DeInit()
+        return true;
+    }
 
-        public override bool DeInit()
-        {
-            //Currently nothing to be done for CCSEffect::DeInit()
-            return true;
-        }
+    public override bool Read(BinaryReader bStream, int sectionSize)
+    {
+        DataSize = sectionSize * 4;
+        Data = new byte[DataSize];
+        bStream.Read(Data, 0, DataSize);
 
-        public override bool Read(BinaryReader bStream, int sectionSize)
-        {
-            DataSize = sectionSize * 4;
-            Data = new byte[DataSize];
-            bStream.Read(Data, 0, DataSize);
-
-            return true;
-        }
+        return true;
     }
 }

@@ -1,27 +1,27 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-namespace StudioCCS.ViewModels
+
+namespace StudioCCS.ViewModels;
+
+/// <summary>Minimal INotifyPropertyChanged base for the app's light view-models.</summary>
+public abstract class ViewModelBase : INotifyPropertyChanged
 {
-    /// <summary>Minimal INotifyPropertyChanged base for the app's light view-models.</summary>
-    public abstract class ViewModelBase : INotifyPropertyChanged
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string name = null)
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string name = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            return false;
         }
 
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string name = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value))
-            {
-                return false;
-            }
-
-            field = value;
-            OnPropertyChanged(name);
-            return true;
-        }
+        field = value;
+        OnPropertyChanged(name);
+        return true;
     }
 }
