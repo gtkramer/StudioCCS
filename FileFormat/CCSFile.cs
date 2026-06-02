@@ -809,7 +809,7 @@ public class CCSFile
         if (collision)
         {
             Log.Info(string.Format("Dumping Collision Meshes to {0}_collision.obj...\n", outputFileName));
-            using (System.IO.StreamWriter fStream = new StreamWriter(outputFileName + "_collison.obj", false))
+            using (System.IO.StreamWriter fStream = new StreamWriter(outputFileName + "_collision.obj", false))
             {
                 int totalVertCount = 1;
                 foreach (var tmpHit in HitList)
