@@ -1,12 +1,13 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using OpenTK.Mathematics;
 
+using StudioCCS.FileFormat;
+using StudioCCS.FileFormat.Geometry;
+using StudioCCS.Logging;
 namespace StudioCCS.Views
 {
     public partial class EditBoneWindow : Window

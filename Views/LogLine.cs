@@ -1,5 +1,4 @@
 using Avalonia.Media;
-
 namespace StudioCCS.Views
 {
     /// <summary>

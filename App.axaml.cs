@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using StudioCCS.Views;
-
 namespace StudioCCS
 {
     public partial class App : Application

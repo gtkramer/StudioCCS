@@ -1,9 +1,8 @@
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-
+using StudioCCS.Logging;
+using StudioCCS.Rendering;
 namespace StudioCCS.FileFormat.Geometry
 {
     public class CCSHitMesh : CCSBaseObject

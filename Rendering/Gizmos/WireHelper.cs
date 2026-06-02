@@ -1,9 +1,8 @@
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-
+using StudioCCS.FileFormat.SceneObjects;
+using StudioCCS.Logging;
 namespace StudioCCS.Rendering.Gizmos
 {
     public static class WireHelper

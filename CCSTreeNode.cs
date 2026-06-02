@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
-
 namespace StudioCCS
 {
     /// <summary>

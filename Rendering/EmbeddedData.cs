@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using Avalonia.Platform;
-
 namespace StudioCCS.Rendering
 {
     /// <summary>

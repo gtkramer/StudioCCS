@@ -1,10 +1,14 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
+using StudioCCS.FileFormat;
+using StudioCCS.FileFormat.Animation;
+using StudioCCS.FileFormat.Geometry;
+using StudioCCS.FileFormat.Materials;
+using StudioCCS.FileFormat.SceneObjects;
+using StudioCCS.Logging;
+using StudioCCS.Rendering.Gizmos;
 namespace StudioCCS.Rendering
 {
     public static class Scene

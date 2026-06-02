@@ -1,6 +1,4 @@
-using System.IO;
 using OpenTK.Mathematics;
-
 namespace StudioCCS.FileFormat.Materials
 {
     public class CCSMaterial : CCSBaseObject

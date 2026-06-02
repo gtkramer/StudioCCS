@@ -1,8 +1,5 @@
-using System;
 using System.Drawing;
-using System.IO;
 using OpenTK.Mathematics;
-
 namespace StudioCCS.FileFormat
 {
     public static class Util

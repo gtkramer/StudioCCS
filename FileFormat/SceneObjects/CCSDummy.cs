@@ -1,6 +1,4 @@
-using System.IO;
 using OpenTK.Mathematics;
-
 namespace StudioCCS.FileFormat.SceneObjects
 {
     public class CCSDummy : CCSBaseObject

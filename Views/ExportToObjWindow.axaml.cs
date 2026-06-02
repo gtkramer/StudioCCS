@@ -1,8 +1,6 @@
-using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-
 namespace StudioCCS.Views
 {
     public partial class ExportToObjWindow : Window

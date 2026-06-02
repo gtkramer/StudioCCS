@@ -1,6 +1,4 @@
-using System.IO;
 using OpenTK.Mathematics;
-
 namespace StudioCCS.FileFormat.Geometry
 {
     public class CCSObject : CCSBaseObject

@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace StudioCCS.FileFormat.Geometry
 {
     public class CCSMorpher : CCSBaseObject

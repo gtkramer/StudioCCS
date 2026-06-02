@@ -1,6 +1,6 @@
-using System.IO;
 using OpenTK.Mathematics;
-
+using StudioCCS.FileFormat.Geometry;
+using StudioCCS.FileFormat.Materials;
 namespace StudioCCS.FileFormat.Animation
 {
     public partial class CCSAnime : CCSBaseObject

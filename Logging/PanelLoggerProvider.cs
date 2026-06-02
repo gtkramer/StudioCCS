@@ -1,7 +1,5 @@
-using System;
 using System.Drawing;
 using Microsoft.Extensions.Logging;
-
 namespace StudioCCS.Logging
 {
     /// <summary>

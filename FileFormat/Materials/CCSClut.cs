@@ -1,6 +1,4 @@
 using System.Drawing;
-using System.IO;
-
 namespace StudioCCS.FileFormat.Materials
 {
     public class CCSClut : CCSBaseObject

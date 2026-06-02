@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using StudioCCS.Rendering;
 namespace StudioCCS.ViewModels
 {
     /// <summary>

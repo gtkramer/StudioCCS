@@ -1,6 +1,4 @@
-using System;
 using OpenTK.Mathematics;
-
 namespace StudioCCS.Rendering
 {
     public class ArcBallCamera

@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace StudioCCS.FileFormat.Raw
 {
     public class CCSLayer : CCSBaseObject

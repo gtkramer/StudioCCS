@@ -1,10 +1,8 @@
-using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using OpenTK.Graphics.OpenGL;
 using SkiaSharp;
-
+using StudioCCS.Logging;
 namespace StudioCCS.FileFormat.Materials
 {
     public class CCSTexture : CCSBaseObject

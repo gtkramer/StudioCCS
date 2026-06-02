@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
 namespace StudioCCS.ViewModels
 {
     /// <summary>Minimal INotifyPropertyChanged base for the app's light view-models.</summary>

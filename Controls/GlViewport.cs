@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -7,7 +6,8 @@ using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Threading;
 using OpenTK.Graphics.OpenGL;
-
+using StudioCCS.Logging;
+using StudioCCS.Rendering;
 namespace StudioCCS.Controls
 {
     /// <summary>

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-
 namespace StudioCCS.Views
 {
     public partial class InfoWindow : Window

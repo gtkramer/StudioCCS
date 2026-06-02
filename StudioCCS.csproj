@@ -3,6 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- The .NET framework baseline (System, System.IO, System.Linq, ...) is
+         imported project-wide via implicit usings. Everything else - third-party
+         packages and the StudioCCS.* taxonomy - is declared per-file, so each
+         file's using block states its real dependencies. There are deliberately
+         no project-wide `global using`s for our own namespaces: a usage tally
+         showed none was near-universal enough to earn one (the broadest was only
+         ~37% of files), so globalizing them would just hide dependencies. -->
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

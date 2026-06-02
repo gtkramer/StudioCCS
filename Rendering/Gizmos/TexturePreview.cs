@@ -1,8 +1,7 @@
-using System;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-
+using StudioCCS.Logging;
 namespace StudioCCS.Rendering.Gizmos
 {
     public static class TexturePreview

@@ -1,5 +1,4 @@
-using System.IO;
-
+using StudioCCS.Logging;
 namespace StudioCCS.FileFormat
 {
     public class CCSFileHeader

@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.OpenGL;
-
 namespace StudioCCS
 {
     internal sealed class Program

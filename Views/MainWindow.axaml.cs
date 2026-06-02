@@ -1,10 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -15,8 +10,12 @@ using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using OpenTK.Mathematics;
+using StudioCCS.FileFormat;
+using StudioCCS.FileFormat.Animation;
+using StudioCCS.FileFormat.Geometry;
+using StudioCCS.Logging;
+using StudioCCS.Rendering;
 using StudioCCS.ViewModels;
-
 namespace StudioCCS.Views
 {
     public partial class MainWindow : Window

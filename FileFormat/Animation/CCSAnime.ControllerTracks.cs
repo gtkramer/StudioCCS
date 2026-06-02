@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using OpenTK.Mathematics;
-
 namespace StudioCCS.FileFormat.Animation
 {
     public partial class CCSAnime : CCSBaseObject

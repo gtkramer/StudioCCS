@@ -1,5 +1,4 @@
 using Avalonia.Platform.Storage;
-
 namespace StudioCCS.Views
 {
     /// <summary>Shared file-picker type descriptors, reused by the load/export dialogs.</summary>

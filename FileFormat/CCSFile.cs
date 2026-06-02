@@ -1,7 +1,10 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-
+using StudioCCS.FileFormat.Animation;
+using StudioCCS.FileFormat.Geometry;
+using StudioCCS.FileFormat.Materials;
+using StudioCCS.FileFormat.Raw;
+using StudioCCS.FileFormat.SceneObjects;
+using StudioCCS.Logging;
 namespace StudioCCS.FileFormat
 {
     public class CCSFile

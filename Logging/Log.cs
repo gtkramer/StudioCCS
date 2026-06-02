@@ -1,6 +1,4 @@
-using System;
 using Microsoft.Extensions.Logging;
-
 namespace StudioCCS.Logging
 {
     /// <summary>
