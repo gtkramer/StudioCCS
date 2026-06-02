@@ -85,7 +85,7 @@ public partial class CCSAnime : CCSBaseObject
     {
         Debug.WriteLine("Reading Anime {0} at 0x{1:X}...", ParentFile.GetSubObjectName(ObjectID), bStream.BaseStream.Position);
         FrameCount = bStream.ReadInt32();
-        var currentFrame = new AnimationFrame(0);
+        AnimationFrame currentFrame = new AnimationFrame(0);
         Frames.Add(currentFrame);
         int restBlockSize = bStream.ReadInt32();
 
@@ -119,14 +119,14 @@ public partial class CCSAnime : CCSBaseObject
                     {
                         if (ParentFile.GetVersion() == CCSFileHeader.CCSVersion.Gen1)
                         {
-                            var tmpController = new ObjectController(ParentFile, this);
+                            ObjectController tmpController = new ObjectController(ParentFile, this);
                             tmpController.Read(bStream, blockSize);
                             Controllers.Add(tmpController);
                             break;
                         }
                         else if (ParentFile.GetVersion() != CCSFileHeader.CCSVersion.Gen1)
                         {
-                            var tmpController = new ObjectController_Gen2(ParentFile, this);
+                            ObjectController_Gen2 tmpController = new ObjectController_Gen2(ParentFile, this);
                             tmpController.Read(bStream, blockSize);
                             Controllers.Add(tmpController);
                             break;
@@ -138,7 +138,7 @@ public partial class CCSAnime : CCSBaseObject
 
                 case CCS_ANIME_MATERIAL_CONTROLLER:
                     {
-                        var tmpController = new MaterialController(ParentFile, this);
+                        MaterialController tmpController = new MaterialController(ParentFile, this);
                         tmpController.Read(bStream, blockSize);
                         Controllers.Add(tmpController);
                         break;
@@ -148,21 +148,21 @@ public partial class CCSAnime : CCSBaseObject
                 //---------Light
                 case CCS_ANIME_LIGHT_AMBIENT_KEYFRAME:
                     {
-                        var tmpKeyFrame = new AmbientLightKeyFrame();
+                        AmbientLightKeyFrame tmpKeyFrame = new AmbientLightKeyFrame();
                         tmpKeyFrame.Read(bStream);
                         currentFrame.KeyFrames.Add(tmpKeyFrame);
                         break;
                     }
                 case CCS_ANIME_LIGHT_DIRECTIONAL_CONTROLLER:
                     {
-                        var tmpController = new DirectionalLightController(ParentFile, this);
+                        DirectionalLightController tmpController = new DirectionalLightController(ParentFile, this);
                         tmpController.Read(bStream, blockSize);
                         Controllers.Add(tmpController);
                         break;
                     }
                 case CCS_ANIME_LIGHT_OMNI_CONTROLLER:
                     {
-                        var tmpController = new OmniLightController(ParentFile, this);
+                        OmniLightController tmpController = new OmniLightController(ParentFile, this);
                         tmpController.Read(bStream, blockSize);
                         Controllers.Add(tmpController);
                         break;
@@ -171,7 +171,7 @@ public partial class CCSAnime : CCSBaseObject
                 //---------Morpher
                 case CCS_ANIME_MORPH_KEYFRAME:
                     {
-                        var tmpKeyFrame = new MorphKeyFrame();
+                        MorphKeyFrame tmpKeyFrame = new MorphKeyFrame();
                         tmpKeyFrame.Read(bStream);
                         currentFrame.KeyFrames.Add(tmpKeyFrame);
                         break;

@@ -122,7 +122,7 @@ public class MainViewModel : ViewModelBase
 
     private void UpdateRenderModeStatus()
     {
-        var options = new List<string>();
+        List<string> options = new List<string>();
         if (_wireframe)
         {
             options.Add("Wireframe");

@@ -26,7 +26,7 @@ public class CCSFileHeader
 
     public bool Read(BinaryReader bStream)
     {
-        var isHeader = bStream.ReadInt32() & 0xFFFF;
+        int isHeader = bStream.ReadInt32() & 0xFFFF;
         if (isHeader != CCSFile.SECTION_HEADER)
         {
             Log.Error("Header Section Mismatch!\n");

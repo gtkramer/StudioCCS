@@ -58,7 +58,7 @@ public class ArcBallCamera
     {
         //Clamp();
         const float rads = (float)(Math.PI / 180.0f);
-        var CamPos = new Vector3();
+        Vector3 CamPos = new Vector3();
         CamPos.X = (float)(dist * -Math.Sin(Rotation.X * rads) * Math.Cos(Rotation.Y * rads));
         CamPos.Y = (float)(dist * -Math.Sin(Rotation.Y * rads));
         CamPos.Z = -(float)(-dist * Math.Cos(Rotation.X * rads) * Math.Cos(Rotation.Y * rads));

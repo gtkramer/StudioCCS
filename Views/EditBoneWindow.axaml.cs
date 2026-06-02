@@ -43,12 +43,12 @@ public partial class EditBoneWindow : Window
         // Build the bone hierarchy as CCSTreeNodes (Tag = the bone) and bind it;
         // the shared CCSNodeTemplate renders it. Each node is parented under its
         // bone's parent, mirroring the clump's skeleton.
-        var roots = new List<CCSTreeNode>();
-        var nodes = new List<CCSTreeNode>();
+        List<CCSTreeNode> roots = new List<CCSTreeNode>();
+        List<CCSTreeNode> nodes = new List<CCSTreeNode>();
         for (int i = 0; i < OperatingClump.NodeCount; i++)
         {
             var tmpBone = OperatingClump.GetObject(i);
-            var tmpNode = new CCSTreeNode(OperatingFile.GetSubObjectName(tmpBone.ObjectID)) { Tag = tmpBone };
+            CCSTreeNode tmpNode = new CCSTreeNode(OperatingFile.GetSubObjectName(tmpBone.ObjectID)) { Tag = tmpBone };
             nodes.Add(tmpNode);
 
             int parentObjectID = tmpBone.ParentObjectID;
@@ -121,7 +121,7 @@ public partial class EditBoneWindow : Window
 
     private void OnBoneSelected(object sender, SelectionChangedEventArgs e)
     {
-        var bone = (treeBones.SelectedItem as CCSTreeNode)?.Tag as CCSObject;
+        CCSObject bone = (treeBones.SelectedItem as CCSTreeNode)?.Tag as CCSObject;
         if (bone == null)
         {
             return;

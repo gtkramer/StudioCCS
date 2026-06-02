@@ -126,7 +126,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var line = new LogLine(tag, message, BrushFor(color));
+        LogLine line = new LogLine(tag, message, BrushFor(color));
         _logLines.Add(line);
         if (_logLines.Count > MaxLogLines)
         {
@@ -167,7 +167,7 @@ public partial class MainWindow : Window
 
     private void LoadFiles(IEnumerable<string> fileNames)
     {
-        var paths = fileNames.ToList();
+        List<string> paths = fileNames.ToList();
         if (paths.Count == 0)
         {
             return;
@@ -179,7 +179,7 @@ public partial class MainWindow : Window
         // resulting node is then added to the bound collection on the UI thread.
         Task.Run(() =>
         {
-            foreach (var fileName in paths)
+            foreach (string fileName in paths)
             {
                 CCSFile file;
                 try
@@ -239,8 +239,8 @@ public partial class MainWindow : Window
 
     private void OnCCSTreeSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var node = ccsTree.SelectedItem as CCSTreeNode;
-        var tag = node?.Tag as TreeNodeTag;
+        CCSTreeNode node = ccsTree.SelectedItem as CCSTreeNode;
+        TreeNodeTag tag = node?.Tag as TreeNodeTag;
         Scene.SelectedPreviewItemTag = tag;
         if (tag != null && tag.ObjectType == CCSFile.SECTION_ANIME)
         {
@@ -307,7 +307,7 @@ public partial class MainWindow : Window
                 }),
                 MakeMenuItem("View Info Report", () =>
                 {
-                    var reportForm = new InfoWindow();
+                    InfoWindow reportForm = new InfoWindow();
                     reportForm.SetReportText(tag.File.GetReport());
                     reportForm.Show();
                 }));
@@ -319,7 +319,7 @@ public partial class MainWindow : Window
                 MakeMenuItem("Load Matrix...", () => LoadMatrix(tag)),
                 MakeMenuItem("Edit Bones", () =>
                 {
-                    var editFrm = new EditBoneWindow();
+                    EditBoneWindow editFrm = new EditBoneWindow();
                     editFrm.SetClump(tag.File.GetObject<CCSClump>(tag.ObjectID));
                     editFrm.Show();
                 }));
@@ -368,7 +368,7 @@ public partial class MainWindow : Window
 
     private static ContextMenu Menu(params MenuItem[] items)
     {
-        var menu = new ContextMenu();
+        ContextMenu menu = new ContextMenu();
         foreach (var mi in items)
         {
             ((IList)menu.Items).Add(mi);
@@ -379,7 +379,7 @@ public partial class MainWindow : Window
 
     private static MenuItem MakeMenuItem(string header, Action action)
     {
-        var mi = new MenuItem { Header = header };
+        MenuItem mi = new MenuItem { Header = header };
         mi.Click += (_, _) => action();
         return mi;
     }
@@ -426,7 +426,7 @@ public partial class MainWindow : Window
 
     private async void OnDumpObjClick(object sender, RoutedEventArgs e)
     {
-        var dlg = new ExportToObjWindow();
+        ExportToObjWindow dlg = new ExportToObjWindow();
         if (await dlg.ShowDialog<bool>(this))
         {
             Scene.DumpToObj(dlg.ExportPath, dlg.ExportCollision, dlg.SplitSubModels, dlg.SplitCollision, dlg.WithNormals, dlg.ExportDummies, dlg.DumpAnime);
@@ -435,7 +435,7 @@ public partial class MainWindow : Window
 
     private async void OnDumpSmdClick(object sender, RoutedEventArgs e)
     {
-        var dlg = new ExportToObjWindow();
+        ExportToObjWindow dlg = new ExportToObjWindow();
         dlg.ConfigureForSmd();
         if (await dlg.ShowDialog<bool>(this))
         {
@@ -447,7 +447,7 @@ public partial class MainWindow : Window
     // frame) rather than the whole loaded scene. Ported from taarna23's fork.
     private async void OnDumpPreviewSmdClick(object sender, RoutedEventArgs e)
     {
-        var dlg = new ExportToObjWindow();
+        ExportToObjWindow dlg = new ExportToObjWindow();
         dlg.ConfigureForSmd();
         if (await dlg.ShowDialog<bool>(this))
         {
@@ -461,7 +461,7 @@ public partial class MainWindow : Window
 
     private void OnViewportPointerPressed(object sender, PointerPressedEventArgs e)
     {
-        var host = (Control)sender;
+        Control host = (Control)sender;
         host.Focus();
         var point = e.GetCurrentPoint(host);
         if (point.Properties.IsRightButtonPressed)
@@ -475,7 +475,7 @@ public partial class MainWindow : Window
 
     private void OnViewportPointerMoved(object sender, PointerEventArgs e)
     {
-        var host = (Control)sender;
+        Control host = (Control)sender;
         var point = e.GetCurrentPoint(host);
         Scene.MouseMove((float)point.Position.X, (float)point.Position.Y, point.Properties.IsRightButtonPressed);
     }

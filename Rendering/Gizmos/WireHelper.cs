@@ -177,7 +177,7 @@ public static class WireHelper
     {
         using (var fs = EmbeddedData.Open("Rendering/Gizmos/WireHelper.bin"))
         {
-            using (var bs = new BinaryReader(fs))
+            using (BinaryReader bs = new BinaryReader(fs))
             {
                 VertexCount = bs.ReadInt32();
                 DirectionalHelperOffset = 0;

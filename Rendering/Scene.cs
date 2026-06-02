@@ -174,7 +174,7 @@ public static class Scene
             // (it never returns null), so a misnamed/absent shader would
             // otherwise propagate an uncaught exception instead of letting
             // LoadProgram fall through to its -1 result.
-            using (var sr = new StreamReader(EmbeddedData.Open(fileName)))
+            using (StreamReader sr = new StreamReader(EmbeddedData.Open(fileName)))
             {
                 shaderCode = sr.ReadToEnd();
             }
@@ -205,7 +205,7 @@ public static class Scene
     //                           current (i.e. inside GlViewport's render callback).
     public static CCSFile ReadCCSFile(string fileName)
     {
-        var tmpCCS = new CCSFile();
+        CCSFile tmpCCS = new CCSFile();
         if (tmpCCS.Read(fileName))
         {
             return tmpCCS;
@@ -234,7 +234,7 @@ public static class Scene
 
     public static CCSTreeNode ToNode()
     {
-        var retNode = new CCSTreeNode();
+        CCSTreeNode retNode = new CCSTreeNode();
         foreach (var tmpCCS in CCSFileList)
         {
             retNode.Nodes.Add(tmpCCS.ToNode());
@@ -246,7 +246,7 @@ public static class Scene
     public static CCSTreeNode ToSceneNode()
     {
 
-        var tmpMainAnmNode = new CCSTreeNode("Animations");
+        CCSTreeNode tmpMainAnmNode = new CCSTreeNode("Animations");
         foreach (var tmpAnmNode in ActiveAnimes)
         {
             tmpMainAnmNode.Nodes.Add(tmpAnmNode.ToNode());

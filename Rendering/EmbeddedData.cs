@@ -19,7 +19,7 @@ public static class EmbeddedData
 
     public static string ReadAllText(string relativePath)
     {
-        using (var sr = new StreamReader(Open(relativePath)))
+        using (StreamReader sr = new StreamReader(Open(relativePath)))
         {
             return sr.ReadToEnd();
         }

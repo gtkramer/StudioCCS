@@ -76,10 +76,13 @@ dotnet_style_qualification_for_event = false:warning
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
 dotnet_style_readonly_field = true:suggestion
 
-# var: prefer explicit types for built-ins, var when the type is apparent.
-csharp_style_var_for_built_in_types = false:suggestion
-csharp_style_var_when_type_is_apparent = true:suggestion
-csharp_style_var_elsewhere = false:suggestion
+# var: explicit types where they are cheap and informative; reserve `var` for
+# cases where the type is unwieldy (LINQ projections, deep generics). Built-in
+# and type-apparent locals are rewritten to explicit; `var` is permitted but
+# not nagged elsewhere, so LINQ queries stay readable.
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = false:warning
+csharp_style_var_elsewhere = true:silent
 
 # Always use braces, even for single-statement blocks.
 csharp_prefer_braces = true:warning

@@ -609,7 +609,7 @@ public class CCSModel : CCSBaseObject
                 {
                     SubModel tmpSubModel = new SubModel();
                     tmpSubModel.VertexCount = bStream.ReadInt32();
-                    var tVertCount = bStream.ReadInt32();
+                    int tVertCount = bStream.ReadInt32();
                     if ((tVertCount % 3) != 0)
                     {
                         Log.Warning(string.Format("Shadow Model {0:X}:{1} has an bad number of triangle verts!", ObjectID, ParentFile.GetSubObjectName(ObjectID)));
@@ -756,7 +756,7 @@ public class CCSModel : CCSBaseObject
             {
                 var tmpSubModel = SubModels[i];
                 string subModelName = ParentFile.GetSubObjectName(tmpSubModel.ParentID);
-                var tmpSubNode = new CCSTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
+                CCSTreeNode tmpSubNode = new CCSTreeNode(string.Format("Sub Model {0}: {1}", i, subModelName))
                 {
                     Tag = new StudioCCS.TreeNodeTag(ParentFile, ObjectID, ObjectType, TreeNodeTag.NodeType.SubNode, i)
                 };

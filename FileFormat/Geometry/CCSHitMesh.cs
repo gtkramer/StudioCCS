@@ -126,7 +126,7 @@ public class CCSHitMesh : CCSBaseObject
                 GL.UniformMatrix4(UniformMatrix, false, ref FinalMtx);
                 /* We don't want to render lines twice if we're in line mode already, so check first
                 */
-                var curMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
+                PolygonMode curMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
                 if (curMode == PolygonMode.Fill)
                 {
                     GL.Uniform4(UniformColor, tmpGroup.Color);
@@ -179,7 +179,7 @@ public class CCSHitMesh : CCSBaseObject
         //Since we're rendering hitmeshes with wrireframes too, it'd be rather pointless to draw them twice
         //if we're in wireframe mode already...
 
-        var curMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
+        PolygonMode curMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
         if (curMode == PolygonMode.Fill)
         {
             GL.DrawArrays(PrimitiveType.Triangles, 0, tmpGroup.VertexCount);

@@ -84,7 +84,7 @@ public static class AxisMarker
     {
         using (var fs = EmbeddedData.Open("Rendering/Gizmos/AxisMarker.bin"))
         {
-            using (var bs = new BinaryReader(fs))
+            using (BinaryReader bs = new BinaryReader(fs))
             {
                 VertexCount = bs.ReadInt32();
                 bs.ReadInt32();
@@ -146,7 +146,7 @@ public static class AxisMarker
             return;
         }
 
-        var currentMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
+        PolygonMode currentMode = (PolygonMode)GL.GetInteger(GetPName.PolygonMode);
         GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
         //Matrix4 FinalMtx = matrix * Matrix4.Identity;
 

@@ -172,8 +172,8 @@ public class CCSFile
     {
         FileName = _fileName;
         Log.Info(string.Format("Loading {0}...\n", _fileName));
-        using var fStream = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
-        using var bStream = new BinaryReader(fStream);
+        using FileStream fStream = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
+        using BinaryReader bStream = new BinaryReader(fStream);
         bool result = Read(bStream);
         Log.Info("Done.\n");
         return result;
@@ -181,7 +181,7 @@ public class CCSFile
 
     public bool Read(BinaryReader bStream)
     {
-        var ErrorString = string.Format("Error reading CCS File {0}, ", FileName);
+        string ErrorString = string.Format("Error reading CCS File {0}, ", FileName);
         if (!Header.Read(bStream))
         {
             Log.Error(ErrorString + "Header section could not be read\n");
@@ -212,55 +212,55 @@ public class CCSFile
     public CCSTreeNode ToNode()
     {
         //In my preferred order
-        var retNode = new CCSTreeNode(Header.CCSFName)
+        CCSTreeNode retNode = new CCSTreeNode(Header.CCSFName)
         {
             Tag = new TreeNodeTag(this, 0, 0, TreeNodeTag.NodeType.File, 0)
         };
 
         //In this order, because that's how I feel like ordering them.
-        var ClumpNode = new CCSTreeNode("Clumps");
+        CCSTreeNode ClumpNode = new CCSTreeNode("Clumps");
         foreach (var tmpClump in ClumpList)
         {
             ClumpNode.Nodes.Add(tmpClump.ToNode());
         }
         retNode.Nodes.Add(ClumpNode);
 
-        var MaterialNode = new CCSTreeNode("Materials");
+        CCSTreeNode MaterialNode = new CCSTreeNode("Materials");
         foreach (var tmpMat in MaterialList)
         {
             MaterialNode.Nodes.Add(tmpMat.ToNode());
         }
         retNode.Nodes.Add(MaterialNode);
 
-        var TextureNode = new CCSTreeNode("Textures");
+        CCSTreeNode TextureNode = new CCSTreeNode("Textures");
         foreach (var tmpTex in TextureList)
         {
             TextureNode.Nodes.Add(tmpTex.ToNode());
         }
         retNode.Nodes.Add(TextureNode);
 
-        var HitNode = new CCSTreeNode("HitMeshes");
+        CCSTreeNode HitNode = new CCSTreeNode("HitMeshes");
         foreach (var tmpHit in HitList)
         {
             HitNode.Nodes.Add(tmpHit.ToNode());
         }
         retNode.Nodes.Add(HitNode);
 
-        var BBoxNode = new CCSTreeNode("Bounding Boxes");
+        CCSTreeNode BBoxNode = new CCSTreeNode("Bounding Boxes");
         foreach (var tmpBBox in BBoxList)
         {
             BBoxNode.Nodes.Add(tmpBBox.ToNode());
         }
         retNode.Nodes.Add(BBoxNode);
 
-        var DummyNode = new CCSTreeNode("Dummies");
+        CCSTreeNode DummyNode = new CCSTreeNode("Dummies");
         foreach (var tmpDummy in DummyList)
         {
             DummyNode.Nodes.Add(tmpDummy.ToNode());
         }
         retNode.Nodes.Add(DummyNode);
 
-        var AnimeNode = new CCSTreeNode("Animations");
+        CCSTreeNode AnimeNode = new CCSTreeNode("Animations");
         foreach (var tmpAnime in AnimeList)
         {
             AnimeNode.Nodes.Add(tmpAnime.ToNode());
@@ -282,7 +282,7 @@ public class CCSFile
 
     private bool ReadIndexSection(BinaryReader bStream)
     {
-        var isIndexSection = bStream.ReadInt32() & 0xFFFF;
+        int isIndexSection = bStream.ReadInt32() & 0xFFFF;
         if (isIndexSection != SECTION_INDEX)
         {
             Log.Error("Index section mismatch\n");
@@ -296,7 +296,7 @@ public class CCSFile
         FileIndex = new IndexFileEntry[FileIndexCount];
         for (int i = 0; i < FileIndexCount; i++)
         {
-            var tmpSubFile = new IndexFileEntry();
+            IndexFileEntry tmpSubFile = new IndexFileEntry();
             tmpSubFile.Read(bStream);
             FileIndex[i] = tmpSubFile;
         }
@@ -304,7 +304,7 @@ public class CCSFile
         ObjectIndex = new IndexObjectEntry[ObjectIndexCount];
         for (int i = 0; i < ObjectIndexCount; i++)
         {
-            var tmpSubObj = new IndexObjectEntry();
+            IndexObjectEntry tmpSubObj = new IndexObjectEntry();
             tmpSubObj.Read(bStream);
             ObjectIndex[i] = tmpSubObj;
         }
@@ -314,7 +314,7 @@ public class CCSFile
 
     private bool ReadSetupSection(BinaryReader bStream)
     {
-        var isSetupSection = bStream.ReadInt32() & 0xffff;
+        int isSetupSection = bStream.ReadInt32() & 0xffff;
         if (isSetupSection != SECTION_SETUP)
         {
             Log.Error("Setup section mismatch\n");
@@ -324,12 +324,12 @@ public class CCSFile
         //Setup section should have a zero size. IMOQ just ignores the setup section block,
         //but we will use it as a check to make sure we're in the right place because it *should*
         //always be between the Index Section and the Contents.
-        var setupSectionSize = bStream.ReadInt32();
+        int setupSectionSize = bStream.ReadInt32();
 
         while (true)
         {
-            var tmpSectionOffset = (int)bStream.BaseStream.Position;
-            var tmpSectionType = bStream.ReadInt32() & 0xFFFF;
+            int tmpSectionOffset = (int)bStream.BaseStream.Position;
+            int tmpSectionType = bStream.ReadInt32() & 0xFFFF;
             if (tmpSectionType == SECTION_STREAM)
             {
                 //Back it up
@@ -337,8 +337,8 @@ public class CCSFile
                 break;
             }
 
-            var tmpSectionSize = bStream.ReadInt32() - 1;
-            var tmpSectionID = bStream.ReadInt32();
+            int tmpSectionSize = bStream.ReadInt32() - 1;
+            int tmpSectionID = bStream.ReadInt32();
             if (tmpSectionID > ObjectIndexCount)
             {
                 Log.Error(string.Format("Error reading sub object, ID out of bounds ({0} > {1}) at 0x{2:X}\n", tmpSectionID, ObjectIndexCount, tmpSectionOffset));
@@ -349,7 +349,7 @@ public class CCSFile
             {
                 case SECTION_OBJECT:
                     {
-                        var tmpObject = new CCSObject(tmpSectionID, this);
+                        CCSObject tmpObject = new CCSObject(tmpSectionID, this);
                         sectionRead = tmpObject.Read(bStream, tmpSectionSize);
                         //For now, just check and override.
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpObject);
@@ -358,7 +358,7 @@ public class CCSFile
                     }
                 case SECTION_MATERIAL:
                     {
-                        var tmpMaterial = new CCSMaterial(tmpSectionID, this);
+                        CCSMaterial tmpMaterial = new CCSMaterial(tmpSectionID, this);
                         sectionRead = tmpMaterial.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpMaterial);
                         MaterialList.Add(tmpMaterial);
@@ -366,7 +366,7 @@ public class CCSFile
                     }
                 case SECTION_TEXTURE:
                     {
-                        var tmpTexture = new CCSTexture(tmpSectionID, this);
+                        CCSTexture tmpTexture = new CCSTexture(tmpSectionID, this);
                         sectionRead = tmpTexture.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpTexture);
                         TextureList.Add(tmpTexture);
@@ -374,28 +374,28 @@ public class CCSFile
                     }
                 case SECTION_CLUT:
                     {
-                        var tmpClut = new CCSClut(tmpSectionID, this);
+                        CCSClut tmpClut = new CCSClut(tmpSectionID, this);
                         sectionRead = tmpClut.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpClut);
                         break;
                     }
                 case SECTION_CAMERA:
                     {
-                        var tmpCamera = new CCSCamera(tmpSectionID, this);
+                        CCSCamera tmpCamera = new CCSCamera(tmpSectionID, this);
                         sectionRead = tmpCamera.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpCamera);
                         break;
                     }
                 case SECTION_LIGHT:
                     {
-                        var tmpLight = new CCSLight(tmpSectionID, this);
+                        CCSLight tmpLight = new CCSLight(tmpSectionID, this);
                         sectionRead = tmpLight.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpLight);
                         break;
                     }
                 case SECTION_ANIME:
                     {
-                        var tmpAnime = new CCSAnime(tmpSectionID, this);
+                        CCSAnime tmpAnime = new CCSAnime(tmpSectionID, this);
                         sectionRead = tmpAnime.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpAnime);
                         AnimeList.Add(tmpAnime);
@@ -403,14 +403,14 @@ public class CCSFile
                     }
                 case SECTION_MODEL:
                     {
-                        var tmpModel = new CCSModel(tmpSectionID, this);
+                        CCSModel tmpModel = new CCSModel(tmpSectionID, this);
                         sectionRead = tmpModel.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpModel);
                         break;
                     }
                 case SECTION_CLUMP:
                     {
-                        var tmpClump = new CCSClump(tmpSectionID, this);
+                        CCSClump tmpClump = new CCSClump(tmpSectionID, this);
                         sectionRead = tmpClump.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpClump);
                         ClumpList.Add(tmpClump);
@@ -419,14 +419,14 @@ public class CCSFile
                     }
                 case SECTION_EXTERNAL:
                     {
-                        var tmpExt = new CCSExt(tmpSectionID, this);
+                        CCSExt tmpExt = new CCSExt(tmpSectionID, this);
                         sectionRead = tmpExt.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpExt);
                         break;
                     }
                 case SECTION_HITMESH:
                     {
-                        var tmpHit = new CCSHitMesh(tmpSectionID, this);
+                        CCSHitMesh tmpHit = new CCSHitMesh(tmpSectionID, this);
                         sectionRead = tmpHit.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpHit);
                         HitList.Add(tmpHit);
@@ -434,7 +434,7 @@ public class CCSFile
                     }
                 case SECTION_BBOX:
                     {
-                        var tmpBBox = new CCSBoundingBox(tmpSectionID, this);
+                        CCSBoundingBox tmpBBox = new CCSBoundingBox(tmpSectionID, this);
                         sectionRead = tmpBBox.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpBBox);
                         BBoxList.Add(tmpBBox);
@@ -442,35 +442,35 @@ public class CCSFile
                     }
                 case SECTION_PARTICLE:
                     {
-                        var tmpParticle = new CCSParticle(tmpSectionID, this);
+                        CCSParticle tmpParticle = new CCSParticle(tmpSectionID, this);
                         sectionRead = tmpParticle.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpParticle);
                         break;
                     }
                 case SECTION_EFFECT:
                     {
-                        var tmpEffect = new CCSEffect(tmpSectionID, this);
+                        CCSEffect tmpEffect = new CCSEffect(tmpSectionID, this);
                         sectionRead = tmpEffect.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpEffect);
                         break;
                     }
                 case SECTION_BLTGROUP:
                     {
-                        var tmpBlitGrp = new CCSBlitGroup(tmpSectionID, this);
+                        CCSBlitGroup tmpBlitGrp = new CCSBlitGroup(tmpSectionID, this);
                         sectionRead = tmpBlitGrp.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpBlitGrp);
                         break;
                     }
                 case SECTION_FBRECT:
                     {
-                        var tmpFBRect = new CCSFBRect(tmpSectionID, this);
+                        CCSFBRect tmpFBRect = new CCSFBRect(tmpSectionID, this);
                         sectionRead = tmpFBRect.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpFBRect);
                         break;
                     }
                 case SECTION_FBPAGE:
                     {
-                        var tmpFBPage = new CCSFBPage(tmpSectionID, this);
+                        CCSFBPage tmpFBPage = new CCSFBPage(tmpSectionID, this);
                         sectionRead = tmpFBPage.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpFBPage);
                         break;
@@ -478,7 +478,7 @@ public class CCSFile
                 case SECTION_DUMMYPOS:
                 case SECTION_DUMMYPOSROT:
                     {
-                        var tmpDummy = new CCSDummy(tmpSectionID, this, tmpSectionType);
+                        CCSDummy tmpDummy = new CCSDummy(tmpSectionID, this, tmpSectionType);
                         sectionRead = tmpDummy.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpDummy);
                         DummyList.Add(tmpDummy);
@@ -486,21 +486,21 @@ public class CCSFile
                     }
                 case SECTION_LAYER:
                     {
-                        var tmpLayer = new CCSLayer(tmpSectionID, this);
+                        CCSLayer tmpLayer = new CCSLayer(tmpSectionID, this);
                         sectionRead = tmpLayer.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpLayer);
                         break;
                     }
                 case SECTION_SHADOW:
                     {
-                        var tmpShadow = new CCSShadow(tmpSectionID, this);
+                        CCSShadow tmpShadow = new CCSShadow(tmpSectionID, this);
                         sectionRead = tmpShadow.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpShadow);
                         break;
                     }
                 case SECTION_MORPHER:
                     {
-                        var tmpMorpher = new CCSMorpher(tmpSectionID, this);
+                        CCSMorpher tmpMorpher = new CCSMorpher(tmpSectionID, this);
                         sectionRead = tmpMorpher.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpMorpher);
                         break;
@@ -513,7 +513,7 @@ public class CCSFile
                     }
                 case SECTION_PCM:
                     {
-                        var tmpPCM = new CCSPCM(tmpSectionID, this);
+                        CCSPCM tmpPCM = new CCSPCM(tmpSectionID, this);
                         sectionRead = tmpPCM.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpPCM);
                         break;
@@ -527,7 +527,7 @@ public class CCSFile
                             Log.Warning(string.Format("Binary Blob (Type 0x2400) with ID of {0} found in Generation 1 CCS File at 0x{1:X}, File may fail in game!\n", tmpSectionID, tmpSectionOffset));
                         }
                         //But read it anyways.
-                        var tmpBinary = new CCSBinaryBlob(tmpSectionID, this);
+                        CCSBinaryBlob tmpBinary = new CCSBinaryBlob(tmpSectionID, this);
                         sectionRead = tmpBinary.Read(bStream, tmpSectionSize);
                         SetObjectRef(tmpSectionID, tmpSectionType, tmpSectionOffset, tmpBinary);
                         break;
@@ -598,13 +598,13 @@ public class CCSFile
     {
         //TODO: CCSFile::ReadStreamSection(): Support stream animation.
         StreamOffset = (int)bStream.BaseStream.Position;
-        var isStreamSection = bStream.ReadInt32() & 0xFFFF;
+        int isStreamSection = bStream.ReadInt32() & 0xFFFF;
         if (isStreamSection != SECTION_STREAM)
         {
             Log.Error("Stream section mismatch!\n");
             return false;
         }
-        var streamHeaderSize = bStream.ReadInt32();
+        int streamHeaderSize = bStream.ReadInt32();
         StreamFrameCount = bStream.ReadInt32();
 
         //End reading here for now.
@@ -884,9 +884,9 @@ public class CCSFile
         {
             mode = FileMode.Truncate;
         }
-        using (var fs = new FileStream(outputFileName, mode))
+        using (FileStream fs = new FileStream(outputFileName, mode))
         {
-            using (var outf = new StreamWriter(fs))
+            using (StreamWriter outf = new StreamWriter(fs))
             {
                 outf.WriteLine(AnimeList.Count.ToString());
                 foreach (var tmpAnime in AnimeList)

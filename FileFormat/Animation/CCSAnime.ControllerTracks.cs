@@ -850,7 +850,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Color Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Vec4Key_Color();
+                    Vec4Key_Color tmpKey = new Vec4Key_Color();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -926,7 +926,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Rotation Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Vec3Key_Rotation();
+                    Vec3Key_Rotation tmpKey = new Vec3Key_Rotation();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -1253,7 +1253,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Rotation4 Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Vec4Key_Rotation();
+                    Vec4Key_Rotation tmpKey = new Vec4Key_Rotation();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -1329,7 +1329,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Position Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Vec3Key_Position();
+                    Vec3Key_Position tmpKey = new Vec3Key_Position();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -1479,7 +1479,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Scale Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Vec3Key_Scale();
+                    Vec3Key_Scale tmpKey = new Vec3Key_Scale();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -1687,7 +1687,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Texture Offset Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Vec2Key_UV();
+                    Vec2Key_UV tmpKey = new Vec2Key_UV();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -1764,7 +1764,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Float Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new F32Key();
+                    F32Key tmpKey = new F32Key();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {
@@ -1867,7 +1867,7 @@ public partial class CCSAnime : CCSBaseObject
                 {
                     int frameNum = bStream.ReadInt32();
                     Debug.WriteLine("\t\tReading Int Track Key {0} of {1}, Frame: {2}", i, KeyCount, frameNum);
-                    var tmpKey = new Int32Key();
+                    Int32Key tmpKey = new Int32Key();
                     tmpKey.Read(bStream, frameNum);
                     if (Keys.Count > 0)
                     {

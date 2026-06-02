@@ -47,7 +47,7 @@ public class CCSDummy : CCSBaseObject
 
     public Matrix4 Matrix()
     {
-        var rotQuat = new Quaternion(Rotation);
+        Quaternion rotQuat = new Quaternion(Rotation);
         return Matrix4.CreateFromQuaternion(rotQuat) * Matrix4.CreateTranslation(Position);
     }
 

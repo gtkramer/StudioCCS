@@ -625,9 +625,9 @@ public class CCSClump : CCSBaseObject
     {
         FrameForward();
         string outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + ".smd";
-        using (var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
+        using (FileStream fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
         {
-            using (var outf = new StreamWriter(fs))
+            using (StreamWriter outf = new StreamWriter(fs))
             {
                 Log.Info(string.Format("Dumping {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
                 outf.WriteLine("version 1");
@@ -671,9 +671,9 @@ public class CCSClump : CCSBaseObject
 
         outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + "_bind.smd";
         Log.Info(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
-        using (var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
+        using (FileStream fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
         {
-            using (var outf = new StreamWriter(fs))
+            using (StreamWriter outf = new StreamWriter(fs))
             {
                 outf.WriteLine("version 1");
                 outf.WriteLine("nodes");
@@ -717,9 +717,9 @@ public class CCSClump : CCSBaseObject
         //    }
         //}
 
-        using (var fs = new FileStream(outputFileName, FileMode.Create))
+        using (FileStream fs = new FileStream(outputFileName, FileMode.Create))
         {
-            using (var outf = new StreamWriter(fs))
+            using (StreamWriter outf = new StreamWriter(fs))
             {
                 Log.Info(string.Format("Dumping {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
                 outf.WriteLine("version 1");
@@ -783,9 +783,9 @@ public class CCSClump : CCSBaseObject
 
         outputFileName = System.IO.Path.Combine(outputPath, ParentFile.GetSubObjectName(ObjectID)) + dumpID.ToString() + "_bind.smd";
         Log.Info(string.Format("Dumping bind pose to {0} to {1}...\n", ParentFile.GetSubObjectName(ObjectID), outputFileName));
-        using (var fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
+        using (FileStream fs = new FileStream(outputFileName, FileMode.OpenOrCreate))
         {
-            using (var outf = new StreamWriter(fs))
+            using (StreamWriter outf = new StreamWriter(fs))
             {
                 outf.WriteLine("version 1");
 
@@ -830,9 +830,9 @@ public class CCSClump : CCSBaseObject
 
     public void LoadMatrixList(string fileName)
     {
-        using (var fs = new FileStream(fileName, FileMode.Open))
+        using (FileStream fs = new FileStream(fileName, FileMode.Open))
         {
-            using (var bs = new BinaryReader(fs))
+            using (BinaryReader bs = new BinaryReader(fs))
             {
                 for (int i = 0; i < NodeCount; i++)
                 {
@@ -852,9 +852,9 @@ public class CCSClump : CCSBaseObject
 
     public void LoadPose(string fileName)
     {
-        using (var fs = new FileStream(fileName, FileMode.Open))
+        using (FileStream fs = new FileStream(fileName, FileMode.Open))
         {
-            using (var bs = new BinaryReader(fs))
+            using (BinaryReader bs = new BinaryReader(fs))
             {
                 for (int i = 0; i < NodeCount; i++)
                 {
@@ -881,9 +881,9 @@ public class CCSClump : CCSBaseObject
 
     public void SavePose(string fileName)
     {
-        using (var fs = new FileStream(fileName, FileMode.OpenOrCreate))
+        using (FileStream fs = new FileStream(fileName, FileMode.OpenOrCreate))
         {
-            using (var bs = new BinaryWriter(fs))
+            using (BinaryWriter bs = new BinaryWriter(fs))
             {
                 for (int i = 0; i < NodeCount; i++)
                 {

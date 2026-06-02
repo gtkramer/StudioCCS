@@ -43,7 +43,7 @@ public class CCSTreeNodeCollection : ObservableCollection<CCSTreeNode>
 {
     public CCSTreeNode Add(string text)
     {
-        var node = new CCSTreeNode(text);
+        CCSTreeNode node = new CCSTreeNode(text);
         Add(node);
         return node;
     }
