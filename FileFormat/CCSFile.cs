@@ -784,7 +784,7 @@ public class CCSFile
         //Output OBJ
 
         string outputFileName = Path.Combine(fullPath, Header.CCSFName);
-        Log.Info(string.Format("Dumping {0} to {0}.obj...\n", Header.CCSFName, outputFileName));
+        Log.Info(string.Format("Dumping {0} to {1}.obj...\n", Header.CCSFName, outputFileName));
         using (System.IO.StreamWriter fStream = new StreamWriter(outputFileName + ".obj", false))
         {
             fStream.WriteLine(string.Format("mtllib {0}.mtl", Header.CCSFName));
