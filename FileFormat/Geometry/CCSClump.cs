@@ -185,10 +185,10 @@ public class CCSClump : CCSBaseObject
             UniformSelectionID = GL.GetUniformLocation(ProgramID, "selectedID");
             UniformMatrixList = GL.GetUniformLocation(ProgramID, "uMatrixList");
 
-            if (UniformMatrix == -1 || UniformSelectionID == -1 || UniformMatrix == -1)
+            if (UniformMatrix == -1 || UniformSelectionID == -1 || UniformMatrixList == -1)
             {
                 Log.Error("Error getting CCSClump Shader Uniforms:\n");
-                Log.Error(string.Format("\tMatrix: {0}, SelectionID: {1}, UniformMatrix: {2}", UniformMatrix, UniformSelectionID, UniformMatrixList));
+                Log.Error(string.Format("\tMatrix: {0}, SelectionID: {1}, MatrixList: {2}", UniformMatrix, UniformSelectionID, UniformMatrixList));
                 return false;
             }
         }
