@@ -257,6 +257,16 @@ public partial class MainWindow : Window
         });
     }
 
+    private void UnloadAllCCS()
+    {
+        // Free the GL resources on the render thread (context current), where the
+        // job also clears the file list and scene state in one pass. The bound
+        // trees are UI state, so clear them here on the UI thread.
+        glViewport.EnqueueGlJob(() => Scene.UnloadAllCCSFiles());
+        _vm.CCSRoots.Clear();
+        _vm.AnimationsRoot.Nodes.Clear();
+    }
+
     private void OnExitClick(object sender, RoutedEventArgs e)
     {
         Close();
@@ -354,6 +364,7 @@ public partial class MainWindow : Window
                     glViewport.EnqueueGlJob(() => Scene.UnloadCCSFile(tag.File));
                     _vm.CCSRoots.Remove(node);
                 }),
+                MakeMenuItem("Unload All", UnloadAllCCS),
                 MakeMenuItem("View Info Report", () =>
                 {
                     InfoWindow reportForm = new InfoWindow();

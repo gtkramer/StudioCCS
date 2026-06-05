@@ -238,6 +238,21 @@ public static class Scene
         return true;
     }
 
+    // Unloads every file at once. DeInit deletes GL resources, so (like
+    // UnloadCCSFile) this must run with the GL context current. Also drops the
+    // scene state that points back into the files - the active animations and the
+    // preview selection - so nothing keeps dereferencing freed objects afterwards.
+    public static void UnloadAllCCSFiles()
+    {
+        foreach (var tmpCCS in CCSFileList)
+        {
+            tmpCCS.DeInit();
+        }
+        CCSFileList.Clear();
+        ActiveAnimes.Clear();
+        SelectedPreviewItemTag = null;
+    }
+
     public static CCSTreeNode ToNode()
     {
         CCSTreeNode retNode = new CCSTreeNode();
