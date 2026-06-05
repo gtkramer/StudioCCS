@@ -178,6 +178,11 @@ public class CCSClump : CCSBaseObject
             {
                 Log.Error("Error getting CCSClump Shader Attributes:\n");
                 Log.Error(string.Format("\tEndpoints: {0}", AttribEndpoints));
+                // Acquisition failed after the program was created: tear it
+                // back down so ProgramID is never left set without a matching
+                // ref count, and so the next clump retries cleanly.
+                GL.DeleteProgram(ProgramID);
+                ProgramID = -1;
                 return false;
             }
 
@@ -189,6 +194,8 @@ public class CCSClump : CCSBaseObject
             {
                 Log.Error("Error getting CCSClump Shader Uniforms:\n");
                 Log.Error(string.Format("\tMatrix: {0}, SelectionID: {1}, MatrixList: {2}", UniformMatrix, UniformSelectionID, UniformMatrixList));
+                GL.DeleteProgram(ProgramID);
+                ProgramID = -1;
                 return false;
             }
         }
