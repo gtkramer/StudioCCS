@@ -94,11 +94,56 @@ public class MainViewModel : ViewModelBase
 
     #region Status bar
 
-    private string _cameraStatus = "";
-    public string CameraStatus
+    // Live camera readout, split per value so the status bar can place each one in
+    // its own fixed-width box - that keeps the columns from jittering as the values
+    // change, without needing a monospace font. Rotations carry the degree suffix.
+    private string _camRotX = "";
+    public string CamRotX
     {
-        get => _cameraStatus;
-        private set => SetField(ref _cameraStatus, value);
+        get => _camRotX;
+        private set => SetField(ref _camRotX, value);
+    }
+
+    private string _camRotY = "";
+    public string CamRotY
+    {
+        get => _camRotY;
+        private set => SetField(ref _camRotY, value);
+    }
+
+    private string _camRotZ = "";
+    public string CamRotZ
+    {
+        get => _camRotZ;
+        private set => SetField(ref _camRotZ, value);
+    }
+
+    private string _camTargetX = "";
+    public string CamTargetX
+    {
+        get => _camTargetX;
+        private set => SetField(ref _camTargetX, value);
+    }
+
+    private string _camTargetY = "";
+    public string CamTargetY
+    {
+        get => _camTargetY;
+        private set => SetField(ref _camTargetY, value);
+    }
+
+    private string _camTargetZ = "";
+    public string CamTargetZ
+    {
+        get => _camTargetZ;
+        private set => SetField(ref _camTargetZ, value);
+    }
+
+    private string _camDistance = "";
+    public string CamDistance
+    {
+        get => _camDistance;
+        private set => SetField(ref _camDistance, value);
     }
 
     private string _renderModeStatus = "";
@@ -112,12 +157,13 @@ public class MainViewModel : ViewModelBase
     public void RefreshCameraStatus()
     {
         ArcBallCamera cam = Scene.CurrentCamera();
-        // Fixed-width fields (monospace status bar) keep the readout from jittering as it
-        // refreshes ~10x/sec; grouped labels make each axis legible at a glance.
-        CameraStatus = string.Format(
-            "Rot {0,6:0.#}° {1,6:0.#}° {2,6:0.#}°     Target {3,5:0.#} {4,5:0.#} {5,5:0.#}     Dist {6,5:0.#}",
-            cam.Rotation.X, cam.Rotation.Y, cam.Rotation.Z,
-            cam.Target.X, cam.Target.Y, cam.Target.Z, cam.Distance);
+        CamRotX = string.Format("{0:0.#}°", cam.Rotation.X);
+        CamRotY = string.Format("{0:0.#}°", cam.Rotation.Y);
+        CamRotZ = string.Format("{0:0.#}°", cam.Rotation.Z);
+        CamTargetX = string.Format("{0:0.#}", cam.Target.X);
+        CamTargetY = string.Format("{0:0.#}", cam.Target.Y);
+        CamTargetZ = string.Format("{0:0.#}", cam.Target.Z);
+        CamDistance = string.Format("{0:0.#}", cam.Distance);
     }
 
     private void UpdateRenderModeStatus()

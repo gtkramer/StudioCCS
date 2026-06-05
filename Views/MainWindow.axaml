@@ -96,15 +96,42 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Bottom bar: live camera readout. -->
+                    <!-- Bottom bar: live camera readout. Each value sits in a
+                         fixed-width, right-aligned box so the columns stay put as the
+                         numbers change ~10x/sec, instead of relying on a monospace
+                         font. Labels and values match the top Mode bar (dark value
+                         colour, SemiBold). Base spacing is 8 so the gap after "Camera"
+                         matches the Mode bar; the Target/Dist labels add left margin to
+                         set the Rot/Target/Dist groups slightly further apart. -->
                     <Border DockPanel.Dock="Bottom" Background="{DynamicResource StatusBarBackground}"
                             BorderBrush="{DynamicResource StatusBarBorder}" BorderThickness="0,1,0,0" Padding="10,4">
+                        <Border.Styles>
+                            <Style Selector="TextBlock.camLabel">
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="Foreground" Value="{DynamicResource StatusBarValue}" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                            <Style Selector="TextBlock.camValue">
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="Foreground" Value="{DynamicResource StatusBarValue}" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="TextAlignment" Value="Right" />
+                                <Setter Property="TextWrapping" Value="NoWrap" />
+                                <Setter Property="Width" Value="40" />
+                            </Style>
+                        </Border.Styles>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="Camera" Foreground="{DynamicResource StatusBarLabel}" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding CameraStatus}"
-                                       FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,monospace"
-                                       Foreground="{DynamicResource StatusBarMono}"
-                                       VerticalAlignment="Center" />
+                            <TextBlock Classes="camLabel" Text="Rot" />
+                            <TextBlock Classes="camValue" Text="{Binding CamRotX}" />
+                            <TextBlock Classes="camValue" Text="{Binding CamRotY}" />
+                            <TextBlock Classes="camValue" Text="{Binding CamRotZ}" />
+                            <TextBlock Classes="camLabel" Text="Target" Margin="50,0,0,0" />
+                            <TextBlock Classes="camValue" Text="{Binding CamTargetX}" />
+                            <TextBlock Classes="camValue" Text="{Binding CamTargetY}" />
+                            <TextBlock Classes="camValue" Text="{Binding CamTargetZ}" />
+                            <TextBlock Classes="camLabel" Text="Dist" Margin="50,0,0,0" />
+                            <TextBlock Classes="camValue" Text="{Binding CamDistance}" />
                         </StackPanel>
                     </Border>
 
