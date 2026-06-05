@@ -24,6 +24,7 @@ use in other tools such as Blender.
   - [Dummies](#dummies)
   - [Animations](#animations)
 - [Controls](#controls)
+  - [Display Options](#display-options)
 - [Usage](#usage)
 - [Exporting Models](#exporting-models)
   - [Dumping a Character / Monster / Anything with Bendy Parts](#dumping-a-character--monster--anything-with-bendy-parts)
@@ -64,15 +65,20 @@ dotnet run
 
 ## Viewport Modes
 
-There are two viewport modes: **Preview** and **Scene**. Each viewport has its
-own independent camera, so changing the view in one mode will not affect the
-other.
+There are three viewport modes — **Preview**, **Scene**, and **All** — selectable
+from the toolbar. Each has its own independent camera, so changing the view in
+one mode will not affect the others.
 
 - **Preview mode** lists all the CCS files that have been loaded and categorizes
-  the interesting stuff. See [What's Inside a CCS File](#whats-inside-a-ccs-file)
-  for a rundown.
-- **Scene mode** just attempts to render everything in all of the loaded CCS
-  files it can, so it may or may not show you something coherent.
+  the interesting stuff, rendering whichever item you select in the tree. See
+  [What's Inside a CCS File](#whats-inside-a-ccs-file) for a rundown.
+- **Scene mode** renders the animations you've added to the scene via the **Add
+  to Scene** right-click option on an animation, so it's geared toward building
+  up a scene rather than browsing a single file.
+- **All mode** just attempts to render everything in all of the loaded CCS files
+  it can, so it may or may not show you something coherent. Collision meshes,
+  bounding boxes, dummies, and light helpers (toggled in the **View** menu) are
+  drawn here.
 
 ## What's Inside a CCS File
 
@@ -164,8 +170,8 @@ Clicking a HitMesh or SubMesh in the Preview tree currently does nothing.
 
 Contain a Min and Max value, not much else.
 
-Clicking a Bounding Box in the Preview tree currently does nothing, and they are
-not visualized in Scene mode.
+Clicking a Bounding Box in the Preview tree currently does nothing, but they can
+be drawn in All mode via **View → Draw Bounding Boxes**.
 
 ### Dummies
 
@@ -173,7 +179,8 @@ Dummies contain a position, and sometimes a rotational value. They're useful
 for, well, being dummies that hold the position and rotation of things.
 
 Clicking a Dummy in the Preview tree currently does nothing, but they are
-visualized as little green wireframe boxes in Scene mode.
+visualized as little green wireframe boxes in All mode (toggle with **View →
+Draw Dummies**).
 
 ### Animations
 
@@ -181,10 +188,13 @@ All Camera parameters, and all parameters but the type for Lights, are stored in
 animations. Animations are a pretty complex topic, and support for them is
 currently in progress.
 
-- Clicking an Animation in the Preview tree currently does nothing.
-- Right-clicking an Animation gives you the option **Set Pose**, which attempts
-  to set everything referenced in its first frame. This will look buggy until
-  animation support is implemented properly.
+- Clicking an Animation in the Preview tree renders it in the Preview viewport.
+  Playback isn't implemented yet, so you'll only ever see its first frame.
+- Right-clicking an Animation gives you two options:
+  - **Add to Scene** adds it to the scene tree so it renders in **Scene mode**.
+    Right-clicking it there offers **Remove** to take it back out.
+  - **Set Pose** attempts to set everything referenced in its first frame. This
+    will look buggy until animation support is implemented properly.
 
 > There are many other types of objects contained in CCS files, but the ones
 > listed above currently have higher priority for support.
@@ -194,30 +204,61 @@ currently in progress.
 Right-click and drag in the Preview and Scene viewports to rotate the arcball
 camera. Use the mouse wheel to zoom in and out.
 
-| Action            | Input                                            |
-| ----------------- | ------------------------------------------------ |
-| Rotate camera     | Right-click + drag                               |
-| Zoom in / out     | Mouse wheel, or `-` / `+` on the number row      |
-| Move along Z axis | `W` / `S`                                        |
-| Move along X axis | `A` / `D`                                        |
-| Move along Y axis | `X` / `Z`                                        |
+| Action               | Input                                       |
+| -------------------- | ------------------------------------------- |
+| Rotate camera        | Right-click + drag                          |
+| Zoom in / out        | Mouse wheel, or `-` / `+` on the number row |
+| Move along Z axis    | `W` / `S`                                   |
+| Move along X axis    | `A` / `D`                                   |
+| Move along Y axis    | `X` / `Z`                                   |
+| Reset camera to default view | `R`                                 |
+
+The following modifier keys can be held while moving or zooming:
+
+| Modifier | Effect                                                              |
+| -------- | ------------------------------------------------------------------ |
+| `Shift`  | Toggles between world-axis and camera-relative movement, and slows keyboard zoom for finer control |
+| `Ctrl`   | In camera-relative movement, frees vertical motion that is otherwise locked to the horizontal plane |
 
 Notes:
 
+- `R` resets the camera of the active viewport only (each viewport has its own).
+- By default, movement is camera-relative (and `Shift` flips it to world-axis).
+  Enable **Options → Default to Axis Movement** to swap that around so plain
+  movement is world-axis aligned and `Shift` gives you camera-relative instead.
 - Each viewport has an independent camera. There may be an option to disable
   this in the future if it ends up becoming annoying.
 - Keys cannot currently be remapped; support for that may be added in the future.
-- Support for moving relative to the current camera direction will probably be
-  added as well.
+
+### Display Options
+
+The **View** menu toggles what gets drawn in the viewport. These apply to the
+active viewport's render:
+
+| Toggle                            | Effect                                            |
+| --------------------------------- | ------------------------------------------------- |
+| Wireframe                         | Render models as wireframe                         |
+| Vertex Colors                     | Shade models with their baked vertex colors        |
+| Vertex Normals                    | Visualize model normals                            |
+| Textured                          | Apply textures to models                           |
+| Backface Culling                  | Cull back-facing triangles instead of drawing double-sided |
+| Draw Grid                         | Show the ground grid                               |
+| Draw Collision Meshes             | Draw collision meshes (All mode)                   |
+| Draw Bounding Boxes               | Draw bounding boxes (All mode)                     |
+| Draw Dummies                      | Draw dummies as green wireframe boxes (All mode)   |
+| Draw Light Helpers                | Draw light-position helpers (All mode)             |
+| Draw Axis Marker (Viewport)       | Show the orientation axis marker in the corner     |
+| Draw Axis Marker (World Center)   | Show an axis marker at the world origin            |
 
 ## Usage
 
-1. Use **File → Load** to load a CCS file. The Log Window will spit out any
+1. Use **File → Load CCS...** to load a CCS file. The Log Window will spit out any
    information it feels necessary, along with whether or not the file loaded
    successfully.
 2. If the file loaded successfully, it will be added to the Preview tree under
    its **internal name**, not the file name.
-3. To unload a file, right-click it in the Preview tree and select **Unload**.
+3. To unload a file, right-click it in the Preview tree and select **Unload** (or
+   **Unload All** to clear every loaded file at once).
 
 Right-clicking a CCS file in the Preview tree also offers **View Info Report**,
 which opens a window with a report of some information that may or may not be
@@ -232,8 +273,8 @@ included `.MTL` file) and dump all textures to PNG.
 
 ### Companion Blender Script
 
-A companion Python script (`blenderDummyImport.py`) is included for importing
-Dummies into Blender:
+A companion Python script (`Extras/blenderDummyImport.py`) is included for
+importing Dummies into Blender:
 
 1. Open a text editor in Blender and open the script.
 2. Hit `Alt` + `P`.
@@ -293,7 +334,13 @@ Now, the part I'm sure you're really wanting to know.
    I implemented these for debugging, but it's kind of nice if you export a model
    and later realize you messed something up and want to go back and fix it.
 
-6. **Export.** Once the model is posed how you like, click **Export to .OBJ** in
+   > A **Load Matrix...** option is also available by right-clicking the clump in
+   > the Preview tree. It's a separate debug tool that reads a flat binary dump of
+   > one 4x4 transform matrix per bone and applies it to the clump directly — a
+   > different format from the Save/Load Pose values above, so the two aren't
+   > interchangeable.
+
+6. **Export.** Once the model is posed how you like, click **Dump to .OBJ...** in
    the **Scene** menu of the main window and it'll dump the model out in that
    pose to `.OBJ` format. It *should* export the model exactly how you see it.
 
@@ -321,7 +368,7 @@ Otherwise you'll just eyeball it. Either way, it's going to be a massive pain.
 - There's an odd bug with collision mesh rendering that was causing a
   `NullReferenceException`. This never happens when run through the debugger, so
   I haven't been able to fix it yet. As a result, only some of the collision sub
-  meshes may render in Scene mode.
+  meshes may render in All mode.
 - Collision meshes do not render in Preview mode yet — haven't gotten around to
   adding that code in.
 
@@ -349,12 +396,13 @@ seems to work fine as is for now.
 ### Dummies
 
 Dummies cannot currently be previewed, nor is there a way to tell which dummy is
-which in Scene mode. They can be exported to a simple ASCII format for importing
+which in All mode. They can be exported to a simple ASCII format for importing
 into Blender with the included companion Python script.
 
 ### Bounding Boxes
 
-Not currently visualized in Preview or Scene mode.
+Drawn in All mode (toggle with **View → Draw Bounding Boxes**), but not in
+Preview or Scene mode, and they can't be selected or labeled.
 
 ### Animations
 
