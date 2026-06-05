@@ -9,45 +9,52 @@
         Title="StudioCCS">
 
     <DockPanel>
-        <!-- Menu -->
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="Load CCS..." Click="OnLoadClick" />
-                <Separator />
-                <MenuItem Header="Exit" Click="OnExitClick" />
-            </MenuItem>
-            <MenuItem Header="_Scene">
-                <MenuItem Header="Dump to .OBJ..." Click="OnDumpObjClick" />
-                <MenuItem Header="Dump to .SMD..." Name="miDumpSmd" IsVisible="False" Click="OnDumpSmdClick" />
-                <MenuItem Header="Dump Preview to .SMD..." Name="miDumpPreviewSmd" IsVisible="False" Click="OnDumpPreviewSmdClick" />
-            </MenuItem>
-            <MenuItem Header="_Options">
-                <MenuItem Header="Default to Axis Movement" ToggleType="CheckBox" IsChecked="{Binding DefaultToAxisMovement, Mode=TwoWay}" />
-            </MenuItem>
-            <MenuItem Header="_View">
-                <MenuItem Header="Wireframe" ToggleType="CheckBox" IsChecked="{Binding Wireframe, Mode=TwoWay}" />
-                <MenuItem Header="Vertex Colors" ToggleType="CheckBox" IsChecked="{Binding VertexColors, Mode=TwoWay}" />
-                <MenuItem Header="Vertex Normals" ToggleType="CheckBox" IsChecked="{Binding VertexNormals, Mode=TwoWay}" />
-                <MenuItem Header="Textured" ToggleType="CheckBox" IsChecked="{Binding Textured, Mode=TwoWay}" />
-                <Separator />
-                <MenuItem Header="Backface Culling" ToggleType="CheckBox" IsChecked="{Binding BackfaceCull, Mode=TwoWay}" />
-                <Separator />
-                <MenuItem Header="Draw Grid" ToggleType="CheckBox" IsChecked="{Binding DrawGrid, Mode=TwoWay}" />
-                <MenuItem Header="Draw Collision Meshes" ToggleType="CheckBox" IsChecked="{Binding DrawCollisionMeshes, Mode=TwoWay}" />
-                <MenuItem Header="Draw Bounding Boxes" ToggleType="CheckBox" IsChecked="{Binding DrawBoundingBoxes, Mode=TwoWay}" />
-                <MenuItem Header="Draw Dummies" ToggleType="CheckBox" IsChecked="{Binding DrawDummies, Mode=TwoWay}" />
-                <MenuItem Header="Draw Light Helpers" ToggleType="CheckBox" IsChecked="{Binding DrawLightHelpers, Mode=TwoWay}" />
-                <MenuItem Header="Draw Axis Marker (Viewport)" ToggleType="CheckBox" IsChecked="{Binding DrawAxisViewport, Mode=TwoWay}" />
-                <MenuItem Header="Draw Axis Marker (World Center)" ToggleType="CheckBox" IsChecked="{Binding DrawWorldCenter, Mode=TwoWay}" />
-            </MenuItem>
-        </Menu>
+        <!-- Top bar: the menu and the view-mode toggle share one row to reclaim the
+             empty space that used to sit beside the menu. The radio group is docked
+             Right so it hugs the window edge; the Menu is the fill child and takes
+             the rest of the row. The radio group's left margin keeps a minimum gap
+             from the menu items even as the window narrows. -->
+        <DockPanel DockPanel.Dock="Top">
+            <!-- Mode toolbar: grouped radio buttons are mutually exclusive by design. -->
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                        Spacing="8" Margin="24,0,8,0" VerticalAlignment="Center">
+                <RadioButton GroupName="ViewMode" Content="Preview" IsChecked="{Binding IsPreviewMode, Mode=TwoWay}" />
+                <RadioButton GroupName="ViewMode" Content="Scene" IsChecked="{Binding IsSceneMode, Mode=TwoWay}" />
+                <RadioButton GroupName="ViewMode" Content="All" IsChecked="{Binding IsAllMode, Mode=TwoWay}" />
+            </StackPanel>
 
-        <!-- Mode toolbar: grouped radio buttons are mutually exclusive by design. -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4" Spacing="8">
-            <RadioButton GroupName="ViewMode" Content="Preview" IsChecked="{Binding IsPreviewMode, Mode=TwoWay}" />
-            <RadioButton GroupName="ViewMode" Content="Scene" IsChecked="{Binding IsSceneMode, Mode=TwoWay}" />
-            <RadioButton GroupName="ViewMode" Content="All" IsChecked="{Binding IsAllMode, Mode=TwoWay}" />
-        </StackPanel>
+            <Menu>
+                <MenuItem Header="_File">
+                    <MenuItem Header="Load CCS..." Click="OnLoadClick" />
+                    <Separator />
+                    <MenuItem Header="Exit" Click="OnExitClick" />
+                </MenuItem>
+                <MenuItem Header="_Scene">
+                    <MenuItem Header="Dump to .OBJ..." Click="OnDumpObjClick" />
+                    <MenuItem Header="Dump to .SMD..." Name="miDumpSmd" IsVisible="False" Click="OnDumpSmdClick" />
+                    <MenuItem Header="Dump Preview to .SMD..." Name="miDumpPreviewSmd" IsVisible="False" Click="OnDumpPreviewSmdClick" />
+                </MenuItem>
+                <MenuItem Header="_Options">
+                    <MenuItem Header="Default to Axis Movement" ToggleType="CheckBox" IsChecked="{Binding DefaultToAxisMovement, Mode=TwoWay}" />
+                </MenuItem>
+                <MenuItem Header="_View">
+                    <MenuItem Header="Wireframe" ToggleType="CheckBox" IsChecked="{Binding Wireframe, Mode=TwoWay}" />
+                    <MenuItem Header="Vertex Colors" ToggleType="CheckBox" IsChecked="{Binding VertexColors, Mode=TwoWay}" />
+                    <MenuItem Header="Vertex Normals" ToggleType="CheckBox" IsChecked="{Binding VertexNormals, Mode=TwoWay}" />
+                    <MenuItem Header="Textured" ToggleType="CheckBox" IsChecked="{Binding Textured, Mode=TwoWay}" />
+                    <Separator />
+                    <MenuItem Header="Backface Culling" ToggleType="CheckBox" IsChecked="{Binding BackfaceCull, Mode=TwoWay}" />
+                    <Separator />
+                    <MenuItem Header="Draw Grid" ToggleType="CheckBox" IsChecked="{Binding DrawGrid, Mode=TwoWay}" />
+                    <MenuItem Header="Draw Collision Meshes" ToggleType="CheckBox" IsChecked="{Binding DrawCollisionMeshes, Mode=TwoWay}" />
+                    <MenuItem Header="Draw Bounding Boxes" ToggleType="CheckBox" IsChecked="{Binding DrawBoundingBoxes, Mode=TwoWay}" />
+                    <MenuItem Header="Draw Dummies" ToggleType="CheckBox" IsChecked="{Binding DrawDummies, Mode=TwoWay}" />
+                    <MenuItem Header="Draw Light Helpers" ToggleType="CheckBox" IsChecked="{Binding DrawLightHelpers, Mode=TwoWay}" />
+                    <MenuItem Header="Draw Axis Marker (Viewport)" ToggleType="CheckBox" IsChecked="{Binding DrawAxisViewport, Mode=TwoWay}" />
+                    <MenuItem Header="Draw Axis Marker (World Center)" ToggleType="CheckBox" IsChecked="{Binding DrawWorldCenter, Mode=TwoWay}" />
+                </MenuItem>
+            </Menu>
+        </DockPanel>
 
         <!-- Main area: tree | viewport, with a resizable log below -->
         <Grid RowDefinitions="*,Auto,160">
