@@ -60,10 +60,28 @@ public class CCSClump : CCSBaseObject
 
     public override bool DeInit()
     {
+        // Mirror Init's node loop: both object and effect nodes are Init'd
+        // there, so both must be DeInit'd here. GetObject<CCSObject> returns
+        // null for effect nodes, so they need their own typed lookup.
         for (int i = 0; i < NodeCount; i++)
         {
-            CCSObject tmpObj = GetObject(i);
-            tmpObj.DeInit();
+            int nodeType = ParentFile.GetSubObjectType(NodeIDs[i]);
+            if (nodeType == CCSFile.SECTION_OBJECT)
+            {
+                var childObject = ParentFile.GetObject<CCSObject>(NodeIDs[i]);
+                if (childObject != null)
+                {
+                    childObject.DeInit();
+                }
+            }
+            else if (nodeType == CCSFile.SECTION_EFFECT)
+            {
+                var childEffect = ParentFile.GetObject<CCSEffect>(NodeIDs[i]);
+                if (childEffect != null)
+                {
+                    childEffect.DeInit();
+                }
+            }
         }
 
         GL.DeleteBuffer(MatrixBuffer);
