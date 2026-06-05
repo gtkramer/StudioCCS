@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 using SkiaSharp;
 using StudioCCS.Logging;
@@ -339,14 +340,14 @@ public class CCSTexture : CCSBaseObject
         return true;
     }
 
-    private static SKColor ToSK(Color c)
-    {
-        return new SKColor(c.R, c.G, c.B, c.A);
-    }
-
     public SKBitmap ToBitmap(int _clutID)
     {
-        SKBitmap OutBitmap = new SKBitmap(Width, Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+        // Fill a flat RGBA8888 buffer and hand it to the bitmap in one copy.
+        // SKBitmap.SetPixel has heavy per-call overhead (bounds checks + colour
+        // conversion); calling it once per texel made loading texture-heavy files
+        // take tens of seconds (the upload runs on the render thread, so it also
+        // froze the UI). A tight byte-buffer loop is orders of magnitude cheaper.
+        byte[] pixels = new byte[Width * Height * 4];
         if (TextureType == CCS_TEXTURE_I4 || TextureType == CCS_TEXTURE_I8)
         {
             CCSClut tmpClut = ParentFile.GetObject<CCSClut>(_clutID);
@@ -356,6 +357,7 @@ public class CCSTexture : CCSBaseObject
             }
 
             HasAlpha = tmpClut.HasAlpha;
+            Color[] palette = tmpClut.Palette;
 
             if (TextureType == CCS_TEXTURE_I4)
             {
@@ -365,37 +367,39 @@ public class CCSTexture : CCSBaseObject
                     {
                         int indiceOffset = (y * (Width / 2)) + x;
                         byte indices = TextureIndices[indiceOffset];
-                        OutBitmap.SetPixel(x * 2, y, ToSK(tmpClut.Palette[indices & 0xf]));
-                        OutBitmap.SetPixel((x * 2) + 1, y, ToSK(tmpClut.Palette[(indices >> 4) & 0xf]));
+                        int p = ((y * Width) + (x * 2)) * 4;
+                        WriteRgba(pixels, p, palette[indices & 0xf]);
+                        WriteRgba(pixels, p + 4, palette[(indices >> 4) & 0xf]);
                     }
                 }
             }
-            else if (TextureType == CCS_TEXTURE_I8)
+            else // CCS_TEXTURE_I8
             {
-                for (int y = 0; y < Height; y++)
+                int count = Width * Height;
+                for (int i = 0; i < count; i++)
                 {
-                    for (int x = 0; x < Width; x++)
-                    {
-                        int indiceOffset = (y * Width) + x;
-                        OutBitmap.SetPixel(x, y, ToSK(tmpClut.Palette[TextureIndices[indiceOffset]]));
-                    }
+                    WriteRgba(pixels, i * 4, palette[TextureIndices[i]]);
                 }
             }
         }
         else if (TextureType == CCS_TEXTURE_RGBA32)
         {
-            //TODO: CCSTexture::ToBitmap(): RGBA32 Textures: There's got to be a better way to do this...
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    int i = ((y * Width) + x) * 4;
-                    OutBitmap.SetPixel(x, y, new SKColor(TextureIndices[i], TextureIndices[i + 1], TextureIndices[i + 2], TextureIndices[i + 3]));
-                }
-            }
+            // Already stored as RGBA bytes; copy straight across.
+            System.Buffer.BlockCopy(TextureIndices, 0, pixels, 0, pixels.Length);
         }
 
+        SKBitmap OutBitmap = new SKBitmap(Width, Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+        Marshal.Copy(pixels, 0, OutBitmap.GetPixels(), pixels.Length);
         return OutBitmap;
+    }
+
+    // Writes one colour as R,G,B,A at the given byte offset (Rgba8888 order).
+    private static void WriteRgba(byte[] buffer, int offset, Color c)
+    {
+        buffer[offset] = c.R;
+        buffer[offset + 1] = c.G;
+        buffer[offset + 2] = c.B;
+        buffer[offset + 3] = c.A;
     }
 
     public string GetTextureTypeStr()
