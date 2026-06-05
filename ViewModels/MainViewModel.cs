@@ -157,13 +157,25 @@ public class MainViewModel : ViewModelBase
     public void RefreshCameraStatus()
     {
         ArcBallCamera cam = Scene.CurrentCamera();
-        CamRotX = string.Format("{0:0.#}°", cam.Rotation.X);
-        CamRotY = string.Format("{0:0.#}°", cam.Rotation.Y);
-        CamRotZ = string.Format("{0:0.#}°", cam.Rotation.Z);
-        CamTargetX = string.Format("{0:0.#}", cam.Target.X);
-        CamTargetY = string.Format("{0:0.#}", cam.Target.Y);
-        CamTargetZ = string.Format("{0:0.#}", cam.Target.Z);
-        CamDistance = string.Format("{0:0.#}", cam.Distance);
+        CamRotX = FormatCameraValue(cam.Rotation.X) + "°";
+        CamRotY = FormatCameraValue(cam.Rotation.Y) + "°";
+        CamRotZ = FormatCameraValue(cam.Rotation.Z) + "°";
+        CamTargetX = FormatCameraValue(cam.Target.X);
+        CamTargetY = FormatCameraValue(cam.Target.Y);
+        CamTargetZ = FormatCameraValue(cam.Target.Z);
+        CamDistance = FormatCameraValue(cam.Distance);
+    }
+
+    // Shared formatting for every numeric value in the camera status bar so they
+    // behave identically. Each keeps one decimal until its magnitude reaches 1000,
+    // then drops it: the decimal earns its place at the values you actually work
+    // at, but once a value goes four digits the ".x" would overflow the fixed-width
+    // status boxes - and that last digit is meaningless that far out anyway.
+    // Rotation never crosses 1000 (it's bounded to +/-359.9), but it runs through
+    // the same helper so all the boxes share one rule.
+    private static string FormatCameraValue(float value)
+    {
+        return string.Format(Math.Abs(value) >= 1000.0f ? "{0:0}" : "{0:0.#}", value);
     }
 
     private void UpdateRenderModeStatus()
