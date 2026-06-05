@@ -108,20 +108,17 @@ public class CCSHitMesh : CCSBaseObject
 
         Matrix4 FinalMtx = Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f) * _matrix;
         GL.UseProgram(ProgramID);
-        Console.WriteLine("Wtf 1");
         for (int i = 0; i < HitGroupCount; i++)
         {
             try
             {
                 //Log.Info(string.Format("Has {0} of {1} hit groups...\n", i, HitGroupCount));
                 var tmpGroup = HitGroups[i];
-                Console.WriteLine("Wtf 1");
                 if (tmpGroup == null)
                 {
                     return;
                 }
 
-                Console.WriteLine("Wtf 1");
                 GL.BindVertexArray(tmpGroup.VertexArrayID);
                 GL.UniformMatrix4(UniformMatrix, false, ref FinalMtx);
                 /* We don't want to render lines twice if we're in line mode already, so check first
