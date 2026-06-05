@@ -56,6 +56,23 @@
             </Menu>
         </DockPanel>
 
+        <!-- Load progress bar: docked at the very bottom of the window and only
+             shown while a file-load batch is in flight. It advances one step as
+             each file finishes fully loading (GL upload done), so it tracks real
+             completion rather than parse start. Stretches the full window width;
+             styled to match the status bars. -->
+        <Border DockPanel.Dock="Bottom"
+                IsVisible="{Binding IsLoading}"
+                Background="{DynamicResource StatusBarBackground}"
+                BorderBrush="{DynamicResource StatusBarBorder}"
+                BorderThickness="0,1,0,0" Padding="10,4">
+            <ProgressBar Minimum="0"
+                         Maximum="{Binding TotalCount}"
+                         Value="{Binding LoadedCount}"
+                         Height="14"
+                         HorizontalAlignment="Stretch" />
+        </Border>
+
         <!-- Main area: tree | viewport, with a resizable log below -->
         <Grid RowDefinitions="*,Auto,160">
             <Grid Grid.Row="0" Name="splitGrid" ColumnDefinitions="240,Auto,*">

@@ -218,6 +218,12 @@ public partial class MainWindow : Window
             return;
         }
 
+        // Show the progress bar for this batch. ReportLoaded fires exactly once per
+        // file as it reaches its terminal point - GL upload finished, or a parse
+        // failure / null skip - so the bar advances only as files finish fully
+        // loading and always reaches completion regardless of outcome.
+        _vm.BeginLoading(paths.Count);
+
         // Parse off the UI thread so a large batch doesn't freeze the UI or stall
         // the render loop. Parsing is pure per-file CPU work with no shared state
         // (each CCSFile reads into its own buffers), so fan it across cores rather
@@ -238,10 +244,12 @@ public partial class MainWindow : Window
                 catch (Exception ex)
                 {
                     Log.Error(string.Format("Failed to load {0}: {1}\n", fileName, ex.Message));
+                    ReportFileLoaded();
                     return;
                 }
                 if (file == null)
                 {
+                    ReportFileLoaded();
                     return;
                 }
 
@@ -252,9 +260,20 @@ public partial class MainWindow : Window
                     {
                         Dispatcher.UIThread.Post(() => _vm.CCSRoots.Add(node));
                     }
+                    // Counts only here, after the GL upload completes, so a file is
+                    // reported "loaded" only when it's genuinely ready in the scene.
+                    ReportFileLoaded();
                 });
             });
         });
+    }
+
+    // Marshals a single file-completion report onto the UI thread, where the
+    // view-model's progress counts live. Called from the parse threads and the GL
+    // render callback.
+    private void ReportFileLoaded()
+    {
+        Dispatcher.UIThread.Post(_vm.ReportFileLoaded);
     }
 
     private void UnloadAllCCS()

@@ -202,6 +202,74 @@ public class MainViewModel : ViewModelBase
 
     #endregion
 
+    #region Loading progress
+
+    // Backs the progress bar that only appears while a file-load batch is in
+    // flight. Counts are cumulative across overlapping batches: a second Load (or
+    // a drag-drop) started while the first is still running just extends the same
+    // bar rather than resetting it. When every file in flight has finished the bar
+    // hides and the counts reset to zero. All mutation happens on the UI thread
+    // (callers marshal there), so no locking is needed.
+    private bool _isLoading;
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set => SetField(ref _isLoading, value);
+    }
+
+    private int _loadedCount;
+    public int LoadedCount
+    {
+        get => _loadedCount;
+        private set => SetField(ref _loadedCount, value);
+    }
+
+    private int _totalCount;
+    public int TotalCount
+    {
+        get => _totalCount;
+        private set => SetField(ref _totalCount, value);
+    }
+
+    private string _loadProgressText = "";
+    public string LoadProgressText
+    {
+        get => _loadProgressText;
+        private set => SetField(ref _loadProgressText, value);
+    }
+
+    /// <summary>Registers a batch of <paramref name="count"/> files about to load, showing the bar.</summary>
+    public void BeginLoading(int count)
+    {
+        TotalCount += count;
+        IsLoading = TotalCount > 0;
+        UpdateLoadProgressText();
+    }
+
+    /// <summary>
+    /// Marks one file as fully loaded. Called exactly once per file at its terminal
+    /// point (GL upload done, or parse failed/skipped). Hides the bar and resets
+    /// the counts once the whole in-flight batch is accounted for.
+    /// </summary>
+    public void ReportFileLoaded()
+    {
+        LoadedCount++;
+        UpdateLoadProgressText();
+        if (LoadedCount >= TotalCount)
+        {
+            IsLoading = false;
+            LoadedCount = 0;
+            TotalCount = 0;
+        }
+    }
+
+    private void UpdateLoadProgressText()
+    {
+        LoadProgressText = string.Format("Loading {0} of {1}", LoadedCount, TotalCount);
+    }
+
+    #endregion
+
     #region Render options (write through to Scene)
 
     private bool _wireframe;
