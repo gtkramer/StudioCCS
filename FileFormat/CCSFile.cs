@@ -155,9 +155,22 @@ public class CCSFile
 
     public bool DeInit()
     {
+        // This must mirror Init: every section that allocates GL resources in
+        // Init has to release them here, or unloading a file leaks whatever it
+        // allocated. If you add a GL-backed section to Init, add its DeInit here.
         foreach (var tmpHit in HitList)
         {
             tmpHit.DeInit();
+        }
+
+        foreach (var tmpClump in ClumpList)
+        {
+            tmpClump.DeInit();
+        }
+
+        foreach (var tmpTexture in TextureList)
+        {
+            tmpTexture.DeInit();
         }
 
         foreach (var tmpBBox in BBoxList)
