@@ -144,9 +144,9 @@ public class CCSTexture : CCSBaseObject
         {
             for (int i = 0; i < (textureDataSize / 4); i++)
             {
-                byte b = bStream.ReadByte();
-                byte g = bStream.ReadByte();
                 byte r = bStream.ReadByte();
+                byte g = bStream.ReadByte();
+                byte b = bStream.ReadByte();
                 byte a = bStream.ReadByte();
                 if (a >= 0x7f)
                 {
@@ -158,9 +158,9 @@ public class CCSTexture : CCSBaseObject
                 }
 
                 int tDelta = i * 4;
-                TextureIndices[tDelta] = b;
+                TextureIndices[tDelta] = r;
                 TextureIndices[tDelta + 1] = g;
-                TextureIndices[tDelta + 2] = r;
+                TextureIndices[tDelta + 2] = b;
                 TextureIndices[tDelta + 3] = a;
             }
         }
@@ -390,7 +390,7 @@ public class CCSTexture : CCSBaseObject
                 for (int x = 0; x < Width; x++)
                 {
                     int i = ((y * Width) + x) * 4;
-                    OutBitmap.SetPixel(x, y, new SKColor(TextureIndices[i + 2], TextureIndices[i + 1], TextureIndices[i], TextureIndices[i + 3]));
+                    OutBitmap.SetPixel(x, y, new SKColor(TextureIndices[i], TextureIndices[i + 1], TextureIndices[i + 2], TextureIndices[i + 3]));
                 }
             }
         }

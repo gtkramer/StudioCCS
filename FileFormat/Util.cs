@@ -157,9 +157,9 @@ public static class Util
 
     public static Color ReadColorRGBA32(BinaryReader bStream)
     {
-        byte b = bStream.ReadByte();
-        byte g = bStream.ReadByte();
         byte r = bStream.ReadByte();
+        byte g = bStream.ReadByte();
+        byte b = bStream.ReadByte();
         byte a = bStream.ReadByte();
         if (a >= 0x7f)
         {
