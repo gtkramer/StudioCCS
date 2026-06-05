@@ -173,13 +173,17 @@ public partial class MainWindow : Window
             return;
         }
 
-        // Parse on a background thread so a large file doesn't freeze the UI or
-        // stall the render loop. The GL upload (InitCCSFile) MUST run with the
-        // context current, so it's enqueued onto the render callback; the
-        // resulting node is then added to the bound collection on the UI thread.
+        // Parse off the UI thread so a large batch doesn't freeze the UI or stall
+        // the render loop. Parsing is pure per-file CPU work with no shared state
+        // (each CCSFile reads into its own buffers), so fan it across cores rather
+        // than grinding through one file at a time on a single thread. The GL
+        // upload (InitCCSFile) MUST run with the context current and against the
+        // shared scene state, so it stays serialized on the render callback;
+        // _glJobs is a concurrent queue, so many parse threads can enqueue safely.
+        // Tree roots therefore appear in parse-completion order, not input order.
         Task.Run(() =>
         {
-            foreach (string fileName in paths)
+            Parallel.ForEach(paths, fileName =>
             {
                 CCSFile file;
                 try
@@ -189,11 +193,11 @@ public partial class MainWindow : Window
                 catch (Exception ex)
                 {
                     Log.Error(string.Format("Failed to load {0}: {1}\n", fileName, ex.Message));
-                    continue;
+                    return;
                 }
                 if (file == null)
                 {
-                    continue;
+                    return;
                 }
 
                 glViewport.EnqueueGlJob(() =>
@@ -204,7 +208,7 @@ public partial class MainWindow : Window
                         Dispatcher.UIThread.Post(() => _vm.CCSRoots.Add(node));
                     }
                 });
-            }
+            });
         });
     }
 
