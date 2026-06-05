@@ -55,6 +55,15 @@ public class GlViewport : OpenGlControlBase
     // control on a dedicated render thread.
     private readonly ConcurrentQueue<Action> _glJobs = new ConcurrentQueue<Action>();
 
+    // Upper bound on time spent running queued GL jobs per render frame. Draining
+    // the whole queue in one frame blocks the UI thread (this control renders on
+    // it) for the full duration of the uploads, which on a large load batch stalls
+    // it for seconds. Capping the per-frame spend spreads the batch across frames
+    // - the continuous redraw loop picks up the remainder next frame - so the UI
+    // and the load progress bar stay responsive and animate smoothly. ~8ms leaves
+    // the rest of a 60fps (16.7ms) frame for Scene.Render.
+    private const double GlJobBudgetMs = 8.0;
+
     /// <summary>
     /// Queues an action to run inside the next render callback with the GL
     /// context current. Safe to call from any thread (e.g. a background parse
@@ -169,13 +178,23 @@ public class GlViewport : OpenGlControlBase
             _sceneInit = true;
         }
 
-        // Run queued GL work (file load/unload) now that the context is current.
-        // The whole queue is drained in this one frame, so however long this takes
-        // is exactly how long the render thread (and thus the UI) is blocked.
+        // Run queued GL work (file load/unload) now that the context is current,
+        // but only up to GlJobBudgetMs this frame so a big load batch can't block
+        // the UI thread for seconds at a stretch. Whatever doesn't fit is left on
+        // the queue and drained on later frames (RequestNextFrameRendering below
+        // keeps the loop alive). The time check is after each job, so at least one
+        // always runs per frame - forward progress is guaranteed even if a single
+        // upload overruns the budget on its own.
+        long drainStart = Stopwatch.GetTimestamp();
+        double budgetTicks = GlJobBudgetMs * Stopwatch.Frequency / 1000.0;
         while (_glJobs.TryDequeue(out var job))
         {
             try { job(); }
             catch (Exception ex) { Log.Error(string.Format("GL job failed: {0}\n", ex)); }
+            if (Stopwatch.GetTimestamp() - drainStart >= budgetTicks)
+            {
+                break;
+            }
         }
 
         Scene.Render();
