@@ -124,12 +124,18 @@
                  A virtualizing ListBox keeps it responsive under heavy logging.
                  The dark background is fixed (not theme-dependent) so the severity
                  colours stay legible regardless of the OS light/dark setting. -->
+            <!-- AutoScrollToSelectedItem is off: with thousands of lines its
+                 forced ScrollIntoView during a layout reflow (e.g. switching to
+                 the All view) trips an "Invalid Arrange rectangle" crash inside
+                 Avalonia's VirtualizingStackPanel. We scroll to the newest line
+                 ourselves in FlushLogs (guarded), so this behaviour isn't needed. -->
             <ListBox Grid.Row="2"
                      Name="logView"
                      Background="#1E1E1E"
                      FontFamily="monospace"
                      FontSize="11"
                      SelectionMode="Multiple"
+                     AutoScrollToSelectedItem="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.Styles>

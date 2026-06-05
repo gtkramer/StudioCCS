@@ -167,7 +167,18 @@ public partial class MainWindow : Window
             _logLines.RemoveAt(0);
         }
 
-        logView.ScrollIntoView(last);
+        // ScrollIntoView forces a synchronous layout pass, which can throw
+        // "Invalid Arrange rectangle" from the virtualizing panel when the list
+        // is churning hard (a heavy parse flushing back-to-back batches). The
+        // auto-scroll is cosmetic, so never let a transient layout state abort
+        // the app over it; skipping one scroll is harmless.
+        try
+        {
+            logView.ScrollIntoView(last);
+        }
+        catch (InvalidOperationException)
+        {
+        }
     }
 
     // The tag colour comes from the logging provider as System.Drawing.Color;
