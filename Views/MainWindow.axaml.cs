@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -30,6 +31,15 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<LogLine> _logLines = new();
     private readonly Dictionary<uint, IBrush> _brushCache = new();
     private const int MaxLogLines = 2000;
+
+    // Incoming lines are buffered here and flushed to _logLines in batches.
+    // Logging can burst thousands of lines during a parse; touching the ListBox
+    // once per line (a dispatcher post, a CollectionChanged, and a layout-forcing
+    // ScrollIntoView each) floods the UI thread and is what kills performance.
+    // Batching collapses each burst into a single UI update. The queue is the
+    // hand-off point between the producing threads and the UI thread.
+    private readonly ConcurrentQueue<(string Tag, string Message, System.Drawing.Color Color)> _pendingLogs = new();
+    private int _logFlushQueued;
 
     public MainWindow() : this(null)
     {
@@ -117,23 +127,47 @@ public partial class MainWindow : Window
 
     private void AppendLog(string tag, string message, System.Drawing.Color color)
     {
-        // Logging can originate on the background parse thread; marshal to the UI
-        // thread first so the list mutation happens on the UI thread. (stdout is
-        // handled separately by the framework's console provider.)
-        if (!Dispatcher.UIThread.CheckAccess())
+        // Called from any thread (often the background parse thread). Buffer the
+        // line and ensure exactly one flush is queued onto the UI thread, where
+        // it drains everything accumulated so far in a single pass. Posting at
+        // Background priority lets a burst coalesce instead of posting per line.
+        // (stdout is handled separately by the framework's console provider.)
+        _pendingLogs.Enqueue((tag, message, color));
+        if (Interlocked.Exchange(ref _logFlushQueued, 1) == 0)
         {
-            Dispatcher.UIThread.Post(() => AppendLog(tag, message, color));
+            Dispatcher.UIThread.Post(FlushLogs, DispatcherPriority.Background);
+        }
+    }
+
+    // Drains every buffered line into the panel in one batch: a single
+    // CollectionChanged storm the ListBox can absorb, one trim, and one scroll.
+    private void FlushLogs()
+    {
+        // Reset the flag *before* draining: any line enqueued from here on queues
+        // a fresh flush, while lines already enqueued are guaranteed to be drained
+        // by the loop below. This is what makes the lock-free hand-off lossless.
+        Interlocked.Exchange(ref _logFlushQueued, 0);
+
+        LogLine last = null;
+        while (_pendingLogs.TryDequeue(out var pending))
+        {
+            last = new LogLine(pending.Tag, pending.Message, BrushFor(pending.Color));
+            _logLines.Add(last);
+        }
+
+        if (last is null)
+        {
             return;
         }
 
-        LogLine line = new LogLine(tag, message, BrushFor(color));
-        _logLines.Add(line);
-        if (_logLines.Count > MaxLogLines)
+        // Cap the panel so a heavy parse can't grow it without bound; drop the
+        // oldest lines first.
+        for (int over = _logLines.Count - MaxLogLines; over > 0; over--)
         {
             _logLines.RemoveAt(0);
         }
 
-        logView.ScrollIntoView(line);
+        logView.ScrollIntoView(last);
     }
 
     // The tag colour comes from the logging provider as System.Drawing.Color;
