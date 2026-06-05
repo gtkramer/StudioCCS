@@ -60,30 +60,36 @@ public class CCSClump : CCSBaseObject
 
     public override bool DeInit()
     {
-        // Mirror Init's node loop: both object and effect nodes are Init'd
-        // there, so both must be DeInit'd here. GetObject<CCSObject> returns
-        // null for effect nodes, so they need their own typed lookup.
         for (int i = 0; i < NodeCount; i++)
         {
-            int nodeType = ParentFile.GetSubObjectType(NodeIDs[i]);
-            if (nodeType == CCSFile.SECTION_OBJECT)
-            {
-                var childObject = ParentFile.GetObject<CCSObject>(NodeIDs[i]);
-                if (childObject != null)
-                {
-                    childObject.DeInit();
-                }
-            }
-            else if (nodeType == CCSFile.SECTION_EFFECT)
-            {
-                var childEffect = ParentFile.GetObject<CCSEffect>(NodeIDs[i]);
-                if (childEffect != null)
-                {
-                    childEffect.DeInit();
-                }
-            }
+            DeInitNode(i);
         }
 
+        ReleaseClumpResources();
+        return true;
+    }
+
+    // DeInit the object or effect node at index i. Mirrors Init's node loop:
+    // both kinds are Init'd there, and GetObject<CCSObject> returns null for
+    // effect nodes, so each needs its own typed lookup.
+    private void DeInitNode(int i)
+    {
+        int nodeType = ParentFile.GetSubObjectType(NodeIDs[i]);
+        if (nodeType == CCSFile.SECTION_OBJECT)
+        {
+            ParentFile.GetObject<CCSObject>(NodeIDs[i])?.DeInit();
+        }
+        else if (nodeType == CCSFile.SECTION_EFFECT)
+        {
+            ParentFile.GetObject<CCSEffect>(NodeIDs[i])?.DeInit();
+        }
+    }
+
+    // Free the GL resources this clump allocated in Init and release its hold
+    // on the shared shader program. Safe to call on partially-initialized
+    // state: unallocated handles are -1, which GL.Delete* treats as a no-op.
+    private void ReleaseClumpResources()
+    {
         GL.DeleteBuffer(MatrixBuffer);
         MatrixBuffer = -1;
         GL.DeleteTexture(MatrixTexture);
@@ -104,8 +110,6 @@ public class CCSClump : CCSBaseObject
 
             ProgramID = -1;
         }
-
-        return true;
     }
 
     public override bool Init()
@@ -266,6 +270,16 @@ public class CCSClump : CCSBaseObject
                 else
                 {
                     Log.Error(string.Format("Clump {0:X}: {1} Init: could not get child Effect {2:X} {3}", ObjectID, ParentFile.GetSubObjectName(ObjectID), NodeIDs[i], ParentFile.GetSubObjectName(NodeIDs[i])));
+                    // We're failing after already allocating this clump's GL
+                    // resources, bumping ProgramRefs, and Init'ing nodes [0, i).
+                    // Roll all of that back so a failed Init leaks nothing.
+                    // Nodes >= i were never Init'd, so leave them alone -
+                    // DeInit'ing them would corrupt their own static ref counts.
+                    for (int j = 0; j < i; j++)
+                    {
+                        DeInitNode(j);
+                    }
+                    ReleaseClumpResources();
                     return false;
                 }
             }
