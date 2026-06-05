@@ -4,14 +4,25 @@ namespace StudioCCS.Rendering;
 
 public class ArcBallCamera
 {
-    public Vector3 Position = new Vector3(0.0f, 0.0f, 0.0f);
-    public Vector3 Rotation = new Vector3(180.0f, -45.0f, .0f);
-    public Vector3 Target = new Vector3(0.0f, 0.0f, 0.0f);
-    public float Distance = 10.0f;
+    public Vector3 Position;
+    public Vector3 Rotation;
+    public Vector3 Target;
+    public float Distance;
 
     public ArcBallCamera()
     {
+        Reset();
+    }
 
+    // The default framing a camera has on a fresh load. This is the single place
+    // those values are defined; both construction and the reset action go through
+    // it, so they can never drift apart.
+    public void Reset()
+    {
+        Position = new Vector3(0.0f, 0.0f, 0.0f);
+        Rotation = new Vector3(180.0f, -45.0f, 0.0f);
+        Target = new Vector3(0.0f, 0.0f, 0.0f);
+        Distance = 10.0f;
     }
 
     private void Clamp()

@@ -18,7 +18,7 @@ public static class Scene
     public enum SceneMode { Preview, Scene, All };
     public enum KeyStatus { Up, Pressed, Repeated };
     //Portable camera-control keys, mapped from the UI's key events.
-    public enum CameraKey { None, Forward, Backward, Left, Right, Up, Down, ZoomIn, ZoomOut };
+    public enum CameraKey { None, Forward, Backward, Left, Right, Up, Down, ZoomIn, ZoomOut, Reset };
     private const int AxisViewSize = 80;
 
     //Draw Mode Flags for rendering
@@ -834,6 +834,11 @@ public static class Scene
         else if (key == CameraKey.ZoomOut)
         {
             ZoomOut = (ZoomOut == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
+        }
+        else if (key == CameraKey.Reset)
+        {
+            // One-shot action: snap the active camera back to its default framing.
+            CurrentCamera().Reset();
         }
 
         if (shift)

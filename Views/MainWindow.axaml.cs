@@ -594,6 +594,7 @@ public partial class MainWindow : Window
             case Key.D: return Scene.CameraKey.Right;
             case Key.X: return Scene.CameraKey.Up;
             case Key.Z: return Scene.CameraKey.Down;
+            case Key.R: return Scene.CameraKey.Reset;
             case Key.OemPlus:
             case Key.Add: return Scene.CameraKey.ZoomIn;
             case Key.OemMinus:
