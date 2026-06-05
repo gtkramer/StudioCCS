@@ -217,12 +217,18 @@ public static class Scene
 
     public static CCSTreeNode InitCCSFile(CCSFile file)
     {
-        if (file != null && file.Init())
+        if (file == null)
         {
-            CCSFileList.Add(file);
-            return file.ToNode();
+            return null;
         }
-        return null;
+
+        if (!file.Init())
+        {
+            return null;
+        }
+
+        CCSFileList.Add(file);
+        return file.ToNode();
     }
 
     public static bool UnloadCCSFile(CCSFile file)
