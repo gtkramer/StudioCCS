@@ -80,6 +80,17 @@ public static class Scene
     public static float MovementSpeed = 0.0025f;
     public static float DeltaTime = 1.0f;
 
+    // Both zoom and pan scale their step by the camera's current distance so the
+    // move is a constant *fraction* of the on-screen view instead of a constant
+    // absolute amount. For zoom that turns the additive step into a multiplicative
+    // one (Distance += step*(Distance/Ref) == Distance *= (1 + step/Ref)), keeping
+    // the perceived zoom rate flat as you pull out; for pan it just grows the
+    // target step with distance so far-out panning doesn't crawl. Without it a
+    // move is ~1% of the view at Distance 10 but only ~0.1% at Distance 100. Ref
+    // is the default framing distance, so the long-tuned feel near it is unchanged;
+    // raising Ref softens the acceleration, lowering it makes it ramp harder.
+    public static float CameraDistanceReference = 10.0f;
+
     //Keys we handle
     //TODO: Make these remappable?
     private static KeyStatus MoveForward = KeyStatus.Up;
@@ -324,6 +335,11 @@ public static class Scene
         ArcBallCamera curCamera = CurrentCamera();
         Vector3 CamTarget = curCamera.Target;
 
+        // Scale the pan step by distance for the same reason as zoom: hold the move
+        // to a constant fraction of the view so panning doesn't crawl when zoomed
+        // out (see CameraDistanceReference).
+        float moveStep = MovementSpeed * DeltaTime * (curCamera.Distance / CameraDistanceReference);
+
         //Check for Movement
         bool shiftMod = (ShiftModifier != KeyStatus.Up);
         if (!DefaultToAxisMovement)
@@ -377,33 +393,33 @@ public static class Scene
                 movement -= Vector3.UnitY;
             }
 
-            CamTarget += (movement * MovementSpeed * DeltaTime);
+            CamTarget += (movement * moveStep);
         }
         else
         {
             if (MoveForward != KeyStatus.Up)
             {
-                CamTarget.Z -= DeltaTime * MovementSpeed;
+                CamTarget.Z -= moveStep;
             }
             if (MoveBackward != KeyStatus.Up)
             {
-                CamTarget.Z += DeltaTime * MovementSpeed;
+                CamTarget.Z += moveStep;
             }
             if (MoveLeft != KeyStatus.Up)
             {
-                CamTarget.X -= DeltaTime * MovementSpeed;
+                CamTarget.X -= moveStep;
             }
             if (MoveRight != KeyStatus.Up)
             {
-                CamTarget.X += DeltaTime * MovementSpeed;
+                CamTarget.X += moveStep;
             }
             if (MoveUp != KeyStatus.Up)
             {
-                CamTarget.Y -= DeltaTime * MovementSpeed;
+                CamTarget.Y -= moveStep;
             }
             if (MoveDown != KeyStatus.Up)
             {
-                CamTarget.Y += DeltaTime * MovementSpeed;
+                CamTarget.Y += moveStep;
             }
         }
         curCamera.Target = CamTarget;
@@ -414,6 +430,10 @@ public static class Scene
         {
             distToZoom *= 0.25f;
         }
+
+        // Match the wheel: scale the step by distance so held +/- keeps a steady
+        // perceived rate instead of crawling once you're far out.
+        distToZoom *= curCamera.Distance / CameraDistanceReference;
 
         if (ZoomIn != KeyStatus.Up)
         {
@@ -774,6 +794,9 @@ public static class Scene
             distToZoom *= 0.25f;
         }
 
+        // Scale by current distance so the notch is a constant fraction of the
+        // view at any zoom level (see CameraDistanceReference).
+        distToZoom *= curCam.Distance / CameraDistanceReference;
         curCam.Distance += distToZoom;
 
     }
