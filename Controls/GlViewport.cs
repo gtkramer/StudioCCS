@@ -170,6 +170,8 @@ public class GlViewport : OpenGlControlBase
         }
 
         // Run queued GL work (file load/unload) now that the context is current.
+        // The whole queue is drained in this one frame, so however long this takes
+        // is exactly how long the render thread (and thus the UI) is blocked.
         while (_glJobs.TryDequeue(out var job))
         {
             try { job(); }
