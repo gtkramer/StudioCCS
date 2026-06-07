@@ -194,8 +194,15 @@ public partial class EditBoneWindow : Window
             return;
         }
 
-        OperatingClump.SavePose(file.Path.LocalPath);
-        Log.Info(string.Format("Saved pose for {0} to {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+        try
+        {
+            OperatingClump.SavePose(file.Path.LocalPath);
+            Log.Info(string.Format("Saved pose for {0} to {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(string.Format("Failed to save pose to {0}: {1}\n", file.Path.LocalPath, ex.Message));
+        }
     }
 
     private async void OnLoadPose(object sender, RoutedEventArgs e)
@@ -212,8 +219,15 @@ public partial class EditBoneWindow : Window
             return;
         }
 
-        OperatingClump.LoadPose(file.Path.LocalPath);
-        Log.Info(string.Format("Loaded pose for {0} from {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+        try
+        {
+            OperatingClump.LoadPose(file.Path.LocalPath);
+            Log.Info(string.Format("Loaded pose for {0} from {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(string.Format("Failed to load pose from {0}: {1}\n", file.Path.LocalPath, ex.Message));
+        }
     }
 
     private static IReadOnlyList<FilePickerFileType> PoseFileTypes()

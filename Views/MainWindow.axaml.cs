@@ -477,7 +477,14 @@ public partial class MainWindow : Window
         }
 
         var tmpClump = tag.File.GetObject<CCSClump>(tag.ObjectID);
-        tmpClump?.LoadMatrixList(file.Path.LocalPath);
+        try
+        {
+            tmpClump?.LoadMatrixList(file.Path.LocalPath);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(string.Format("Failed to load matrix from {0}: {1}\n", file.Path.LocalPath, ex.Message));
+        }
     }
 
     #endregion

@@ -869,6 +869,12 @@ public class CCSClump : CCSBaseObject
 
     public void LoadMatrixList(string fileName)
     {
+        // Parse into a local buffer first and commit to FinalMatrixList only once
+        // the whole file has read cleanly. A malformed or truncated file throws
+        // mid-loop; reading straight into the live array would leave it half
+        // overwritten (and rendered), so the all-or-nothing commit keeps the
+        // existing matrices intact on failure.
+        Matrix4[] loaded = new Matrix4[NodeCount];
         using (FileStream fs = new FileStream(fileName, FileMode.Open))
         {
             using (BinaryReader bs = new BinaryReader(fs))
@@ -882,38 +888,55 @@ public class CCSClump : CCSBaseObject
                     Vector4 v4 = new Vector4(bs.ReadSingle() * mScale, bs.ReadSingle() * mScale, bs.ReadSingle() * mScale, bs.ReadSingle());
                     Matrix4 derp = new Matrix4(v1, v2, v3, v4);
                     derp.Invert();
-                    FinalMatrixList[i] = derp;
+                    loaded[i] = derp;
                     //return new Matrix4(v1, v2, v3, v4)
                 }
             }
+        }
+
+        for (int i = 0; i < NodeCount; i++)
+        {
+            FinalMatrixList[i] = loaded[i];
         }
     }
 
     public void LoadPose(string fileName)
     {
+        // Parse into local buffers first and commit to the live pose/bind arrays
+        // only once the whole file has read cleanly. A malformed or truncated file
+        // throws mid-loop; reading straight into the live arrays would leave the
+        // pose half overwritten (and rendered), so the all-or-nothing commit keeps
+        // the existing pose intact on failure.
+        Vector3[] positions = new Vector3[NodeCount];
+        Vector3[] rotations = new Vector3[NodeCount];
+        Vector3[] scales = new Vector3[NodeCount];
         using (FileStream fs = new FileStream(fileName, FileMode.Open))
         {
             using (BinaryReader bs = new BinaryReader(fs))
             {
                 for (int i = 0; i < NodeCount; i++)
                 {
-                    Vector3 p = new Vector3(bs.ReadSingle(), bs.ReadSingle(), bs.ReadSingle());
-                    Vector3 r = new Vector3(bs.ReadSingle(), bs.ReadSingle(), bs.ReadSingle());
-                    Vector3 s = new Vector3(bs.ReadSingle(), bs.ReadSingle(), bs.ReadSingle());
-
-                    if (ParentFile.GetVersion() == CCSFileHeader.CCSVersion.Gen1)
-                    {
-                        PosePositions[i] = p;
-                        PoseRotations[i] = r;
-                        PoseScales[i] = s;
-                    }
-                    else
-                    {
-                        BindPositions[i] = p;
-                        BindRotations[i] = r;
-                        BindScales[i] = s;
-                    }
+                    positions[i] = new Vector3(bs.ReadSingle(), bs.ReadSingle(), bs.ReadSingle());
+                    rotations[i] = new Vector3(bs.ReadSingle(), bs.ReadSingle(), bs.ReadSingle());
+                    scales[i] = new Vector3(bs.ReadSingle(), bs.ReadSingle(), bs.ReadSingle());
                 }
+            }
+        }
+
+        bool gen1 = ParentFile.GetVersion() == CCSFileHeader.CCSVersion.Gen1;
+        for (int i = 0; i < NodeCount; i++)
+        {
+            if (gen1)
+            {
+                PosePositions[i] = positions[i];
+                PoseRotations[i] = rotations[i];
+                PoseScales[i] = scales[i];
+            }
+            else
+            {
+                BindPositions[i] = positions[i];
+                BindRotations[i] = rotations[i];
+                BindScales[i] = scales[i];
             }
         }
     }
