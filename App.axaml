@@ -9,7 +9,18 @@
             <!-- Status-bar palette, keyed by theme variant so the Mode/Camera bars
                  track the OS light/dark setting (DynamicResource re-resolves these
                  live on a theme switch). The Dark values preserve the original look;
-                 the Light values are tuned to sit against a light UI. -->
+                 the Light values are tuned to sit against a light UI.
+
+                 The Log* keys are the log panel's own theme-aware palette. It is
+                 deliberately separate from the console's fixed LogPalette: a
+                 terminal is virtually always dark, but the panel sits in a themed
+                 window, so its neutral text and severity hues must flip with the
+                 theme (light-grey "info" text is invisible on a light panel, and
+                 the bright orange/red read poorly there too). Dark mirrors the
+                 console colours exactly, so dark mode is unchanged; Light uses
+                 darker text and deeper amber/red. The panel's *background* reuses
+                 StatusBarBackground so it matches the bars above and below it by
+                 construction. -->
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="StatusBarBackground" Color="#202020" />
@@ -17,6 +28,9 @@
                     <SolidColorBrush x:Key="StatusBarLabel" Color="#808890" />
                     <SolidColorBrush x:Key="StatusBarValue" Color="#E0E0E0" />
                     <SolidColorBrush x:Key="StatusBarMono" Color="#B0B8C0" />
+                    <SolidColorBrush x:Key="LogForeground" Color="#DCDCDC" />
+                    <SolidColorBrush x:Key="LogWarn" Color="#FFA500" />
+                    <SolidColorBrush x:Key="LogError" Color="#FF5555" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="StatusBarBackground" Color="#ECECEC" />
@@ -24,6 +38,9 @@
                     <SolidColorBrush x:Key="StatusBarLabel" Color="#5A6168" />
                     <SolidColorBrush x:Key="StatusBarValue" Color="#202428" />
                     <SolidColorBrush x:Key="StatusBarMono" Color="#384048" />
+                    <SolidColorBrush x:Key="LogForeground" Color="#202428" />
+                    <SolidColorBrush x:Key="LogWarn" Color="#B35900" />
+                    <SolidColorBrush x:Key="LogError" Color="#C42B1C" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 

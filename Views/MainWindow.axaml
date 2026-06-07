@@ -173,16 +173,20 @@
 
             <!-- Log console: one colour-coded line per log call, mirroring stdout.
                  A virtualizing ListBox keeps it responsive under heavy logging.
-                 The dark background is fixed (not theme-dependent) so the severity
-                 colours stay legible regardless of the OS light/dark setting. -->
-            <!-- AutoScrollToSelectedItem is off: with thousands of lines its
-                 forced ScrollIntoView during a layout reflow (e.g. switching to
-                 the All view) trips an "Invalid Arrange rectangle" crash inside
-                 Avalonia's VirtualizingStackPanel. We scroll to the newest line
-                 ourselves in FlushLogs (guarded), so this behaviour isn't needed. -->
+                 Background reuses StatusBarBackground so the panel matches the
+                 bars above and below the viewport; the severity colours come from
+                 the theme-aware Log* resources (see App.axaml). The code-behind
+                 tails the view to the newest line by setting the ScrollViewer
+                 offset (never ScrollIntoView), so there is no forced layout pass
+                 to crash under heavy logging.
+
+                 AutoScrollToSelectedItem is off by design: in a log you click a
+                 line to read or copy it, and the view jerking to re-centre that
+                 line would be hostile. (It also happens to keep selection off the
+                 ScrollIntoView path entirely.) -->
             <ListBox Grid.Row="2"
                      Name="logView"
-                     Background="#1E1E1E"
+                     Background="{DynamicResource StatusBarBackground}"
                      FontFamily="monospace"
                      FontSize="11"
                      SelectionMode="Multiple"
@@ -194,15 +198,31 @@
                         <Setter Property="Padding" Value="4,0" />
                         <Setter Property="MinHeight" Value="0" />
                     </Style>
+                    <!-- The tag's colour is its severity. Default is the neutral
+                         LogForeground (info/trace/debug); the warn/error classes,
+                         toggled per line by LogLine.IsWarn/IsError, override it.
+                         No local Foreground is set on the tag so these style
+                         setters win, and they use DynamicResource so a theme
+                         switch recolours every line live. -->
+                    <Style Selector="TextBlock.tag">
+                        <Setter Property="Foreground" Value="{DynamicResource LogForeground}" />
+                    </Style>
+                    <Style Selector="TextBlock.tag.warn">
+                        <Setter Property="Foreground" Value="{DynamicResource LogWarn}" />
+                    </Style>
+                    <Style Selector="TextBlock.tag.error">
+                        <Setter Property="Foreground" Value="{DynamicResource LogError}" />
+                    </Style>
                 </ListBox.Styles>
                 <ListBox.ItemTemplate>
                     <!-- Only the severity tag is coloured; ": " and the message are
-                         a neutral light grey, mirroring the console. -->
+                         the neutral LogForeground, mirroring the console. -->
                     <DataTemplate x:DataType="views:LogLine">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Tag}" Foreground="{Binding TagBrush}" TextWrapping="NoWrap" />
-                            <TextBlock Text=": " Foreground="#DCDCDC" />
-                            <TextBlock Text="{Binding Message}" Foreground="#DCDCDC" TextWrapping="NoWrap" />
+                            <TextBlock Classes="tag" Classes.warn="{Binding IsWarn}" Classes.error="{Binding IsError}"
+                                       Text="{Binding Tag}" TextWrapping="NoWrap" />
+                            <TextBlock Text=": " Foreground="{DynamicResource LogForeground}" />
+                            <TextBlock Text="{Binding Message}" Foreground="{DynamicResource LogForeground}" TextWrapping="NoWrap" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

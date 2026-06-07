@@ -1,13 +1,12 @@
 using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using OpenTK.Mathematics;
@@ -25,21 +24,17 @@ public partial class MainWindow : Window
     private readonly MainViewModel _vm = new MainViewModel();
     private readonly DispatcherTimer _statusTimer;
 
-    // The log panel's backing store. Capped so a heavy parse can't grow it
-    // without bound; oldest lines are dropped first. Touched only on the UI
-    // thread (AppendLog marshals there first).
-    private readonly ObservableCollection<LogLine> _logLines = new();
-    private readonly Dictionary<uint, IBrush> _brushCache = new();
-    private const int MaxLogLines = 2000;
+    // The log panel's backing store. Owns the line buffer and the thread-safe,
+    // coalesced hand-off from the (many) logging threads to the UI thread — every
+    // threading concern about the panel lives in LogConsoleModel, not here.
+    private readonly LogConsoleModel _log = new LogConsoleModel();
 
-    // Incoming lines are buffered here and flushed to _logLines in batches.
-    // Logging can burst thousands of lines during a parse; touching the ListBox
-    // once per line (a dispatcher post, a CollectionChanged, and a layout-forcing
-    // ScrollIntoView each) floods the UI thread and is what kills performance.
-    // Batching collapses each burst into a single UI update. The queue is the
-    // hand-off point between the producing threads and the UI thread.
-    private readonly ConcurrentQueue<(string Tag, string Message, System.Drawing.Color Color)> _pendingLogs = new();
-    private int _logFlushQueued;
+    // The log ListBox's inner ScrollViewer, resolved once its template is applied
+    // (see HookLogScroll). We tail it to the newest line ourselves by setting its
+    // offset; _logPinnedToBottom records whether the user is parked at the bottom
+    // (so we keep tailing) or has scrolled up to read (so we leave them be).
+    private ScrollViewer _logScroll;
+    private bool _logPinnedToBottom = true;
 
     public MainWindow() : this(null)
     {
@@ -50,16 +45,21 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = _vm;
 
-        logView.ItemsSource = _logLines;
+        logView.ItemsSource = _log.Lines;
 
         // Configure logging: the framework owns levels/filtering and the stdout
-        // sink; our custom provider routes to the log panel (marshalled onto the
-        // UI thread by AppendLog).
+        // sink; our custom provider routes to the log panel. _log.Append is
+        // thread-safe and marshals onto the UI thread itself, so the provider can
+        // hand it lines from any thread.
         Log.Init(b => b
             .SetMinimumLevel(LogLevel.Information)
             .AddConsole(o => o.FormatterName = CompactConsoleFormatter.FormatterName)
             .AddConsoleFormatter<CompactConsoleFormatter, ConsoleFormatterOptions>()
-            .AddProvider(new PanelLoggerProvider(AppendLog)));
+            .AddProvider(new PanelLoggerProvider(_log.Append)));
+
+        // The log ListBox's ScrollViewer only exists once the control is
+        // templated and attached, so wire our auto-tail after the window loads.
+        Loaded += (_, _) => HookLogScroll();
 
         // Let a whole tree row toggle expand/collapse, not just the chevron.
         ccsTree.Tapped += TreeViewExpand.ToggleOnTap;
@@ -123,75 +123,74 @@ public partial class MainWindow : Window
         }
     }
 
-    #region Logging
+    #region Log panel auto-scroll
 
-    private void AppendLog(string tag, string message, System.Drawing.Color color)
+    // The log "tails" the newest line like a terminal: as lines arrive we keep
+    // the view pinned to the bottom, unless the user has scrolled up to read
+    // something — then we leave the view put until they scroll back down. We do
+    // this by setting the ScrollViewer's offset, never via ScrollIntoView: that
+    // method forces a synchronous layout pass through the virtualizing panel,
+    // which is what used to throw "Invalid Arrange rectangle" and (once that was
+    // swallowed) leave the tail rows arranged on top of each other. Setting the
+    // offset is a plain property change the panel resolves on its normal layout
+    // pass, so the whole class of crash/corruption is gone, not suppressed.
+
+    // Resolves the ListBox's inner ScrollViewer and subscribes once the template
+    // is applied. Auto-tail simply no-ops if it can't be found, so a template
+    // change can never turn this into a crash.
+    private void HookLogScroll()
     {
-        // Called from any thread (often the background parse thread). Buffer the
-        // line and ensure exactly one flush is queued onto the UI thread, where
-        // it drains everything accumulated so far in a single pass. Posting at
-        // Background priority lets a burst coalesce instead of posting per line.
-        // (stdout is handled separately by the framework's console provider.)
-        _pendingLogs.Enqueue((tag, message, color));
-        if (Interlocked.Exchange(ref _logFlushQueued, 1) == 0)
-        {
-            Dispatcher.UIThread.Post(FlushLogs, DispatcherPriority.Background);
-        }
-    }
-
-    // Drains every buffered line into the panel in one batch: a single
-    // CollectionChanged storm the ListBox can absorb, one trim, and one scroll.
-    private void FlushLogs()
-    {
-        // Reset the flag *before* draining: any line enqueued from here on queues
-        // a fresh flush, while lines already enqueued are guaranteed to be drained
-        // by the loop below. This is what makes the lock-free hand-off lossless.
-        Interlocked.Exchange(ref _logFlushQueued, 0);
-
-        LogLine last = null;
-        while (_pendingLogs.TryDequeue(out var pending))
-        {
-            last = new LogLine(pending.Tag, pending.Message, BrushFor(pending.Color));
-            _logLines.Add(last);
-        }
-
-        if (last is null)
+        if (_logScroll != null)
         {
             return;
         }
 
-        // Cap the panel so a heavy parse can't grow it without bound; drop the
-        // oldest lines first.
-        for (int over = _logLines.Count - MaxLogLines; over > 0; over--)
+        _logScroll = logView.FindDescendantOfType<ScrollViewer>();
+        if (_logScroll == null)
         {
-            _logLines.RemoveAt(0);
+            return;
         }
 
-        // ScrollIntoView forces a synchronous layout pass, which can throw
-        // "Invalid Arrange rectangle" from the virtualizing panel when the list
-        // is churning hard (a heavy parse flushing back-to-back batches). The
-        // auto-scroll is cosmetic, so never let a transient layout state abort
-        // the app over it; skipping one scroll is harmless.
-        try
+        _logScroll.ScrollChanged += OnLogScrollChanged;
+        _logScroll.LayoutUpdated += OnLogLayoutUpdated;
+    }
+
+    // Re-evaluate the pin only on a genuine offset move (the user scrolling, or
+    // our own tail). A flushed batch grows the extent without moving the offset,
+    // so excluding extent-only changes here is what stops newly-arrived lines
+    // from being mistaken for the user scrolling away and unpinning us.
+    private void OnLogScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (e.OffsetDelta.Y != 0)
         {
-            logView.ScrollIntoView(last);
-        }
-        catch (InvalidOperationException)
-        {
+            _logPinnedToBottom = IsLogAtBottom();
         }
     }
 
-    // The tag colour comes from the logging provider as System.Drawing.Color;
-    // cache the Avalonia brushes since only a handful of distinct colours occur.
-    private IBrush BrushFor(System.Drawing.Color c)
+    // After any layout that grew the extent (e.g. a flushed batch added lines),
+    // glue the view back to the newest line — but only while pinned, so a user
+    // who has scrolled up keeps their place. The guard makes this a cheap no-op
+    // on the layout passes where nothing moved the bottom.
+    private void OnLogLayoutUpdated(object sender, EventArgs e)
     {
-        uint key = (uint)c.ToArgb();
-        if (!_brushCache.TryGetValue(key, out var brush))
+        if (!_logPinnedToBottom || _logScroll == null)
         {
-            brush = new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
-            _brushCache[key] = brush;
+            return;
         }
-        return brush;
+
+        double maxY = Math.Max(0, _logScroll.Extent.Height - _logScroll.Viewport.Height);
+        if (Math.Abs(_logScroll.Offset.Y - maxY) > 0.5)
+        {
+            _logScroll.Offset = new Vector(_logScroll.Offset.X, maxY);
+        }
+    }
+
+    // "At the bottom" with a one-pixel tolerance so sub-pixel rounding on the
+    // last row doesn't read as scrolled-up.
+    private bool IsLogAtBottom()
+    {
+        double maxY = _logScroll.Extent.Height - _logScroll.Viewport.Height;
+        return _logScroll.Offset.Y >= maxY - 1.0;
     }
 
     #endregion

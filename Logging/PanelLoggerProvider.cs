@@ -1,20 +1,20 @@
-using System.Drawing;
 using Microsoft.Extensions.Logging;
 
 namespace StudioCCS.Logging;
 
 /// <summary>
 /// A logging provider that routes log lines to the in-app log panel. Each line
-/// is handed to the sink as (tag, message, tagColour) so the panel can colour
-/// just the severity tag — matching the console — while the colour itself comes
-/// from the shared <see cref="LogPalette"/>. The sink is expected to marshal
-/// onto the UI thread (see MainWindow.AppendLog).
+/// is handed to the sink as (level, message); the panel derives the tag and its
+/// colour from the level itself (the tag via <see cref="LogLevelTag"/>, the
+/// colour from the theme so it tracks light/dark). The sink is expected to
+/// marshal onto the UI thread — see <c>LogConsoleModel.Append</c>, which is
+/// safe to call from any thread.
 /// </summary>
 public sealed class PanelLoggerProvider : ILoggerProvider
 {
     private readonly PanelLogger _logger;
 
-    public PanelLoggerProvider(Action<string, string, Color> sink)
+    public PanelLoggerProvider(Action<LogLevel, string> sink)
     {
         _logger = new PanelLogger(sink);
     }
@@ -28,9 +28,9 @@ public sealed class PanelLoggerProvider : ILoggerProvider
 
     private sealed class PanelLogger : ILogger
     {
-        private readonly Action<string, string, Color> _sink;
+        private readonly Action<LogLevel, string> _sink;
 
-        public PanelLogger(Action<string, string, Color> sink)
+        public PanelLogger(Action<LogLevel, string> sink)
         {
             _sink = sink;
         }
@@ -59,13 +59,7 @@ public sealed class PanelLoggerProvider : ILoggerProvider
                 return;
             }
 
-            _sink(LogLevelTag.Of(logLevel), text, ColorFor(logLevel));
-        }
-
-        private static Color ColorFor(LogLevel level)
-        {
-            var (r, g, b) = LogPalette.Of(level);
-            return Color.FromArgb(255, r, g, b);
+            _sink(logLevel, text);
         }
     }
 }
