@@ -7,6 +7,7 @@ using OpenTK.Mathematics;
 using StudioCCS.FileFormat;
 using StudioCCS.FileFormat.Geometry;
 using StudioCCS.Logging;
+using StudioCCS.Rendering;
 
 namespace StudioCCS.Views;
 
@@ -72,6 +73,7 @@ public partial class EditBoneWindow : Window
         treeBones.ItemsSource = roots;
 
         Title = string.Format("Edit Bones for {0}...", OperatingFile.GetSubObjectName(OperatingClump.ObjectID));
+        Scene.RequestRedraw();
     }
 
     private void OnUpdateClick(object sender, RoutedEventArgs e)
@@ -114,6 +116,8 @@ public partial class EditBoneWindow : Window
                 }
             }
         }
+
+        Scene.RequestRedraw();
     }
 
     private void OnBoneSelected(object sender, SelectionChangedEventArgs e)
@@ -150,6 +154,7 @@ public partial class EditBoneWindow : Window
         txtScaleZ.Text = tmpScale.Z.ToString();
 
         lblBoneName.Text = OperatingFile.GetSubObjectName(OperatingObject.ObjectID);
+        Scene.RequestRedraw();
     }
 
     private void OnClearRotation(object sender, RoutedEventArgs e)
@@ -166,6 +171,8 @@ public partial class EditBoneWindow : Window
                 OperatingClump.PoseQuats[i] = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
             }
         }
+
+        Scene.RequestRedraw();
     }
 
     private void OnClearScale(object sender, RoutedEventArgs e)
@@ -175,6 +182,8 @@ public partial class EditBoneWindow : Window
             OperatingClump.BindScales[i] = Vector3.One;
             OperatingClump.PoseScales[i] = Vector3.One;
         }
+
+        Scene.RequestRedraw();
     }
 
     private async void OnSavePose(object sender, RoutedEventArgs e)
@@ -219,6 +228,7 @@ public partial class EditBoneWindow : Window
         {
             OperatingClump.LoadPose(file.Path.LocalPath);
             Log.Info(string.Format("Loaded pose for {0} from {1}.\n", OperatingFile.GetSubObjectName(OperatingClump.ObjectID), file.Path.LocalPath));
+            Scene.RequestRedraw();
         }
         catch (Exception ex)
         {
@@ -238,6 +248,7 @@ public partial class EditBoneWindow : Window
         {
             OperatingClump.RenderBones = false;
             OperatingClump.SelectedBoneID = -1;
+            Scene.RequestRedraw();
         }
     }
 }

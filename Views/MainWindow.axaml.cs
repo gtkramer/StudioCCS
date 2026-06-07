@@ -72,6 +72,13 @@ public partial class MainWindow : Window
         ActualThemeVariantChanged += (_, _) => ApplyViewportTheme();
         ApplyViewportTheme();
 
+        // A KeyUp only reaches the focused control, so a camera key held while the
+        // window loses activation (switching windows, alt-tab) would never be
+        // released and would strand the render loop in continuous redraw. Drop all
+        // held keys on deactivation; the viewport Border does the same on LostFocus
+        // for focus moves within the window.
+        Deactivated += (_, _) => Scene.ReleaseAllCameraKeys();
+
         // Drag & drop CCS files onto the window.
         DragDrop.SetAllowDrop(this, true);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
@@ -92,6 +99,15 @@ public partial class MainWindow : Window
             {
                 ApplyModeLayout(_vm.Mode);
             }
+
+            // Wake the viewport for any view-model change. Everything here is
+            // either render-affecting (a View-menu toggle, the mode, a
+            // write-through option) or a status string that only fires while
+            // something is already happening - the camera readout changes only as
+            // the camera moves, the load counters only during a load - and all of
+            // those are silent at rest. So a blanket redraw is safe and means no
+            // option toggle can be forgotten. (See Scene's render-on-demand.)
+            Scene.RequestRedraw();
         };
         ApplyModeLayout(_vm.Mode);
 
@@ -121,6 +137,8 @@ public partial class MainWindow : Window
             Scene.BackgroundColor = new Vector4(0.86f, 0.86f, 0.86f, 1.0f);
             Scene.GridColor = new Vector4(0.62f, 0.62f, 0.62f, 1.0f);
         }
+
+        Scene.RequestRedraw();
     }
 
     #region Log panel auto-scroll
@@ -328,6 +346,8 @@ public partial class MainWindow : Window
                 tmpAnime.CurrentFrame = 0;
             }
         }
+
+        Scene.RequestRedraw();
     }
 
     private void OnCCSTreeContextRequested(object sender, ContextRequestedEventArgs e)
@@ -419,6 +439,7 @@ public partial class MainWindow : Window
                 {
                     var tmpAnime = tag.File.GetObject<CCSAnime>(tag.ObjectID);
                     tmpAnime?.FrameForward();
+                    Scene.RequestRedraw();
                 }));
         }
 
@@ -485,6 +506,8 @@ public partial class MainWindow : Window
         {
             Log.Error(string.Format("Failed to load matrix from {0}: {1}\n", file.Path.LocalPath, ex.Message));
         }
+
+        Scene.RequestRedraw();
     }
 
     #endregion
@@ -607,6 +630,14 @@ public partial class MainWindow : Window
     private void OnViewportKeyUp(object sender, KeyEventArgs e)
     {
         Scene.KeyRelease(MapCameraKey(e.Key), e.KeyModifiers.HasFlag(KeyModifiers.Shift), e.KeyModifiers.HasFlag(KeyModifiers.Control));
+    }
+
+    private void OnViewportLostFocus(object sender, RoutedEventArgs e)
+    {
+        // Focus moved off the viewport (e.g. to the tree), so its KeyUp events stop
+        // arriving; release any held camera keys so the render loop can return to
+        // idle rather than spinning on a key that will never report up.
+        Scene.ReleaseAllCameraKeys();
     }
 
     private static Scene.CameraKey MapCameraKey(Key k)

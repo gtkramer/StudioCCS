@@ -64,6 +64,18 @@ public class GlViewport : OpenGlControlBase
     // the rest of a 60fps (16.7ms) frame for Scene.Render.
     private const double GlJobBudgetMs = 8.0;
 
+    public GlViewport()
+    {
+        // Render on demand (see Scene's render-on-demand region): wake the loop
+        // when our visible area changes (resize/layout) and whenever any code
+        // requests a redraw via Scene.RequestRedraw. The Scene subscription is
+        // tied to visual-tree lifetime so the static event never outlives the
+        // control.
+        EffectiveViewportChanged += (_, _) => WakeRenderLoop();
+        AttachedToVisualTree += (_, _) => Scene.RedrawRequested += WakeRenderLoop;
+        DetachedFromVisualTree += (_, _) => Scene.RedrawRequested -= WakeRenderLoop;
+    }
+
     /// <summary>
     /// Queues an action to run inside the next render callback with the GL
     /// context current. Safe to call from any thread (e.g. a background parse
@@ -72,6 +84,15 @@ public class GlViewport : OpenGlControlBase
     public void EnqueueGlJob(Action job)
     {
         _glJobs.Enqueue(job);
+        WakeRenderLoop();
+    }
+
+    // Schedules a single render frame, marshalling onto the UI thread when called
+    // from elsewhere. This is the one place that pokes Avalonia's render callback
+    // awake: it backs EnqueueGlJob, the Scene.RedrawRequested subscription, and
+    // the viewport-size hook, so every redraw request funnels through here.
+    private void WakeRenderLoop()
+    {
         if (Dispatcher.UIThread.CheckAccess())
         {
             RequestNextFrameRendering();
@@ -199,7 +220,15 @@ public class GlViewport : OpenGlControlBase
 
         Scene.Render();
 
-        // Continuous redraw loop (replaces the old WinForms render timer).
-        RequestNextFrameRendering();
+        // Render on demand: re-arm only while there's a reason to keep drawing -
+        // GL jobs still queued (a load batch draining across frames) or the scene
+        // is live (a held camera key or a playing animation). Otherwise the loop
+        // idles here until the next RequestRedraw wakes it, so a static view at
+        // rest costs nothing. Replaces the old unconditional re-arm that pinned
+        // the loop at the display refresh rate forever.
+        if (!_glJobs.IsEmpty || Scene.WantsContinuousRender())
+        {
+            RequestNextFrameRendering();
+        }
     }
 }

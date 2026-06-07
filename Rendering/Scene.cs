@@ -80,6 +80,14 @@ public static class Scene
     public static float MovementSpeed = 0.0025f;
     public static float DeltaTime = 1.0f;
 
+    // Upper bound for DeltaTime (ms). Render-on-demand (and the export render
+    // suspend) can leave the viewport idle for arbitrarily long between frames,
+    // so the measured gap can be seconds. Camera motion and animation stepping
+    // scale by DeltaTime, so clamping keeps the first frame after a long idle to
+    // a small step instead of a teleport, while still tracking real time for
+    // ordinary (even moderately slow) frames.
+    private const float MaxDeltaTime = 100.0f;
+
     // Both zoom and pan scale their step by the camera's current distance so the
     // move is a constant *fraction* of the on-screen view instead of a constant
     // absolute amount. For zoom that turns the additive step into a multiplicative
@@ -475,6 +483,13 @@ public static class Scene
         Timer.Reset();
         Timer.Start();
 
+        // Bound the first frame after a long idle/suspend so delta-scaled camera
+        // motion steps once, not by the whole elapsed gap (which would lurch).
+        if (DeltaTime > MaxDeltaTime)
+        {
+            DeltaTime = MaxDeltaTime;
+        }
+
         //Handle Keyboard input
         HandleInput();
         ArcBallCamera curCamera = CurrentCamera();
@@ -757,6 +772,7 @@ public static class Scene
             // Pitch (Y) is inverted from the original: dragging up tilts the
             // far end of the scene down, and dragging down tilts it up.
             curCam.Rotation = new Vector3(camRot.X + dXm, camRot.Y - dYm, 0.0f);
+            RequestRedraw();
             //}
 
             //else
@@ -798,7 +814,7 @@ public static class Scene
         // view at any zoom level (see CameraDistanceReference).
         distToZoom *= curCam.Distance / CameraDistanceReference;
         curCam.Distance += distToZoom;
-
+        RequestRedraw();
     }
 
     public static void KeyPress(CameraKey key, bool shift, bool control)
@@ -850,6 +866,8 @@ public static class Scene
         {
             ControlModifier = (ControlModifier == KeyStatus.Pressed) ? KeyStatus.Repeated : KeyStatus.Pressed;
         }
+
+        RequestRedraw();
     }
 
     public static void KeyRelease(CameraKey key, bool shift, bool control)
@@ -896,8 +914,106 @@ public static class Scene
         {
             ControlModifier = KeyStatus.Up;
         }
+
+        RequestRedraw();
     }
 
+    /// <summary>
+    /// Forces every camera movement/zoom key (and the shift/control modifiers)
+    /// back to the released state. A KeyUp is only delivered to the focused
+    /// control, so a key held while the viewport loses focus (clicking another
+    /// control, switching windows, alt-tab) would otherwise stay logically down
+    /// forever - keeping WantsContinuousRender() true and the render loop spinning
+    /// instead of idling. Wired to viewport focus loss / window deactivation.
+    /// </summary>
+    public static void ReleaseAllCameraKeys()
+    {
+        MoveForward = KeyStatus.Up;
+        MoveBackward = KeyStatus.Up;
+        MoveLeft = KeyStatus.Up;
+        MoveRight = KeyStatus.Up;
+        MoveUp = KeyStatus.Up;
+        MoveDown = KeyStatus.Up;
+        ZoomIn = KeyStatus.Up;
+        ZoomOut = KeyStatus.Up;
+        ShiftModifier = KeyStatus.Up;
+        ControlModifier = KeyStatus.Up;
+
+        RequestRedraw();
+    }
+
+
+    #region Render-on-demand
+
+    // The viewport renders on demand rather than in a constant loop. Anything that
+    // changes how the scene should look calls RequestRedraw() to schedule a single
+    // frame; GlViewport subscribes to RedrawRequested and wakes its render
+    // callback. That callback then keeps drawing frames back-to-back only while
+    // WantsContinuousRender() is true (a held camera key or a playing animation),
+    // and otherwise idles until the next RequestRedraw - so a static view at rest
+    // costs nothing. Most triggers live at the mutation sites: the camera input
+    // methods and AddAnime/RemoveAnime raise it directly; discrete UI changes
+    // (render-option toggles, selection, theme, bone edits) raise it from their
+    // handlers.
+    public static event Action RedrawRequested;
+
+    /// <summary>Schedules a single viewport frame. A no-op if nothing is listening yet.</summary>
+    public static void RequestRedraw()
+    {
+        RedrawRequested?.Invoke();
+    }
+
+    /// <summary>
+    /// Whether the render loop should keep drawing without waiting for a new
+    /// RequestRedraw: true while a camera movement/zoom key is held (the view
+    /// pans/zooms every frame) or the current view advances an animation. Errs
+    /// toward true - a false positive is a wasted frame, a false negative is a
+    /// frozen viewport.
+    /// </summary>
+    public static bool WantsContinuousRender()
+    {
+        return IsCameraKeyHeld() || IsViewAnimating();
+    }
+
+    // Any held-key camera control down? Those drive motion in HandleInput every
+    // frame, so the view keeps changing until they are released.
+    private static bool IsCameraKeyHeld()
+    {
+        return MoveForward != KeyStatus.Up || MoveBackward != KeyStatus.Up
+            || MoveLeft != KeyStatus.Up || MoveRight != KeyStatus.Up
+            || MoveUp != KeyStatus.Up || MoveDown != KeyStatus.Up
+            || ZoomIn != KeyStatus.Up || ZoomOut != KeyStatus.Up;
+    }
+
+    // Does the current view advance an animation every frame? Mirrors the
+    // FrameForward calls in the render paths: a previewed object/model/anime and
+    // any active scene animation play; a previewed clump/texture and All mode are
+    // static. Deliberately broad (an ended animation still reports true) so this
+    // never under-reports and stalls a live view.
+    private static bool IsViewAnimating()
+    {
+        if (SceneDisplay == SceneMode.Preview)
+        {
+            if (SelectedPreviewItemTag == null)
+            {
+                return false;
+            }
+
+            int type = SelectedPreviewItemTag.ObjectType;
+            return type == CCSFile.SECTION_OBJECT
+                || type == CCSFile.SECTION_MODEL
+                || type == CCSFile.SECTION_ANIME;
+        }
+
+        if (SceneDisplay == SceneMode.Scene)
+        {
+            return ActiveAnimes.Count > 0;
+        }
+
+        return false;
+    }
+
+    #endregion
 
     public static ArcBallCamera CurrentCamera()
     {
@@ -974,11 +1090,13 @@ public static class Scene
             }
         }
         ActiveAnimes.Add(anime);
+        RequestRedraw();
     }
 
     public static void RemoveAnime(CCSAnime anime)
     {
         ActiveAnimes.RemoveAll(item => item == anime);
+        RequestRedraw();
     }
 
 }

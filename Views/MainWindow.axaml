@@ -162,7 +162,8 @@
                             PointerReleased="OnViewportPointerReleased"
                             PointerWheelChanged="OnViewportPointerWheel"
                             KeyDown="OnViewportKeyDown"
-                            KeyUp="OnViewportKeyUp">
+                            KeyUp="OnViewportKeyUp"
+                            LostFocus="OnViewportLostFocus">
                         <controls:GlViewport Name="glViewport" IsHitTestVisible="False" />
                     </Border>
                 </DockPanel>
