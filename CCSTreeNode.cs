@@ -15,6 +15,16 @@ public class CCSTreeNode
     public string Text { get; set; }
     public object Tag { get; set; }
     public Color ForeColor { get; set; } = Color.Empty;
+
+    /// <summary>
+    /// True when this node carries a non-default <see cref="ForeColor"/> — the
+    /// flag <c>Util.NonExistantNode</c> sets (red) to mark a dangling object
+    /// reference. Drives the shared tree template's <c>missingNode</c> style
+    /// class, restoring the red cue the WinForms ForeColor gave (now theme-aware
+    /// via the App's TreeNodeMissing brush).
+    /// </summary>
+    public bool IsMissing => !ForeColor.IsEmpty;
+
     public CCSTreeNodeCollection Nodes { get; } = new CCSTreeNodeCollection();
 
     public CCSTreeNode()

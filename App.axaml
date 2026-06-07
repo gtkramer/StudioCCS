@@ -31,6 +31,7 @@
                     <SolidColorBrush x:Key="LogForeground" Color="#DCDCDC" />
                     <SolidColorBrush x:Key="LogWarn" Color="#FFA500" />
                     <SolidColorBrush x:Key="LogError" Color="#FF5555" />
+                    <SolidColorBrush x:Key="TreeNodeMissing" Color="#FF5555" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="StatusBarBackground" Color="#ECECEC" />
@@ -41,19 +42,26 @@
                     <SolidColorBrush x:Key="LogForeground" Color="#202428" />
                     <SolidColorBrush x:Key="LogWarn" Color="#B35900" />
                     <SolidColorBrush x:Key="LogError" Color="#C42B1C" />
+                    <SolidColorBrush x:Key="TreeNodeMissing" Color="#C42B1C" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
             <!-- Shared template for every CCSTreeNode tree (CCS objects, scene
                  animations, clump bones). Recurses children via Nodes. -->
             <TreeDataTemplate x:Key="CCSNodeTemplate" x:DataType="ccs:CCSTreeNode" ItemsSource="{Binding Nodes}">
-                <TextBlock Text="{Binding Text}" />
+                <TextBlock Text="{Binding Text}" Classes.missingNode="{Binding IsMissing}" />
             </TreeDataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />
+        <!-- Dangling CCS object references (Util.NonExistantNode) render red so a
+             broken reference stands out in the tree, the way the original WinForms
+             ForeColor did. DynamicResource so the colour tracks the light/dark theme. -->
+        <Style Selector="TextBlock.missingNode">
+            <Setter Property="Foreground" Value="{DynamicResource TreeNodeMissing}" />
+        </Style>
     </Application.Styles>
 
 </Application>
