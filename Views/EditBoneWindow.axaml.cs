@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -70,7 +69,6 @@ public partial class EditBoneWindow : Window
             }
         }
 
-        Debug.WriteLine(string.Format("BoneTree has {0} root nodes...", roots.Count));
         treeBones.ItemsSource = roots;
 
         Title = string.Format("Edit Bones for {0}...", OperatingFile.GetSubObjectName(OperatingClump.ObjectID));
@@ -78,7 +76,6 @@ public partial class EditBoneWindow : Window
 
     private void OnUpdateClick(object sender, RoutedEventArgs e)
     {
-        float radTo = 0.0174533f;
         bool result = true;
         float[] vals = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
         for (int i = 0; i < _textBoxes.Count; i++)
@@ -98,7 +95,7 @@ public partial class EditBoneWindow : Window
         if (result)
         {
             Vector3 tmpPos = new Vector3(vals[0], vals[1], vals[2]);
-            Vector3 tmpRot = new Vector3(vals[3] * radTo, vals[4] * radTo, vals[5] * radTo);
+            Vector3 tmpRot = new Vector3(MathHelper.DegreesToRadians(vals[3]), MathHelper.DegreesToRadians(vals[4]), MathHelper.DegreesToRadians(vals[5]));
             Vector3 tmpScale = new Vector3(vals[6], vals[7], vals[8]);
 
             if (OperatingObject != null)
@@ -144,10 +141,9 @@ public partial class EditBoneWindow : Window
         txtPosY.Text = tmpPos.Y.ToString();
         txtPosZ.Text = tmpPos.Z.ToString();
 
-        float pi = 3.14159265f;
-        txtRotX.Text = (tmpRot.X * 180.0f / pi).ToString();
-        txtRotY.Text = (tmpRot.Y * 180.0f / pi).ToString();
-        txtRotZ.Text = (tmpRot.Z * 180.0f / pi).ToString();
+        txtRotX.Text = MathHelper.RadiansToDegrees(tmpRot.X).ToString();
+        txtRotY.Text = MathHelper.RadiansToDegrees(tmpRot.Y).ToString();
+        txtRotZ.Text = MathHelper.RadiansToDegrees(tmpRot.Z).ToString();
 
         txtScaleX.Text = tmpScale.X.ToString();
         txtScaleY.Text = tmpScale.Y.ToString();

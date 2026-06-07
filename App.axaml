@@ -27,7 +27,6 @@
                     <SolidColorBrush x:Key="StatusBarBorder" Color="#40808080" />
                     <SolidColorBrush x:Key="StatusBarLabel" Color="#808890" />
                     <SolidColorBrush x:Key="StatusBarValue" Color="#E0E0E0" />
-                    <SolidColorBrush x:Key="StatusBarMono" Color="#B0B8C0" />
                     <SolidColorBrush x:Key="LogForeground" Color="#DCDCDC" />
                     <SolidColorBrush x:Key="LogWarn" Color="#FFA500" />
                     <SolidColorBrush x:Key="LogError" Color="#FF5555" />
@@ -38,7 +37,6 @@
                     <SolidColorBrush x:Key="StatusBarBorder" Color="#40606060" />
                     <SolidColorBrush x:Key="StatusBarLabel" Color="#5A6168" />
                     <SolidColorBrush x:Key="StatusBarValue" Color="#202428" />
-                    <SolidColorBrush x:Key="StatusBarMono" Color="#384048" />
                     <SolidColorBrush x:Key="LogForeground" Color="#202428" />
                     <SolidColorBrush x:Key="LogWarn" Color="#B35900" />
                     <SolidColorBrush x:Key="LogError" Color="#C42B1C" />

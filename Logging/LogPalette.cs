@@ -3,12 +3,11 @@ using Microsoft.Extensions.Logging;
 namespace StudioCCS.Logging;
 
 /// <summary>
-/// Single source of truth for severity colours, shared by the console
-/// formatter and the panel provider so stdout and the in-app log view are
-/// always coloured identically. Defined as RGB: the console emits a 24-bit
-/// (truecolor) ANSI escape, the panel builds a brush from the same values.
-/// Tuned to read on a dark background (the panel fixes one; most terminals
-/// use one too).
+/// Severity colours for the console log output. The console emits a 24-bit
+/// (truecolor) ANSI escape built from these RGB values. The in-app log panel
+/// does NOT use these — it has its own theme-aware palette (the Log* brushes in
+/// App.axaml) so its colours flip with the light/dark setting, whereas a
+/// terminal is effectively always dark. Tuned to read on that dark background.
 /// </summary>
 internal static class LogPalette
 {

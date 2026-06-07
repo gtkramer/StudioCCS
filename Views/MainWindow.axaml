@@ -156,8 +156,7 @@
                          hit-test target, so it never receives pointer events. We catch
                          input on a transparent, focusable Border over it and forward to
                          Scene; the GL control is marked input-transparent. -->
-                    <Border Name="viewportHost"
-                            Background="Transparent" Focusable="True"
+                    <Border Background="Transparent" Focusable="True"
                             PointerPressed="OnViewportPointerPressed"
                             PointerMoved="OnViewportPointerMoved"
                             PointerReleased="OnViewportPointerReleased"
