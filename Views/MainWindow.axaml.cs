@@ -514,7 +514,7 @@ public partial class MainWindow : Window
         ExportToObjWindow dlg = new ExportToObjWindow();
         if (await dlg.ShowDialog<bool>(this))
         {
-            Scene.DumpToObj(dlg.ExportPath, dlg.ExportCollision, dlg.SplitSubModels, dlg.SplitCollision, dlg.WithNormals, dlg.ExportDummies, dlg.DumpAnime);
+            RunExport(() => Scene.DumpToObj(dlg.ExportPath, dlg.ExportCollision, dlg.SplitSubModels, dlg.SplitCollision, dlg.WithNormals, dlg.ExportDummies, dlg.DumpAnime));
         }
     }
 
@@ -524,7 +524,7 @@ public partial class MainWindow : Window
         dlg.ConfigureForSmd();
         if (await dlg.ShowDialog<bool>(this))
         {
-            Scene.DumpToSMD(dlg.ExportPath, dlg.WithNormals);
+            RunExport(() => Scene.DumpToSMD(dlg.ExportPath, dlg.WithNormals));
         }
     }
 
@@ -536,7 +536,26 @@ public partial class MainWindow : Window
         dlg.ConfigureForSmd();
         if (await dlg.ShowDialog<bool>(this))
         {
-            Scene.DumpPreviewToSMD(dlg.ExportPath, dlg.WithNormals);
+            RunExport(() => Scene.DumpPreviewToSMD(dlg.ExportPath, dlg.WithNormals));
+        }
+    }
+
+    // Runs a scene export, turning any I/O failure (bad path, permission denied,
+    // disk full) into a logged error instead of an unhandled exception that would
+    // crash the app on these async-void handlers. Deliberately synchronous on the
+    // UI thread: the dump mutates shared scene state - each clump's FrameForward
+    // advances and recomputes its pose - that the render loop reads every frame,
+    // so it must be serialized with rendering rather than raced against it on a
+    // background thread. The cost is a brief freeze on a large export.
+    private static void RunExport(Action export)
+    {
+        try
+        {
+            export();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(string.Format("Export failed: {0}\n", ex.Message));
         }
     }
 
