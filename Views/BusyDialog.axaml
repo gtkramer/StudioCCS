@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="StudioCCS.Views.BusyDialog"
+        Width="320" SizeToContent="Height"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowDecorations="BorderOnly"
+        WindowStartupLocation="CenterOwner"
+        Title="Working...">
+    <!-- Transient modal shown while a long operation (e.g. a scene export) runs
+         off the UI thread. It is modal on purpose: blocking the owner is what
+         stops menu/tree actions from mutating the scene mid-operation. The owner
+         clears it via BusyDialog.Close once AllowClose has been called; the user
+         cannot dismiss it (no decorations, OnClosing cancels). -->
+    <StackPanel Margin="20" Spacing="14">
+        <TextBlock Name="messageText" Text="Working..." HorizontalAlignment="Center" />
+        <ProgressBar IsIndeterminate="True" Height="6" />
+    </StackPanel>
+</Window>

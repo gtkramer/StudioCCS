@@ -537,7 +537,16 @@ public partial class MainWindow : Window
         ExportToObjWindow dlg = new ExportToObjWindow();
         if (await dlg.ShowDialog<bool>(this))
         {
-            RunExport(() => Scene.DumpToObj(dlg.ExportPath, dlg.ExportCollision, dlg.SplitSubModels, dlg.SplitCollision, dlg.WithNormals, dlg.ExportDummies, dlg.DumpAnime));
+            // Read the dialog's control-backed values here on the UI thread; the
+            // export runs on a background thread and must never touch its controls.
+            string path = dlg.ExportPath;
+            bool collision = dlg.ExportCollision;
+            bool splitSub = dlg.SplitSubModels;
+            bool splitCollision = dlg.SplitCollision;
+            bool normals = dlg.WithNormals;
+            bool dummies = dlg.ExportDummies;
+            bool anime = dlg.DumpAnime;
+            await RunExport("OBJ", () => Scene.DumpToObj(path, collision, splitSub, splitCollision, normals, dummies, anime));
         }
     }
 
@@ -547,7 +556,10 @@ public partial class MainWindow : Window
         dlg.ConfigureForSmd();
         if (await dlg.ShowDialog<bool>(this))
         {
-            RunExport(() => Scene.DumpToSMD(dlg.ExportPath, dlg.WithNormals));
+            // Snapshot the dialog's control values on the UI thread (see OnDumpObjClick).
+            string path = dlg.ExportPath;
+            bool normals = dlg.WithNormals;
+            await RunExport("SMD", () => Scene.DumpToSMD(path, normals));
         }
     }
 
@@ -559,26 +571,45 @@ public partial class MainWindow : Window
         dlg.ConfigureForSmd();
         if (await dlg.ShowDialog<bool>(this))
         {
-            RunExport(() => Scene.DumpPreviewToSMD(dlg.ExportPath, dlg.WithNormals));
+            // Snapshot the dialog's control values on the UI thread (see OnDumpObjClick).
+            string path = dlg.ExportPath;
+            bool normals = dlg.WithNormals;
+            await RunExport("preview SMD", () => Scene.DumpPreviewToSMD(path, normals));
         }
     }
 
-    // Runs a scene export, turning any I/O failure (bad path, permission denied,
-    // disk full) into a logged error instead of an unhandled exception that would
-    // crash the app on these async-void handlers. Deliberately synchronous on the
-    // UI thread: the dump mutates shared scene state - each clump's FrameForward
-    // advances and recomputes its pose - that the render loop reads every frame,
-    // so it must be serialized with rendering rather than raced against it on a
-    // background thread. The cost is a brief freeze on a large export.
-    private static void RunExport(Action export)
+    // Runs a scene export off the UI thread so a large export no longer freezes
+    // the app. The dump mutates shared scene state (each clump's FrameForward
+    // advances/recomputes its pose) that the render loop reads every frame, so for
+    // the duration we suspend rendering (glViewport skips all scene work) and put
+    // up a modal busy dialog. The modality is load-bearing, not just feedback: it
+    // blocks the menu/tree actions that would otherwise mutate the scene from the
+    // UI thread while the background export reads it. Any I/O failure is logged
+    // rather than crashing this async-void caller.
+    private async Task RunExport(string what, Action export)
     {
+        BusyDialog busy = new BusyDialog();
+        busy.SetMessage(string.Format("Exporting {0}...", what));
+
+        // Raise the guard and show the modal inside the try so the finally always
+        // clears the guard and closes the dialog - even if ShowDialog throws -
+        // rather than leaving the viewport suspended with no way to recover.
         try
         {
-            export();
+            Scene.ExportInProgress = true;
+            _ = busy.ShowDialog(this);
+            await Task.Run(export);
         }
         catch (Exception ex)
         {
             Log.Error(string.Format("Export failed: {0}\n", ex.Message));
+        }
+        finally
+        {
+            Scene.ExportInProgress = false;
+            Scene.RequestRedraw();
+            busy.AllowClose();
+            busy.Close();
         }
     }
 

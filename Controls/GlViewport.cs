@@ -187,6 +187,18 @@ public class GlViewport : OpenGlControlBase
             return;
         }
 
+        if (Scene.ExportInProgress)
+        {
+            // A long operation (a scene export) is touching scene state off the
+            // UI thread; skip all scene work this frame so we don't race it, and
+            // don't re-arm - it requests a redraw when it finishes. Clear to the
+            // scene background (a plain colour field, not the geometry the export
+            // reads) so the viewport behind the modal stays consistent.
+            GL.ClearColor(Scene.BackgroundColor.X, Scene.BackgroundColor.Y, Scene.BackgroundColor.Z, Scene.BackgroundColor.W);
+            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+            return;
+        }
+
         double scaling = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1.0;
         int pw = Math.Max(1, (int)(Bounds.Width * scaling));
         int ph = Math.Max(1, (int)(Bounds.Height * scaling));

@@ -76,8 +76,28 @@ public partial class EditBoneWindow : Window
         Scene.RequestRedraw();
     }
 
+    // Bone edits mutate the pose/bind arrays that a background scene export reads.
+    // The export's modal blocks MainWindow but not this separate, unowned window,
+    // so refuse edits while one runs - that's what actually keeps the two from
+    // racing. (See Scene.ExportInProgress.)
+    private static bool ExportBlocksEdit()
+    {
+        if (Scene.ExportInProgress)
+        {
+            Log.Warning("Ignored bone edit: a scene export is in progress.\n");
+            return true;
+        }
+
+        return false;
+    }
+
     private void OnUpdateClick(object sender, RoutedEventArgs e)
     {
+        if (ExportBlocksEdit())
+        {
+            return;
+        }
+
         bool result = true;
         float[] vals = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
         for (int i = 0; i < _textBoxes.Count; i++)
@@ -159,6 +179,11 @@ public partial class EditBoneWindow : Window
 
     private void OnClearRotation(object sender, RoutedEventArgs e)
     {
+        if (ExportBlocksEdit())
+        {
+            return;
+        }
+
         for (int i = 0; i < OperatingClump.NodeCount; i++)
         {
             if (OperatingFile.GetVersion() == CCSFileHeader.CCSVersion.Gen1)
@@ -177,6 +202,11 @@ public partial class EditBoneWindow : Window
 
     private void OnClearScale(object sender, RoutedEventArgs e)
     {
+        if (ExportBlocksEdit())
+        {
+            return;
+        }
+
         for (int i = 0; i < OperatingClump.NodeCount; i++)
         {
             OperatingClump.BindScales[i] = Vector3.One;
@@ -220,6 +250,11 @@ public partial class EditBoneWindow : Window
         });
         var file = files.FirstOrDefault();
         if (file == null)
+        {
+            return;
+        }
+
+        if (ExportBlocksEdit())
         {
             return;
         }

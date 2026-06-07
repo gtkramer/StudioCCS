@@ -112,6 +112,13 @@ public static class Scene
     private static KeyStatus ShiftModifier = KeyStatus.Up;
     private static KeyStatus ControlModifier = KeyStatus.Up;
 
+    // True while a scene export runs on a background thread. The render callback
+    // skips all scene work while it's set (so the loop can't race the export's
+    // FrameForward mutations), and the bone editor refuses edits - the one scene
+    // mutation path the export's modal dialog does not already block. Set and
+    // cleared by RunExport in MainWindow.
+    public static bool ExportInProgress = false;
+
     //Items We'll Render
     public static List<CCSFile> CCSFileList = new List<CCSFile>();
     public static List<CCSAnime> ActiveAnimes = new List<CCSAnime>();
