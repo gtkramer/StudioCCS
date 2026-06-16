@@ -343,7 +343,9 @@ public partial class CCSAnime : CCSBaseObject
                 var tmpObj = ParentFile.GetObject<CCSObject>(tmpExt.ReferencedObjectID);
                 if (tmpObj != null)
                 {
-                    tmpObj.ParentClump.BindMatrixList();
+                    // No BindMatrixList() here: DumpToSMD reads CPU-side data and
+                    // runs off the UI thread (no current GL context), so a GL
+                    // upload would segfault the process. See DumpToText.
                     tmpObj.ParentClump.DumpToSMD(outputPath, withNormals, ParentFile.TextureList, controllerCount);
                 }
             }
@@ -370,7 +372,10 @@ public partial class CCSAnime : CCSBaseObject
                     var tmpObj = ParentFile.GetObject<CCSObject>(tmpExt.ReferencedObjectID);
                     if (tmpObj != null)
                     {
-                        tmpObj.ParentClump.BindMatrixList();
+                        // No BindMatrixList() here: this is a CPU-side text dump
+                        // (DumpToText reads the controller's keyframe tracks) that
+                        // runs off the UI thread, where there is no current GL
+                        // context - a GL upload would segfault the process.
                         tmpController.DumpToText(outf, ref lastModelName, ref lastValue, i);
                     }
                 }
